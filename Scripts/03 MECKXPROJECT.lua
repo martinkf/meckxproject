@@ -1,4 +1,16 @@
 -- SCREEN SELECT MUSIC
+
+-- MUSIC WHEEL
+
+-- Y position is done through metrics.ini ([ScreenSelectMusic] > MusicWheelY)
+-- original is: SCREEN_CENTER_Y*1.68
+-- modified is: SCREEN_CENTER_Y*1.55
+
+-- YELLOW ARROW TO THE LEFT OF THE MUSIC WHEEL
+
+--YellowArrows_Y = SCREEN_CENTER_Y*1.66; --original
+YellowArrows_Y = SCREEN_CENTER_Y*1.55;
+
 -- DIFFICULTY LIST
 
 --DifficultyListOrbs_Y = SCREEN_CENTER_Y+124; --original

@@ -158,7 +158,7 @@ t[#t+1] =  Def.ActorFrame
 
 	LoadActor(THEME:GetPathG("","ScreenSelectMusic/ws_arrow_to_left"))..{
 		Name="MWARROW";
-		InitCommand=cmd(zoom,zoomArrowsBanner;y,SCREEN_CENTER_Y*1.66;x,SCREEN_CENTER_X-songwsx;diffusealpha,0.6;blend,'BlendMode_Add');
+		InitCommand=cmd(zoom,zoomArrowsBanner;y,YellowArrows_Y;x,SCREEN_CENTER_X-songwsx;diffusealpha,0.6;blend,'BlendMode_Add');
 		PreviousSongMessageCommand=cmd(stoptweening;linear,0.08;x,SCREEN_CENTER_X-(songwsx+10);linear,0.08;x,SCREEN_CENTER_X-songwsx);
 
 		--SelectChannelMessageCommand=cmd(linear,0.05;diffusealpha,0;y,SCREEN_CENTER_Y-40;linear,0.05;diffusealpha,0.4);
@@ -178,7 +178,7 @@ t[#t+1] =  Def.ActorFrame
 			songwsx = basesongwsx;
 			self:diffusealpha(0);
 			self:zoom(zoomArrowsBanner);			
-			self:y(SCREEN_CENTER_Y*1.66);
+			self:y(YellowArrows_Y);
 			self:x(SCREEN_CENTER_X-songwsx);
 			self:linear(0.1);
 			self:diffusealpha(0.6);
@@ -190,7 +190,7 @@ t[#t+1] =  Def.ActorFrame
 
 	LoadActor(THEME:GetPathG("","ScreenSelectMusic/ws_arrow_to_left"))..{
 		Name="MWARROW";
-		InitCommand=cmd(zoom,zoomArrowsBanner;y,SCREEN_CENTER_Y*1.66;x,SCREEN_CENTER_X-songwsx;diffusealpha,0.8);
+		InitCommand=cmd(zoom,zoomArrowsBanner;y,YellowArrows_Y;x,SCREEN_CENTER_X-songwsx;diffusealpha,0.8);
 		PreviousSongMessageCommand=cmd(stoptweening;linear,0.08;x,SCREEN_CENTER_X-(songwsx+10);linear,0.08;x,SCREEN_CENTER_X-songwsx);
 		SelectChannelMessageCommand=function(self)
 			songwsx = basegroupwx;
@@ -206,7 +206,7 @@ t[#t+1] =  Def.ActorFrame
 			songwsx = basesongwsx;
 			self:zoom(zoomArrowsBanner);
 			self:diffusealpha(0);
-			self:y(SCREEN_CENTER_Y*1.66);
+			self:y(YellowArrows_Y);
 			self:x(SCREEN_CENTER_X-songwsx);
 			self:sleep(0.05);
 			self:diffusealpha(0.8);
@@ -219,7 +219,7 @@ t[#t+1] =  Def.ActorFrame
 
  	LoadActor(THEME:GetPathG("","ScreenSelectMusic/ws_arrow_to_left"))..{
 		Name="MWARROW";
-		InitCommand=cmd(rotationz,180;zoom,zoomArrowsBanner;y,SCREEN_CENTER_Y*1.66;x,SCREEN_CENTER_X+songwsx;diffusealpha,0.6;blend,'BlendMode_Add');		
+		InitCommand=cmd(rotationz,180;zoom,zoomArrowsBanner;y,YellowArrows_Y;x,SCREEN_CENTER_X+songwsx;diffusealpha,0.6;blend,'BlendMode_Add');		
 		NextSongMessageCommand=cmd(stoptweening;linear,0.08;x,SCREEN_CENTER_X+(songwsx+10);linear,0.08;x,SCREEN_CENTER_X+songwsx);
 
 		--SelectChannelMessageCommand=cmd(linear,0.05;diffusealpha,0;y,SCREEN_CENTER_Y-40;linear,0.05;diffusealpha,0.4);
@@ -239,7 +239,7 @@ t[#t+1] =  Def.ActorFrame
 			songwsx = basesongwsx;
 			self:diffusealpha(0);
 			self:zoom(zoomArrowsBanner);
-			self:y(SCREEN_CENTER_Y*1.66);
+			self:y(YellowArrows_Y);
 			self:x(SCREEN_CENTER_X+songwsx);
 			self:linear(0.1);
 			self:diffusealpha(0.6);
@@ -251,7 +251,7 @@ t[#t+1] =  Def.ActorFrame
 
  	LoadActor(THEME:GetPathG("","ScreenSelectMusic/ws_arrow_to_left"))..{
 		Name="MWARROW";
-		InitCommand=cmd(rotationz,180;zoom,zoomArrowsBanner;y,SCREEN_CENTER_Y*1.66;x,SCREEN_CENTER_X+songwsx;diffusealpha,0.4);		
+		InitCommand=cmd(rotationz,180;zoom,zoomArrowsBanner;y,YellowArrows_Y;x,SCREEN_CENTER_X+songwsx;diffusealpha,0.4);		
 		NextSongMessageCommand=cmd(stoptweening;linear,0.08;x,SCREEN_CENTER_X+(songwsx+10);linear,0.08;x,SCREEN_CENTER_X+songwsx);
 
 		--SelectChannelMessageCommand=cmd(linear,0.05;diffusealpha,0;y,SCREEN_CENTER_Y-40;linear,0.05;diffusealpha,0.4);
@@ -272,7 +272,7 @@ t[#t+1] =  Def.ActorFrame
 			songwsx = basesongwsx;
 			self:diffusealpha(0);
 			self:zoom(zoomArrowsBanner);
-			self:y(SCREEN_CENTER_Y*1.66);
+			self:y(YellowArrows_Y);
 			self:x(SCREEN_CENTER_X+songwsx);
 			self:linear(0.1);
 			self:diffusealpha(0.8);
