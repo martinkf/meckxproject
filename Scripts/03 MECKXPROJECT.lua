@@ -24,3 +24,8 @@ DifficultyListOrbs_SongChosenTransition1 = 0.25
 
 --DifficultyListOrbs_SongChosenTransition2 = 0.065 --original
 DifficultyListOrbs_SongChosenTransition2 = 0.125
+
+-- SONG INDEX COUNTER
+
+--SongIndexCounter_Y = 106 --original
+SongIndexCounter_Y = 35

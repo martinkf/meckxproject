@@ -747,7 +747,7 @@ t[#t+1] =  Def.ActorFrame{
 		LoadFont("xolonium")..{
 			Name="Counter";
 			Text="x,xxx / x,xxx";
-			InitCommand=cmd(zoom,.7;xy,-37,106;horizalign,left;maxwidth,160/.8;strokecolor,color("0,0,0,1") );
+			InitCommand=cmd(zoom,.7;xy,-37,SongIndexCounter_Y;horizalign,left;maxwidth,160/.8;strokecolor,color("0,0,0,1") );
 		};
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/SM-BACKTITLE"))..{
