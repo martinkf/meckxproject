@@ -2,7 +2,7 @@ local t = Def.ActorFrame{};
 --base list.
 t[#t+1] = LoadActor("0_difficulty_list")..{
 	OnCommand=function(self)
-		self:y(SCREEN_CENTER_Y+124);
+		self:y(DifficultyListOrbs_Y);
 
 		if isAspectRatio1610() then
 			self:y(SCREEN_CENTER_Y+138);
@@ -14,20 +14,20 @@ t[#t+1] = LoadActor("0_difficulty_list")..{
 
 	SongChosenMessageCommand=function(self)
 		self:stoptweening();
-		self:y(SCREEN_CENTER_Y+124);
-		self:linear(0.065);
+		self:y(DifficultyListOrbs_Y);
+		self:linear(DifficultyListOrbs_SongChosenTransition1);
 		self:zoom(0.7);
-		self:y(SCREEN_CENTER_Y+128);
+		self:y(DifficultyListOrbs_YSongChosen);
 	end;
 	SongUnchosenMessageCommand=function(self)
 		self:stoptweening();
-		self:y(SCREEN_CENTER_Y+128);
-		self:linear(0.065);
+		self:y(DifficultyListOrbs_YSongChosen);
+		self:linear(DifficultyListOrbs_SongChosenTransition2);
 
 		if isAspectRatio1610() then
 			self:y(SCREEN_CENTER_Y+138);
 		else
-			self:y(SCREEN_CENTER_Y+124);
+			self:y(DifficultyListOrbs_Y);
 		end;
 
 	
