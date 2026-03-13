@@ -1,0 +1,99 @@
+{
+  "option": [
+    {
+      "title": "customInt",
+      "valuestype": "int",
+      "defaultvalue": 4
+    },
+    {
+      "title": "customString",
+      "valuestype": "string",
+      "defaultvalue": "zwei"
+    },
+    {
+      "title": "judgmentSkin",
+      "valuestype": "string",
+      "defaultvalue": "sanity"
+    },
+    {
+      "title": "judgmentZoom",
+      "valuestype": "int",
+      "defaultvalue": 100
+    },
+    {
+      "title": "lifebarSkin",
+      "valuestype": "string",
+      "defaultvalue": "i_default"
+    },
+    {
+      "title": "gameplay_stats_ui",
+      "valuestype": "bool",
+      "defaultvalue": false
+    },
+    {
+      "title": "gameplay_score_ui",
+      "valuestype": "bool",
+      "defaultvalue": false
+    },
+    {
+      "title": "gameplay_score_percentaje_ui",
+      "valuestype": "bool",
+      "defaultvalue": false
+    },    
+    {
+      "title": "gameplay_song_time_ui",
+      "valuestype": "bool",
+      "defaultvalue": false
+    },
+    {
+      "title": "gameplay_break_icon_ui",
+      "valuestype": "bool",
+      "defaultvalue": false
+    },
+    {
+      "title": "gameplay_lv_ui",
+      "valuestype": "bool",
+      "defaultvalue": false
+    },    
+    {
+      "title": "gameplay_fastslow",
+      "valuestype": "bool",
+      "defaultvalue": false
+    },
+    {
+      "title": "gameplay_timingbar",
+      "valuestype": "bool",
+      "defaultvalue": false
+    },
+    {
+      "title": "lifebar_extra_mode",
+      "valuestype": "string",
+      "defaultvalue": "none"
+    },
+    {
+      "title": "channelMusic",
+      "valuestype": "string",
+      "defaultvalue": "default (loop).ogg"
+    },
+    {
+      "title": "channelMusic_type",
+      "valuestype": "string",
+      "defaultvalue": "internal"
+    },
+    {
+      "title": "performance_mode",
+      "valuestype": "bool",
+      "defaultvalue": false
+    },
+    {
+      "title": "timing_adjustment",
+      "valuestype": "string",
+      "defaultvalue": "0"
+    },
+    {
+      "title": "difficultyListMode",
+      "valuestype": "string",
+      "defaultvalue": "list"
+    }   
+  ]
+}

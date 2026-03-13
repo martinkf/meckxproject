@@ -1,0 +1,33 @@
+{
+  "content": "Result from <@$31> VS <@$41> :arrow_down:",
+  "embeds": [
+    {
+      "title": ":small_orange_diamond:        Score Result from Versus Match        :small_orange_diamond:",
+      "color": $10,
+      "fields": [
+        {
+          "name": ":notes: Song Information",
+          "value": "$11"
+        },
+        {
+          "name": ":small_red_triangle: Step Information",
+          "value": "$12"
+        },
+        {
+          "name": "$51 HOST",
+          "value": "<@$31> \n**Perfect**: $32\n**Great**: $33\n**Good**: $34\n**Bad**: $35\n**Miss**: $36\n**MaxCombo**: $37\n**Score**: $38\n**Grade**: $39\n**Judge**: $40",
+          "inline": true
+        },
+        {
+          "name": "$52 GUEST",
+          "value": "<@$41> \n**Perfect**: $42\n**Great**: $43\n**Good**: $44\n**Bad**: $45\n**Miss**: $46\n**MaxCombo**: $47\n**Score**: $48\n**Grade**: $49\n**Judge**: $50",
+          "inline": true
+        }
+      ],
+      "footer": {
+        "text": "StepPXX",
+        "icon_url": "https://cdn.discordapp.com/app-assets/834886227810582588/847300533202059275.png"
+      }
+    }
+  ]
+}
