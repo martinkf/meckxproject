@@ -286,13 +286,23 @@ t[#t+1] =  Def.ActorFrame
 
 --backsimpleDiffList
 t[#t + 1] = LoadActor(THEME:GetPathG("","ScreenSelectMusic/SM-BACKTITLE"))..{
-	InitCommand=cmd(xy,SCREEN_CENTER_X,DifficultyListBackArtAssets_Y1;zoomx,2.8;zoomy,0.75;diffusealpha,0.8;fadetop,0.1);
+	InitCommand=function(self)
+		self:x(SCREEN_CENTER_X)
+		self:y(DifficultyListBackArtAssets_Y)
+		self:zoomx(2.8)
+		self:zoomy(DifficultyListBackArtAssets_ZoomY)
+		self:diffusealpha(0.8)
+		self:fadetop(0.1)
+	end;
 	CurrentSongChangedMessageCommand=function(self)			
 		self:finishtweening():diffusealpha(0.6):sleep(0.05):linear(0.2):diffusealpha(0.8);	
-	end;	
-	SongChosenMessageCommand=cmd(stoptweening;linear,0.25;y,SCREEN_CENTER_Y*0.57;zoomy,1.25;);
-	SongUnchosenMessageCommand=cmd(stoptweening;linear,0.125;y,SCREEN_CENTER_Y*1.86;zoomy,0.75;);	
-
+	end;
+	SongChosenMessageCommand=function(self)
+		self:stoptweening():linear(0.25):y(DifficultyListBackArtAssets_YSongChosen):zoomy(DifficultyListBackArtAssets_ZoomYSongChosen);
+	end;
+	SongUnchosenMessageCommand=function(self)
+		self:stoptweening():linear(0.125):y(DifficultyListBackArtAssets_Y):zoomy(DifficultyListBackArtAssets_ZoomY);
+	end;
 	SelectChannelMessageCommand=function(self)
 		self:linear(0.2);
 		self:y(SCREEN_CENTER_Y*1.51);
@@ -300,7 +310,7 @@ t[#t + 1] = LoadActor(THEME:GetPathG("","ScreenSelectMusic/SM-BACKTITLE"))..{
 		self:zoomx(2.1);
 	end;
 	ChannelChosenMessageCommand=function(self)
-		self:y(DifficultyListBackArtAssets_Y1);
+		self:y(DifficultyListBackArtAssets_Y);
 		self:diffusealpha(0.8);
 		self:zoomx(2.8);
 	end;
@@ -594,6 +604,9 @@ t[#t+1] =  Def.ActorFrame{
 	};
 	Def.ActorFrame{
 		Name="Fonts";
+		InitCommand = function(self)
+			self:y(SongInfoStrip_Y)
+		end;
 		UpdateinfoCommand=function(self)
 			BarTitle(self);
 
@@ -636,10 +649,10 @@ t[#t+1] =  Def.ActorFrame{
 			self:finishtweening():queuecommand("Updateinfo"):diffusealpha(0):sleep(0.02):queuecommand("showInfo");	
 		end;
 		SongChosenMessageCommand=function(self)
-			self:stoptweening():linear(0.25):y(SongInfoStrip_YSongChosen);
+			self:stoptweening():linear(0.25):y(SongInfoStrip_YSongChosen):zoom(SongInfoStrip_ZoomSongChosen);
 		end;
 		SongUnchosenMessageCommand=function(self)
-			self:stoptweening():linear(0.125):y(SongInfoStrip_Y);
+			self:stoptweening():linear(0.125):y(SongInfoStrip_Y):zoom(SongInfoStrip_Zoom);
 		end;
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/SM-BACKTITLE"))..{

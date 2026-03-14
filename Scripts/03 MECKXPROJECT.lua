@@ -3,31 +3,34 @@
 -- SONG INFORMATION STRIP
 
 --SongInfoStrip_Y = 0 --original
-SongInfoStrip_Y = 0
+SongInfoStrip_Y = -294
 
 --SongInfoStrip_YSongChosen = 0 --original
-SongInfoStrip_YSongChosen = -294
+SongInfoStrip_YSongChosen = -258
+
+SongInfoStrip_Zoom = 1
+SongInfoStrip_ZoomSongChosen = 1.5
 
 -- SONG INDEX COUNTER
 
 --SongIndexCounter_Y = 106 --original
-SongIndexCounter_Y = 35
+SongIndexCounter_Y = -252
 
 -- MUSIC WHEEL
 
 -- Y position is done through metrics.ini ([ScreenSelectMusic] > MusicWheelY)
 -- original is: SCREEN_CENTER_Y*1.68
--- modified is: SCREEN_CENTER_Y*1.55
+-- modified is: SCREEN_CENTER_Y-84
 
 -- YELLOW ARROW TO THE LEFT OF THE MUSIC WHEEL
 
 --YellowArrows_Y = SCREEN_CENTER_Y*1.66; --original
-YellowArrows_Y = SCREEN_CENTER_Y*1.55;
+YellowArrows_Y = SCREEN_CENTER_Y-130
 
 -- FAVORITE SONG ICON
 
 --FavoriteIcon_Y = -40 --original
-FavoriteIcon_Y = -40
+FavoriteIcon_Y = -334
 
 --FavoriteIcon_YSongChosen = -40 --original
 FavoriteIcon_YSongChosen = -334
@@ -35,27 +38,21 @@ FavoriteIcon_YSongChosen = -334
 -- DIFFICULTY LIST
 
 --DifficultyListOrbs_Y = SCREEN_CENTER_Y+124; --original
-DifficultyListOrbs_Y = SCREEN_CENTER_Y+307;
+DifficultyListOrbs_Y = SCREEN_CENTER_Y+40
 
 --DifficultyListOrbs_YSongChosen = SCREEN_CENTER_Y+128; --original
-DifficultyListOrbs_YSongChosen = SCREEN_CENTER_Y-158;
+DifficultyListOrbs_YSongChosen = SCREEN_CENTER_Y-80
 
 --DifficultyListOrbs_SongChosenTransition1 = 0.065 --original
 DifficultyListOrbs_SongChosenTransition1 = 0.25
-
 --DifficultyListOrbs_SongChosenTransition2 = 0.065 --original
 DifficultyListOrbs_SongChosenTransition2 = 0.125
 
---DifficultyListBackArtAssets_Y1 = SCREEN_CENTER_Y*1.37 --original
-DifficultyListBackArtAssets_Y1 = SCREEN_CENTER_Y*1.86
---DifficultyListBackArtAssets_Y2 = SCREEN_CENTER_Y*1.35 --original
-DifficultyListBackArtAssets_Y2 = SCREEN_CENTER_Y*1.86
---DifficultyListBackArtAssets_SongChosenTransition
--- original is: stoptweening;decelerate,0.2;diffusealpha,0;
--- modified is: stoptweening;linear,0.25;y,SCREEN_CENTER_Y*0.57;zoomy,1.25;
---DifficultyListBackArtAssets_SongUnchosenTransition
--- original is: stoptweening;decelerate,0.2;diffusealpha,1;
--- modified is: stoptweening;linear,0.125;y,SCREEN_CENTER_Y*1.86;zoomy,0.75;
+--DifficultyListBackArtAssets_Y = SCREEN_CENTER_Y*1.37 --original
+DifficultyListBackArtAssets_Y = SCREEN_CENTER_Y+40
+DifficultyListBackArtAssets_ZoomY = 0.75
+DifficultyListBackArtAssets_YSongChosen = SCREEN_CENTER_Y-80
+DifficultyListBackArtAssets_ZoomYSongChosen = 1.25
 
 -- PLAYER MOD ICONS
 
