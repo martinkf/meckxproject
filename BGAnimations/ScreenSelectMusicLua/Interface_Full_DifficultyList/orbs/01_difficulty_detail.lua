@@ -88,16 +88,6 @@ for p=-1,1,2 do
 	Def.ActorFrame{
 		OnCommand=cmd(xy,(p == -1 and -568 or 556),-70;zoom,0.8;animate,false;visible,false);
 
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/stepartistsprite"))..{
-			Name="stepartistbase";
-		};
-
-		LoadFont("_century gothic")..{
-			OnCommand=cmd(x,55;y,-4;settext,"";horizalign,center;queuecommand,"artistStep");
-			Name="stepartisttext";
-		};	
-
-
 		SongUnchosenMessageCommand=function(self,params)
 				self:visible(false);
 		end;
@@ -105,23 +95,22 @@ for p=-1,1,2 do
 		ChangeStepsMessageCommand=function(self,params)
 			if params.Player == ARRAY[p] then
 				self:stoptweening();
-				self:queuecommand("artistStep");
+				self:queuecommand("UpdateDetails");
 			end;
 		end;
 
 		SongChosenMessageCommand=function(self,params)
 
 			if GAMESTATE:GetNumSidesJoined() == 2 then
-				self:queuecommand("artistStep");
+				self:queuecommand("UpdateDetails");
 			else
 				if params.Player == ARRAY[p] then
 					self:stoptweening();
-					self:queuecommand("artistStep");
+					self:queuecommand("UpdateDetails");
 				end;				
 			end;
 
 		end;
-
 
 		StepsUnchosenMessageCommand=function(self,params)
 			if params.Player == ARRAY[p] then
@@ -129,18 +118,81 @@ for p=-1,1,2 do
 			end;
 		end;	
 
-		artistStepCommand=function(self)
-				local steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);
-				local stepArtist = steps:GetAuthorCredit();
-				if #stepArtist > 0 then
-					self:visible(true);
-					self:GetChild("stepartisttext"):settext(stepArtist);
-				else
-					self:visible(false);
-					self:GetChild("stepartisttext"):settext("");
-				end;			
+		UpdateDetailsCommand=function(self)
+			
+			local steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);
+			if steps then self:visible(true) end;
+			local chartFullName = steps:GetChartName();			
+
+			-- CHART MAIN NAME
+			local chartMainName = chartFullName
+			if #chartMainName > 0 then				
+				self:GetChild("chartMainName"):settext(chartMainName);
+			else
+				self:GetChild("chartMainName"):settext("");
+			end;
+
+			-- CHART ORIGINAL NAME
+			local chartOriginalName = chartFullName
+			if #chartOriginalName > 0 then				
+				self:GetChild("chartOriginalName"):settext(chartOriginalName);
+			else
+				self:GetChild("chartOriginalName"):settext("");
+			end;
+
+			-- CHART ARTIST
+			local chartArtist = steps:GetAuthorCredit();
+			if #chartArtist > 0 then
+				self:GetChild("chartArtist"):settext(chartArtist);
+			else
+				self:GetChild("chartArtist"):settext("");
+			end;
+
+			-- CHART ORIGIN
+			local chartOrigin = chartFullName
+			if #chartOrigin > 0 then				
+				self:GetChild("chartOrigin"):settext(chartOrigin);
+			else
+				self:GetChild("chartOrigin"):settext("");
+			end;
+
 		end;
 
+		Def.Quad{
+			Name="chartMainName_bg";
+			InitCommand=cmd(zoomto,400,42;diffuse,color("0,0,0,0.7");x,200;y,0;);
+		};
+		LoadFont("_prime")..{
+			OnCommand=cmd(x,200;y,0;zoom,0.75;settext,"";horizalign,center;queuecommand,"UpdateDetails");
+			Name="chartMainName";
+		};
+
+		Def.Quad{
+			Name="chartOriginalName_bg";
+			InitCommand=cmd(zoomto,400,42;diffuse,color("0,0,0,0.7");x,200;y,46;);
+		};
+		LoadFont("_prime")..{
+			OnCommand=cmd(x,200;y,46;zoom,0.75;settext,"";horizalign,center;queuecommand,"UpdateDetails");
+			Name="chartOriginalName";
+		};
+
+		Def.Quad{
+			Name="chartArtist_bg";
+			InitCommand=cmd(zoomto,400,42;diffuse,color("0,0,0,0.7");x,200;y,92;);
+		};
+		LoadFont("_prime")..{
+			OnCommand=cmd(x,200;y,92;zoom,0.75;settext,"";horizalign,center;queuecommand,"UpdateDetails");
+			Name="chartArtist";
+		};
+
+		Def.Quad{
+			Name="chartOrigin_bg";
+			InitCommand=cmd(zoomto,400,42;diffuse,color("0,0,0,0.7");x,200;y,138;);
+		};
+		LoadFont("_prime")..{
+			OnCommand=cmd(x,200;y,138;zoom,0.75;settext,"";horizalign,center;queuecommand,"UpdateDetails");
+			Name="chartOrigin";
+		};
 
 	};
 		
