@@ -18,7 +18,7 @@ AvatarPic_Y = 32+546
 -- PLAYER MOD ICONS
 
 --Player1ModIcons_X = SCREEN_CENTER_X-608 --original
-Player1ModIcons_X = SCREEN_CENTER_X-606
+Player1ModIcons_X = SCREEN_CENTER_X-604
 --Player2ModIcons_X = SCREEN_CENTER_X+610 --original
 Player2ModIcons_X = SCREEN_CENTER_X+604
 --PlayerModIcons_Y = SCREEN_CENTER_Y-257 --original
@@ -87,3 +87,58 @@ DifficultyListBackArtAssets_ZoomYSongChosen = 1.25
 
 --FloatingLabels_Visibility = true --original
 FloatingLabels_Visibility = false
+
+-- -- SCREEN SELECT MUSIC - SONG CHOSEN (CHART DETAILS)
+
+--DifficultyDetails_Y = -70 --original
+DifficultyDetails_Y = -90
+--DifficultyDetails_XPlayer1 = -568 --original
+DifficultyDetails_XPlayer1 = -400
+--DifficultyDetails_XPlayer2 = 556 --original
+DifficultyDetails_XPlayer2 = 400
+
+
+-- -- -- 02 - FUNCTIONS
+-- inputs:
+-- 1) a chart object
+-- 2) a string detailing what you want, from this list:
+-- "Chart Original Name", "Chart Origin",
+-- "Chart Author", "Chart Level"
+-- returns:
+-- check below
+function Meckx_FetchFromChart(input_chart, fetch_details)
+
+	local output = ""
+
+	if fetch_details == "Chart Original Name" then
+		-- returns a string such as "NORMAL ii"
+
+		local chartFullChartnameFromSSC = input_chart:GetChartName()
+		local openParen = chartFullChartnameFromSSC:find("%(")
+		output = chartFullChartnameFromSSC:sub(1, openParen - 2)
+
+	elseif fetch_details == "Chart Origin" then
+		-- returns a string such as "The 2nd DF"
+
+		local chartFullChartnameFromSSC = input_chart:GetChartName()
+		local openParen = chartFullChartnameFromSSC:find("%(")
+		local closeParen = chartFullChartnameFromSSC:find("%)")
+		output = chartFullChartnameFromSSC:sub(openParen + 1, closeParen - 1)
+
+	elseif fetch_details == "Chart Author" then
+		-- returns a string such as "Andamiro"
+
+		if (input_chart:GetAuthorCredit() == "") then output = "Author is blank"
+		else output = input_chart:GetAuthorCredit() end
+
+	elseif fetch_details == "Chart Level" then
+		-- returns a string such as "16"
+
+		if input_chart:GetMeter() == 99 then output = "??"
+		else output = string.format("%02d", input_chart:GetMeter()) end
+
+	end
+
+	return output
+
+end

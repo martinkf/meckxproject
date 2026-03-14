@@ -82,11 +82,17 @@ for p=-1,1,2 do
 			SongUnchosenMessageCommand=cmd(stoptweening;linear,0.1;zoom,1.2;y,SCREEN_CENTER_Y+125;zoom,1;diffusealpha,0);
 		};
 
-		--*********************************
-		--********* STEP ARTIST  **********
-		--*********************************
+		--****************************************
+		--********* DIFFICULTY DETAILS  **********
+		--****************************************
 	Def.ActorFrame{
-		OnCommand=cmd(xy,(p == -1 and -568 or 556),-70;zoom,0.8;animate,false;visible,false);
+		OnCommand=function(self)
+			self:x((p == -1 and DifficultyDetails_XPlayer1 or DifficultyDetails_XPlayer2));
+			self:y(DifficultyDetails_Y);
+			self:zoom(0.8);
+			self:animate(false);
+			self:visible(false);
+		end;
 
 		SongUnchosenMessageCommand=function(self,params)
 				self:visible(false);
@@ -120,12 +126,11 @@ for p=-1,1,2 do
 
 		UpdateDetailsCommand=function(self)
 			
-			local steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);
-			if steps then self:visible(true) end;
-			local chartFullName = steps:GetChartName();			
+			local thisChart = GAMESTATE:GetCurrentSteps(ARRAY[p]);
+			if thisChart then self:visible(true) end;
 
 			-- CHART MAIN NAME
-			local chartMainName = chartFullName
+			local chartMainName = Meckx_FetchFromChart(thisChart, "Chart Original Name")
 			if #chartMainName > 0 then				
 				self:GetChild("chartMainName"):settext(chartMainName);
 			else
@@ -133,65 +138,82 @@ for p=-1,1,2 do
 			end;
 
 			-- CHART ORIGINAL NAME
-			local chartOriginalName = chartFullName
+			local chartOriginalName = Meckx_FetchFromChart(thisChart, "Chart Original Name")
 			if #chartOriginalName > 0 then				
-				self:GetChild("chartOriginalName"):settext(chartOriginalName);
+				self:GetChild("chartOriginalName"):settext("Originally called \""..chartOriginalName.."\"");
 			else
 				self:GetChild("chartOriginalName"):settext("");
 			end;
 
-			-- CHART ARTIST
-			local chartArtist = steps:GetAuthorCredit();
-			if #chartArtist > 0 then
-				self:GetChild("chartArtist"):settext(chartArtist);
+			-- CHART AUTHOR
+			local chartAuthor = Meckx_FetchFromChart(thisChart, "Chart Author")
+			if #chartAuthor > 0 then
+				self:GetChild("chartAuthor"):settext(chartAuthor);
 			else
-				self:GetChild("chartArtist"):settext("");
+				self:GetChild("chartAuthor"):settext("");
 			end;
 
 			-- CHART ORIGIN
-			local chartOrigin = chartFullName
+			local chartOrigin = Meckx_FetchFromChart(thisChart, "Chart Origin")
 			if #chartOrigin > 0 then				
-				self:GetChild("chartOrigin"):settext(chartOrigin);
+				self:GetChild("chartOrigin"):settext("Chart debut in "..chartOrigin);
 			else
 				self:GetChild("chartOrigin"):settext("");
+			end;
+
+			-- CHART LEVEL
+			local chartLevel = Meckx_FetchFromChart(thisChart, "Chart Level")
+			if #chartLevel > 0 then				
+				self:GetChild("chartLevel"):settext("Lvl. "..chartLevel);
+			else
+				self:GetChild("chartLevel"):settext("");
 			end;
 
 		end;
 
 		Def.Quad{
 			Name="chartMainName_bg";
-			InitCommand=cmd(zoomto,400,42;diffuse,color("0,0,0,0.7");x,200;y,0;);
+			InitCommand=cmd(zoomto,400,42;diffuse,color("0,0,0,0.7");x,0;y,0;);
 		};
 		LoadFont("_prime")..{
-			OnCommand=cmd(x,200;y,0;zoom,0.75;settext,"";horizalign,center;queuecommand,"UpdateDetails");
+			OnCommand=cmd(x,0;y,0;zoom,0.75;settext,"";horizalign,center;queuecommand,"UpdateDetails");
 			Name="chartMainName";
 		};
 
 		Def.Quad{
 			Name="chartOriginalName_bg";
-			InitCommand=cmd(zoomto,400,42;diffuse,color("0,0,0,0.7");x,200;y,46;);
+			InitCommand=cmd(zoomto,400,42;diffuse,color("0,0,0,0.7");x,0;y,46;);
 		};
 		LoadFont("_prime")..{
-			OnCommand=cmd(x,200;y,46;zoom,0.75;settext,"";horizalign,center;queuecommand,"UpdateDetails");
+			OnCommand=cmd(x,0;y,46;zoom,0.75;settext,"";horizalign,center;queuecommand,"UpdateDetails");
 			Name="chartOriginalName";
 		};
 
 		Def.Quad{
-			Name="chartArtist_bg";
-			InitCommand=cmd(zoomto,400,42;diffuse,color("0,0,0,0.7");x,200;y,92;);
+			Name="chartAuthor_bg";
+			InitCommand=cmd(zoomto,400,42;diffuse,color("0,0,0,0.7");x,0;y,92;);
 		};
 		LoadFont("_prime")..{
-			OnCommand=cmd(x,200;y,92;zoom,0.75;settext,"";horizalign,center;queuecommand,"UpdateDetails");
-			Name="chartArtist";
+			OnCommand=cmd(x,0;y,92;zoom,0.75;settext,"";horizalign,center;queuecommand,"UpdateDetails");
+			Name="chartAuthor";
 		};
 
 		Def.Quad{
 			Name="chartOrigin_bg";
-			InitCommand=cmd(zoomto,400,42;diffuse,color("0,0,0,0.7");x,200;y,138;);
+			InitCommand=cmd(zoomto,400,42;diffuse,color("0,0,0,0.7");x,0;y,138;);
 		};
 		LoadFont("_prime")..{
-			OnCommand=cmd(x,200;y,138;zoom,0.75;settext,"";horizalign,center;queuecommand,"UpdateDetails");
+			OnCommand=cmd(x,0;y,138;zoom,0.75;settext,"";horizalign,center;queuecommand,"UpdateDetails");
 			Name="chartOrigin";
+		};
+
+		Def.Quad{
+			Name="chartLevel_bg";
+			InitCommand=cmd(zoomto,400,42;diffuse,color("0,0,0,0.7");x,0;y,184;);
+		};
+		LoadFont("_prime")..{
+			OnCommand=cmd(x,0;y,184;zoom,0.75;settext,"";horizalign,center;queuecommand,"UpdateDetails");
+			Name="chartLevel";
 		};
 
 	};
