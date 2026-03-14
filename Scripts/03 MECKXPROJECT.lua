@@ -38,3 +38,8 @@ Player1ModIcons_X = SCREEN_CENTER_X-604
 Player2ModIcons_X = SCREEN_CENTER_X+606
 --PlayerModIcons_Y = SCREEN_CENTER_Y-257 --original
 PlayerModIcons_Y = SCREEN_CENTER_Y-340
+
+-- FLOATING CATEGORY AND CHANNEL LABELS
+
+--FloatingLabels_Visibility = true --original
+FloatingLabels_Visibility = false
