@@ -35,7 +35,7 @@ FunctionKeysSearch_Y = SCREEN_CENTER_Y-350
 SongInfoStrip_Y = -294
 
 --SongInfoStrip_YSongChosen = 0 --original
-SongInfoStrip_YSongChosen = -258
+SongInfoStrip_YSongChosen = -278
 
 SongInfoStrip_Zoom = 1
 SongInfoStrip_ZoomSongChosen = 1.5
@@ -67,7 +67,7 @@ FavoriteIcon_YSongChosen = -334
 -- DIFFICULTY LIST
 
 --DifficultyListOrbs_Y = SCREEN_CENTER_Y+124; --original
-DifficultyListOrbs_Y = SCREEN_CENTER_Y+40
+DifficultyListOrbs_Y = SCREEN_CENTER_Y+46
 
 --DifficultyListOrbs_YSongChosen = SCREEN_CENTER_Y+128; --original
 DifficultyListOrbs_YSongChosen = SCREEN_CENTER_Y-80
@@ -78,9 +78,9 @@ DifficultyListOrbs_SongChosenTransition1 = 0.25
 DifficultyListOrbs_SongChosenTransition2 = 0.125
 
 --DifficultyListBackArtAssets_Y = SCREEN_CENTER_Y*1.37 --original
-DifficultyListBackArtAssets_Y = SCREEN_CENTER_Y+40
+DifficultyListBackArtAssets_Y = DifficultyListOrbs_Y
 DifficultyListBackArtAssets_ZoomY = 0.75
-DifficultyListBackArtAssets_YSongChosen = SCREEN_CENTER_Y-80
+DifficultyListBackArtAssets_YSongChosen = DifficultyListOrbs_YSongChosen
 DifficultyListBackArtAssets_ZoomYSongChosen = 1.25
 
 -- FLOATING CATEGORY AND CHANNEL LABELS
