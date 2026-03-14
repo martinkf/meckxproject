@@ -24,6 +24,11 @@ Player2ModIcons_X = SCREEN_CENTER_X+604
 --PlayerModIcons_Y = SCREEN_CENTER_Y-257 --original
 PlayerModIcons_Y = SCREEN_CENTER_Y-376+338
 
+-- FUNCTION KEYS HELPER INFORMATION
+
+--FunctionKeysSearch_Y = SCREEN_CENTER_Y+347 --original
+FunctionKeysSearch_Y = SCREEN_CENTER_Y-350
+
 -- SONG INFORMATION STRIP
 
 --SongInfoStrip_Y = 0 --original

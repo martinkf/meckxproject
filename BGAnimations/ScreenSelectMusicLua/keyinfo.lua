@@ -160,7 +160,7 @@ t[#t+1] =  Def.ActorFrame
 }
 
 --######
-local yBaseForInfoKeys=SCREEN_CENTER_Y+347;
+local yBaseForInfoKeys=FunctionKeysSearch_Y;
 local yBaseForInfoKeys1610=SCREEN_CENTER_Y+387;
 
 --f11 SEARCH
