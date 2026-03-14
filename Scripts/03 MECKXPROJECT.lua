@@ -11,6 +11,14 @@
 --YellowArrows_Y = SCREEN_CENTER_Y*1.66; --original
 YellowArrows_Y = SCREEN_CENTER_Y*1.55;
 
+-- FAVORITE SONG ICON
+
+--FavoriteIcon_Y = -40 --original
+FavoriteIcon_Y = -40
+
+--FavoriteIcon_YSongChosen = -40 --original
+FavoriteIcon_YSongChosen = -334
+
 -- DIFFICULTY LIST
 
 --DifficultyListOrbs_Y = SCREEN_CENTER_Y+124; --original

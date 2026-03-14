@@ -519,7 +519,7 @@ t[#t+1] =  Def.ActorFrame{
 	LoadActor(THEME:GetPathG("", "ScreenSelectMusic/"..langMessageFav))..{
 		name="favoriteMessage";
 		InitCommand = function(self)
-			self:zoom(0.6):xy(0, -40):diffusealpha(0);
+			self:zoom(0.6):xy(0, FavoriteIcon_Y):diffusealpha(0);
 			favMessage = self;
 		end;
 
@@ -550,6 +550,13 @@ t[#t+1] =  Def.ActorFrame{
 			end;
 		end;
 
+		SongChosenMessageCommand=function(self)
+			self:stoptweening():linear(0.25):y(FavoriteIcon_YSongChosen);
+		end;
+		SongUnchosenMessageCommand=function(self)
+			self:stoptweening():linear(0.125):y(FavoriteIcon_Y);
+		end;
+
 		OffCommand=function(self)
 			self:stoptweening();
 			self:linear(0.15);
@@ -563,7 +570,7 @@ t[#t+1] =  Def.ActorFrame{
 	LoadActor(THEME:GetPathG("", "ScreenSelectMusic/favorite"))..{
 		name="favoriteP1";
 		InitCommand = function(self)
-			self:zoom(0.8):xy(-150, -40):visible(GAMESTATE:IsPlayerEnabled(PLAYER_1)):diffusealpha(0);
+			self:zoom(0.8):xy(-150, FavoriteIcon_Y):visible(GAMESTATE:IsPlayerEnabled(PLAYER_1)):diffusealpha(0);
 		end;
 		CurrentSongChangedMessageCommand = function(self) 
 			p1StatusFavSelectMode = false;
@@ -580,12 +587,12 @@ t[#t+1] =  Def.ActorFrame{
 		end;
 		SongUnchosenMessageCommand = function(self) 
 			p1StatusFavSelectMode = false;
-			self:stoptweening():queuecommand("UpdateFavorite") 
+			self:stoptweening():linear(0.125):y(FavoriteIcon_Y):queuecommand("UpdateFavorite");
 		end;
 
 	   	SongChosenMessageCommand = function(self) 
 			p1StatusFavSelectMode = true;
-			self:stoptweening():queuecommand("UpdateFavorite");
+			self:stoptweening():linear(0.25):y(FavoriteIcon_YSongChosen):queuecommand("UpdateFavorite");
 	   	end;
 		
 		SelectChannelMessageCommand = function(self) 
@@ -624,7 +631,7 @@ t[#t+1] =  Def.ActorFrame{
 	LoadActor(THEME:GetPathG("", "ScreenSelectMusic/favorite"))..{
 		name="favoriteP2";
 		InitCommand = function(self)
-			self:zoom(0.8):xy(150, -40):visible(GAMESTATE:IsPlayerEnabled(PLAYER_2)):diffusealpha(0);
+			self:zoom(0.8):xy(150, FavoriteIcon_Y):visible(GAMESTATE:IsPlayerEnabled(PLAYER_2)):diffusealpha(0);
 		end;
 		CurrentSongChangedMessageCommand = function(self) 
 			self:stoptweening():queuecommand("UpdateFavorite") 
@@ -632,11 +639,12 @@ t[#t+1] =  Def.ActorFrame{
 
 		SongUnchosenMessageCommand = function(self) 
 			p2StatusFavSelectMode = false;
+			self:stoptweening():linear(0.125):y(FavoriteIcon_Y):queuecommand("UpdateFavorite");
 		end;
 
 		SongChosenMessageCommand = function(self) 
 			p2StatusFavSelectMode = true;
-			self:stoptweening():queuecommand("UpdateFavorite");
+			self:stoptweening():linear(0.25):y(FavoriteIcon_YSongChosen):queuecommand("UpdateFavorite");
 		end;
 
 		SelectChannelMessageCommand = function(self) 
