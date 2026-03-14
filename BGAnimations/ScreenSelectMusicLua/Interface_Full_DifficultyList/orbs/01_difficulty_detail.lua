@@ -814,314 +814,458 @@ for p=-1,1,2 do
 		};
 
 
-
-		LoadActor( THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/Difficulty_BigBalls frame") )..{
+		Def.ActorFrame{
 			OnCommand=function(self)
-				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(225*p):y(220):zoom(0.7):diffusealpha(0);				
+				self:visible(false);
 			end;
-			SongChosenMessageCommand=cmd(finishtweening;linear,0.125;y,220;diffusealpha,1);
-			SongUnchosenMessageCommand=cmd(finishtweening;diffusealpha,0);
 			
-			ChangeStepsMessageCommand=function(self, params)
-				if (params.Player == ARRAY[p]) then
-					self:stoptweening();
-
+			LoadActor( THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/Difficulty_BigBalls frame") )..{
+				OnCommand=function(self)
+					self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(225*p):y(220):zoom(0.7):diffusealpha(0);				
 				end;
-			end;
+				SongChosenMessageCommand=cmd(finishtweening;linear,0.125;y,220;diffusealpha,1);
+				SongUnchosenMessageCommand=cmd(finishtweening;diffusealpha,0);
+				
+				ChangeStepsMessageCommand=function(self, params)
+					if (params.Player == ARRAY[p]) then
+						self:stoptweening();
 
-			StepsChosenMessageCommand=function(self, params)
-				if (params.Player == ARRAY[p]) then
-					self:finishtweening();
+					end;
 				end;
-			end;
-			StepsUnchosenMessageCommand=function(self, params)
-				if (params.Player == ARRAY[p]) then
+
+				StepsChosenMessageCommand=function(self, params)
+					if (params.Player == ARRAY[p]) then
+						self:finishtweening();
+					end;
+				end;
+				StepsUnchosenMessageCommand=function(self, params)
+					if (params.Player == ARRAY[p]) then
+						if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
+
+						end;
+						
+					end;
+				end;
+			};
+
+			LoadActor( THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/Difficulty_BigBalls glow spin") ) .. {
+				InitCommand=cmd(blend,'BlendMode_Add';diffusealpha,.15;spin);
+				OnCommand=function(self)
+					self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(225*p):y(220):zoom(1.56):diffusealpha(0):rotationy(0);	
+				end;
+				SongChosenMessageCommand=cmd(finishtweening;linear,0.125;y,220;diffusealpha,0.05);
+				SongUnchosenMessageCommand=cmd(finishtweening;diffusealpha,0);
+			};
+			
+			LoadActor( THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/FX-OverBallBackground") )..{
+				OnCommand=function(self)
+					self:visible(false):animate(false):x(225*p):y(220):zoom(.9):diffusealpha(0):blend('BlendMode_Add');
+				end;
+				SongUnchosenMessageCommand=cmd(finishtweening;diffusealpha,0);
+				
+				StepsChosenMessageCommand=function(self, params)
+					if (params.Player == ARRAY[p]) then
+						self:finishtweening();
+						self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p]));
+						self:linear(.1);
+						self:diffusealpha(1);
+					end;
+				end;
+				StepsUnchosenMessageCommand=function(self, params)
+					if (params.Player == ARRAY[p]) then
+						self:finishtweening();
+						self:visible(false);
+					end;
+				end;
+			};
+			
+			LoadActor( THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/FX-BallBackground") )..{
+				OnCommand=function(self)
+					self:visible(false):animate(false):x(225*p):y(220):zoom(.9):diffusealpha(0);
+				end;
+				SongUnchosenMessageCommand=cmd(finishtweening;diffusealpha,0);
+				
+				StepsChosenMessageCommand=function(self, params)
+					if (params.Player == ARRAY[p]) then
+						self:finishtweening();
+						self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p]));
+						self:linear(.1);
+						self:diffusealpha(1);
+						self:queuecommand("Effect");
+					end;
+				end;
+				StepsUnchosenMessageCommand=function(self, params)
+					if (params.Player == ARRAY[p]) then
+						self:finishtweening();
+						self:visible(false);
+					end;
+				end;
+				EffectCommand=cmd(linear,.22;diffusealpha,.5;linear,.22;diffusealpha,.9;queuecommand,"Effect");
+			};
+			
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/StepBall_Body"))..{
+				OnCommand=function(self)
+					self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):setstate(0):diffusealpha(0):animate(false):x(900*p):y(220):zoom(.73);				
+				end;
+				SongChosenMessageCommand=cmd(stoptweening;diffusealpha,1;linear,0.125;x,225*p;playcommand,"Refresh");
+				SongUnchosenMessageCommand=cmd(stoptweening;linear,0.125;x,900*p;sleep,.1;diffusealpha,0);
+				ChangeStepsMessageCommand=cmd(finishtweening;playcommand,"Refresh");
+				RefreshStepMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
+				StepsUnchosenMessageCommand=function(self)
 					if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
-
+						self:finishtweening():playcommand("Refresh");
 					end;
-					
 				end;
-			end;
-
-		};
-
-		LoadActor( THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/Difficulty_BigBalls glow spin") ) .. {
-			InitCommand=cmd(blend,'BlendMode_Add';diffusealpha,.15;spin);
-			OnCommand=function(self)
-				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(225*p):y(220):zoom(1.56):diffusealpha(0):rotationy(0);	
-			end;
-			SongChosenMessageCommand=cmd(finishtweening;linear,0.125;y,220;diffusealpha,0.05);
-			SongUnchosenMessageCommand=cmd(finishtweening;diffusealpha,0);
-		};
-
-		
-		LoadActor( THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/FX-OverBallBackground") )..{
-			OnCommand=function(self)
-				self:visible(false):animate(false):x(225*p):y(220):zoom(.9):diffusealpha(0):blend('BlendMode_Add');
-			end;
-			SongUnchosenMessageCommand=cmd(finishtweening;diffusealpha,0);
-			
-			StepsChosenMessageCommand=function(self, params)
-				if (params.Player == ARRAY[p]) then
-					self:finishtweening();
-					self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p]));
-					self:linear(.1);
-					self:diffusealpha(1);
-				end;
-			end;
-			StepsUnchosenMessageCommand=function(self, params)
-				if (params.Player == ARRAY[p]) then
-					self:finishtweening();
-					self:visible(false);
-				end;
-			end;
-		};
-		
-		LoadActor( THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/FX-BallBackground") )..{
-			OnCommand=function(self)
-				self:visible(false):animate(false):x(225*p):y(220):zoom(.9):diffusealpha(0);
-			end;
-			SongUnchosenMessageCommand=cmd(finishtweening;diffusealpha,0);
-			
-			StepsChosenMessageCommand=function(self, params)
-				if (params.Player == ARRAY[p]) then
-					self:finishtweening();
-					self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p]));
-					self:linear(.1);
-					self:diffusealpha(1);
-					self:queuecommand("Effect");
-				end;
-			end;
-			StepsUnchosenMessageCommand=function(self, params)
-				if (params.Player == ARRAY[p]) then
-					self:finishtweening();
-					self:visible(false);
-				end;
-			end;
-			EffectCommand=cmd(linear,.22;diffusealpha,.5;linear,.22;diffusealpha,.9;queuecommand,"Effect");
-		};
-		
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/StepBall_Body"))..{
-			OnCommand=function(self)
-				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):setstate(0):diffusealpha(0):animate(false):x(900*p):y(220):zoom(.73);				
-			end;
-			SongChosenMessageCommand=cmd(stoptweening;diffusealpha,1;linear,0.125;x,225*p;playcommand,"Refresh");
-			SongUnchosenMessageCommand=cmd(stoptweening;linear,0.125;x,900*p;sleep,.1;diffusealpha,0);
-			ChangeStepsMessageCommand=cmd(finishtweening;playcommand,"Refresh");
-			RefreshStepMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
-			StepsUnchosenMessageCommand=function(self)
-				if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
-					self:finishtweening():playcommand("Refresh");
-				end;
-			end;
-			PlayerJoinedMessageCommand=cmd(finishtweening;playcommand,"On");
-			RefreshCommand=function(self)
-				if GAMESTATE:IsHumanPlayer(ARRAY[p]) then
-					local CurrentStep = GAMESTATE:GetCurrentSteps(ARRAY[p]);					
-					if CurrentStep:GetStepsType() == 'StepsType_Pump_Single' then
-						self:setstate(0);
-					end;
-					if CurrentStep:GetStepsType() == 'StepsType_Pump_Single_P' then
-						self:setstate(1);
-					end;
-					if CurrentStep:GetStepsType() == 'StepsType_Pump_Double' then
-						self:setstate(3);
-					end;
-					if CurrentStep:GetStepsType() == 'StepsType_Pump_Double_P' then
-						self:setstate(4);
-					end;
-					if CurrentStep:GetPlayers() ~= 1 then
-						self:setstate(5);
-					end;
-					if CurrentStep:GetStepsType() == 'StepsType_Pump_Halfdouble' then
-						self:setstate(2);
-					end;
-					
-					
-					if (GAMESTATE:GetMusicTrainChannel() or  GAMESTATE:GetProgressiveChannel())  and #vpSteps > 0 then
-						local sType = vpSteps[1].modes;
-						local sVarType = nil;
-						
-						lastStepTypeTrain = sType;
-						if (#vpSteps > 1) then
-							sVarType = vpSteps[2].modes;
-						end;
-						
-						if (sType == "pump-single") then
+				PlayerJoinedMessageCommand=cmd(finishtweening;playcommand,"On");
+				RefreshCommand=function(self)
+					if GAMESTATE:IsHumanPlayer(ARRAY[p]) then
+						local CurrentStep = GAMESTATE:GetCurrentSteps(ARRAY[p]);					
+						if CurrentStep:GetStepsType() == 'StepsType_Pump_Single' then
 							self:setstate(0);
-							lastStepTypeTrain = sType;
 						end;
-						if (sType == "pump-double") then
-							self:setstate(3);
-							lastStepTypeTrain = sType;
-						end;
-						
-						
-						if (sType == "pump-single-p") then
-							lastStepTypeTrain = sType;
-							if (sVarType ~= nil) then
-								if (sVarType == sType) then
-									self:setstate(1);
-								else
-									self:setstate(0);
-									lastStepTypeTrain = "pump-single";
-								end;
-							else
-								self:setstate(1);
-							end;
-						end; 
-						
-						if (sType == "pump-double-p") then
-							lastStepTypeTrain = sType;
-							if (sVarType ~= nil) then
-								if (sVarType == sType) then
-									self:setstate(4);
-								else
-									self:setstate(3);
-									lastStepTypeTrain = "pump-double";
-								end;
-							else
-								self:setstate(4);
-							end;
-						end; 
-						
-						if (sType == "pump-half") then
-							lastStepTypeTrain = sType;
-							if (sVarType ~= nil) then
-								if (sVarType == sType) then
-									self:setstate(2);
-								else
-									self:setstate(3);
-									lastStepTypeTrain = "pump-double";
-								end;
-							else
-								self:setstate(2);
-							end;
-						end;
-					end;
-					
-				end;
-			end;
-		};
-
-
-		
-		
-		
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DIFFLABELS"))..{
-			OnCommand=function(self)
-				self:setstate(0):animate(false):x(225*p):y(290):zoom(1);
-			end;
-			SongChosenMessageCommand=cmd(finishtweening;diffusealpha,1;sleep,0.125;queuecommand,"Refresh");
-			RefreshStepMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
-			RefreshCommand=function(self)
-				self:setstate(0);
-				if GAMESTATE:IsHumanPlayer(ARRAY[p]) then
-					local CurrentStep = GAMESTATE:GetCurrentSteps(ARRAY[p]);
-					if CurrentStep:GetLabelType() == "LABELTYPE_NEW" then
-						local scorelist = PROFILEMAN:GetProfile(ARRAY[p]):GetHighScoreList(GAMESTATE:GetCurrentSong(),GAMESTATE:GetCurrentSteps(ARRAY[p]));
-						local scores = scorelist:GetHighScores();
-						local topscore = scores[1];
-						if not topscore then
+						if CurrentStep:GetStepsType() == 'StepsType_Pump_Single_P' then
 							self:setstate(1);
 						end;
-					end;
-					if CurrentStep:GetLabelType() == "LABELTYPE_UCS" then
-						self:setstate(2);
-					end;
-					if CurrentStep:GetLabelType() == "LABELTYPE_ANOTHER" then
-						self:setstate(3);
+						if CurrentStep:GetStepsType() == 'StepsType_Pump_Double' then
+							self:setstate(3);
+						end;
+						if CurrentStep:GetStepsType() == 'StepsType_Pump_Double_P' then
+							self:setstate(4);
+						end;
+						if CurrentStep:GetPlayers() ~= 1 then
+							self:setstate(5);
+						end;
+						if CurrentStep:GetStepsType() == 'StepsType_Pump_Halfdouble' then
+							self:setstate(2);
+						end;
+						
+						
+						if (GAMESTATE:GetMusicTrainChannel() or  GAMESTATE:GetProgressiveChannel())  and #vpSteps > 0 then
+							local sType = vpSteps[1].modes;
+							local sVarType = nil;
+							
+							lastStepTypeTrain = sType;
+							if (#vpSteps > 1) then
+								sVarType = vpSteps[2].modes;
+							end;
+							
+							if (sType == "pump-single") then
+								self:setstate(0);
+								lastStepTypeTrain = sType;
+							end;
+							if (sType == "pump-double") then
+								self:setstate(3);
+								lastStepTypeTrain = sType;
+							end;
+							
+							
+							if (sType == "pump-single-p") then
+								lastStepTypeTrain = sType;
+								if (sVarType ~= nil) then
+									if (sVarType == sType) then
+										self:setstate(1);
+									else
+										self:setstate(0);
+										lastStepTypeTrain = "pump-single";
+									end;
+								else
+									self:setstate(1);
+								end;
+							end; 
+							
+							if (sType == "pump-double-p") then
+								lastStepTypeTrain = sType;
+								if (sVarType ~= nil) then
+									if (sVarType == sType) then
+										self:setstate(4);
+									else
+										self:setstate(3);
+										lastStepTypeTrain = "pump-double";
+									end;
+								else
+									self:setstate(4);
+								end;
+							end; 
+							
+							if (sType == "pump-half") then
+								lastStepTypeTrain = sType;
+								if (sVarType ~= nil) then
+									if (sVarType == sType) then
+										self:setstate(2);
+									else
+										self:setstate(3);
+										lastStepTypeTrain = "pump-double";
+									end;
+								else
+									self:setstate(2);
+								end;
+							end;
+						end;
+						
 					end;
 				end;
-			end;
-			SongUnchosenMessageCommand=cmd(finishtweening;setstate,0;diffusealpha,0);
-			ChangeStepsMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
-			ProfileMessageCommand=function(self)
-				if SCREENMAN:GetTopScreen():GetSelectionState() ~= 'SelectingChannel' and SCREENMAN:GetTopScreen():GetSelectionState() ~= 'SelectingSong' then
-					self:finishtweening():queuecommand("Refresh");
+			};
+			
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/DIFFLABELS"))..{
+				OnCommand=function(self)
+					self:setstate(0):animate(false):x(225*p):y(290):zoom(1);
 				end;
-			end;
-			StepsUnchosenMessageCommand=function(self)
-				if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
-					self:finishtweening():queuecommand("Refresh");
-				end;
-			end;
-		};
-		
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/CUSLABELS"))..{
-			OnCommand=function(self)
-				self:setstate(0):animate(false):x(225*p):y(290):zoom(1);
-			end;
-			SongChosenMessageCommand=cmd(finishtweening;sleep,0.125;queuecommand,"Refresh");
-			RefreshStepMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
-			RefreshCommand=function(self)
-				if bIsModded() and mCustomLabel then
-					local CurrentStep = GAMESTATE:GetCurrentSteps(ARRAY[p]);
+				SongChosenMessageCommand=cmd(finishtweening;diffusealpha,1;sleep,0.125;queuecommand,"Refresh");
+				RefreshStepMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
+				RefreshCommand=function(self)
 					self:setstate(0);
-					if GAMESTATE:IsHumanPlayer(ARRAY[p]) and not GAMESTATE:GetQuestZoneChannel() then
-
-						local tlabel = string.lower(LabelTypeToMode(CurrentStep:GetLabelType()))
-						local clabel = string.lower(DesCustomLabel(CurrentStep:GetDescription()))
-						local setlclabel = setNormalLabelState(tlabel, clabel)
-
-						local nlabel = (tlabel == "ucs" and 2) or (tlabel == "another" and 3) or 0
-						self:setstate(nlabel == 0 and setlclabel or 0);
-
+					if GAMESTATE:IsHumanPlayer(ARRAY[p]) then
+						local CurrentStep = GAMESTATE:GetCurrentSteps(ARRAY[p]);
+						if CurrentStep:GetLabelType() == "LABELTYPE_NEW" then
+							local scorelist = PROFILEMAN:GetProfile(ARRAY[p]):GetHighScoreList(GAMESTATE:GetCurrentSong(),GAMESTATE:GetCurrentSteps(ARRAY[p]));
+							local scores = scorelist:GetHighScores();
+							local topscore = scores[1];
+							if not topscore then
+								self:setstate(1);
+							end;
+						end;
+						if CurrentStep:GetLabelType() == "LABELTYPE_UCS" then
+							self:setstate(2);
+						end;
+						if CurrentStep:GetLabelType() == "LABELTYPE_ANOTHER" then
+							self:setstate(3);
+						end;
 					end;
 				end;
-			end;
-			SongUnchosenMessageCommand=cmd(finishtweening;setstate,0);
-			ChangeStepsMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
-			StepsUnchosenMessageCommand=function(self)
-				if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
-					self:finishtweening():queuecommand("Refresh");
+				SongUnchosenMessageCommand=cmd(finishtweening;setstate,0;diffusealpha,0);
+				ChangeStepsMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
+				ProfileMessageCommand=function(self)
+					if SCREENMAN:GetTopScreen():GetSelectionState() ~= 'SelectingChannel' and SCREENMAN:GetTopScreen():GetSelectionState() ~= 'SelectingSong' then
+						self:finishtweening():queuecommand("Refresh");
+					end;
 				end;
-			end;
-		};
+				StepsUnchosenMessageCommand=function(self)
+					if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
+						self:finishtweening():queuecommand("Refresh");
+					end;
+				end;
+			};
+			
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/CUSLABELS"))..{
+				OnCommand=function(self)
+					self:setstate(0):animate(false):x(225*p):y(290):zoom(1);
+				end;
+				SongChosenMessageCommand=cmd(finishtweening;sleep,0.125;queuecommand,"Refresh");
+				RefreshStepMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
+				RefreshCommand=function(self)
+					if bIsModded() and mCustomLabel then
+						local CurrentStep = GAMESTATE:GetCurrentSteps(ARRAY[p]);
+						self:setstate(0);
+						if GAMESTATE:IsHumanPlayer(ARRAY[p]) and not GAMESTATE:GetQuestZoneChannel() then
 
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/SSM-FULL-QUESTTHINGS"))..{
-			OnCommand=function(self)
-				self:setstate(1):animate(false):y(-380):zoom(1.3):visible(false);				
-			end;
-			SongChosenMessageCommand=cmd(finishtweening;sleep,0.125;queuecommand,"Refresh");
-			RefreshCommand=function(self)
-				self:visible(false);
-				if GAMESTATE:IsHumanPlayer(ARRAY[p]) then
-					if GRAY(GAMESTATE:GetCurrentSteps(ARRAY[p]),ARRAY[p]) then
+							local tlabel = string.lower(LabelTypeToMode(CurrentStep:GetLabelType()))
+							local clabel = string.lower(DesCustomLabel(CurrentStep:GetDescription()))
+							local setlclabel = setNormalLabelState(tlabel, clabel)
+
+							local nlabel = (tlabel == "ucs" and 2) or (tlabel == "another" and 3) or 0
+							self:setstate(nlabel == 0 and setlclabel or 0);
+
+						end;
+					end;
+				end;
+				SongUnchosenMessageCommand=cmd(finishtweening;setstate,0);
+				ChangeStepsMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
+				StepsUnchosenMessageCommand=function(self)
+					if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
+						self:finishtweening():queuecommand("Refresh");
+					end;
+				end;
+			};
+
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/SSM-FULL-QUESTTHINGS"))..{
+				OnCommand=function(self)
+					self:setstate(1):animate(false):y(-380):zoom(1.3):visible(false);				
+				end;
+				SongChosenMessageCommand=cmd(finishtweening;sleep,0.125;queuecommand,"Refresh");
+				RefreshCommand=function(self)
+					self:visible(false);
+					if GAMESTATE:IsHumanPlayer(ARRAY[p]) then
+						if GRAY(GAMESTATE:GetCurrentSteps(ARRAY[p]),ARRAY[p]) then
+							self:visible(true);
+						end;
+					end;						
+				end;
+				SongUnchosenMessageCommand=cmd(finishtweening;visible,false);
+				ChangeStepsMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
+				ProfileMessageCommand=function(self)
+					if SCREENMAN:GetTopScreen():GetSelectionState() ~= 'SelectingChannel' and SCREENMAN:GetTopScreen():GetSelectionState() ~= 'SelectingSong' then
+						self:finishtweening():queuecommand("Refresh");
+					end;
+				end;
+				StepsUnchosenMessageCommand=function(self)
+					if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
+						self:finishtweening():queuecommand("Refresh");
+					end;
+				end;
+			};
+
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/StepBall_Ready"))..{
+				OnCommand=cmd(visible,false;x,225*p;y,290;zoom,.7;glowshift;effectcolor1,color("1,1,1,0.25");effectcolor2,color("1,1,1,0");effectperiod,0.25);
+				SongUnchosenMessageCommand=cmd(visible,false);
+				StepsChosenMessageCommand=function(self,params)
+					if params.Player == ARRAY[p] then
 						self:visible(true);
 					end;
-				end;						
-			end;
-			SongUnchosenMessageCommand=cmd(finishtweening;visible,false);
-			ChangeStepsMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
-			ProfileMessageCommand=function(self)
-				if SCREENMAN:GetTopScreen():GetSelectionState() ~= 'SelectingChannel' and SCREENMAN:GetTopScreen():GetSelectionState() ~= 'SelectingSong' then
-					self:finishtweening():queuecommand("Refresh");
 				end;
-			end;
-			StepsUnchosenMessageCommand=function(self)
-				if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
-					self:finishtweening():queuecommand("Refresh");
+				StepsUnchosenMessageCommand=function(self,params)
+					if params.Player == ARRAY[p] then
+						self:visible(false);
+					end;
 				end;
-			end;
-		};
-		
+			};
 
-		
-		
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/StepBall_Ready"))..{
-			OnCommand=cmd(visible,false;x,225*p;y,290;zoom,.7;glowshift;effectcolor1,color("1,1,1,0.25");effectcolor2,color("1,1,1,0");effectperiod,0.25);
-			SongUnchosenMessageCommand=cmd(visible,false);
-			StepsChosenMessageCommand=function(self,params)
-				if params.Player == ARRAY[p] then
-					self:visible(true);
+			LoadFont("Level")..{
+				OnCommand=function(self)
+					self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(900*p):y(205):zoomx(.85):zoomy(.95);
 				end;
-			end;
-			StepsUnchosenMessageCommand=function(self,params)
-				if params.Player == ARRAY[p] then
-					self:visible(false);
+				SongChosenMessageCommand=cmd(stoptweening;diffusealpha,1;linear,0.125;x,225*p;playcommand,"Refresh");
+				SongUnchosenMessageCommand=cmd(stoptweening;linear,0.125;x,900*p;sleep,.1;diffusealpha,0);
+				ChangeStepsMessageCommand=cmd(finishtweening;playcommand,"Refresh");
+				RefreshStepMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
+				StepsUnchosenMessageCommand=function(self)
+					if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
+						self:finishtweening():playcommand("Refresh");
+					end;
 				end;
-			end;
+				PlayerJoinedMessageCommand=cmd(finishtweening;playcommand,"On");
+				
+				RefreshCommand=function(self)
+					if GAMESTATE:IsHumanPlayer(ARRAY[p]) then
+						self:visible(true);
+						local CurrentStep = GAMESTATE:GetCurrentSteps(ARRAY[p]);
+						local meter = CurrentStep:GetMeter();
+						meter = FixMeter(meter);
+						if (meter == "49" or meter == "50" or meter == "99") then
+							meter = "??";
+						end;
+						if meter == "51" then
+							meter = "!!";
+						end;
+						if CurrentStep:GetPlayers() ~= 1 then
+							meter = "x"..CurrentStep:GetPlayers();
+						end;
+
+						self:settext(meter);
+						
+					end;
+				end;
+			};	
+
+			LoadFont("borderlevel")..{
+				OnCommand=function(self)
+					self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(900*p):y(205):zoomx(.85):zoomy(.95);				
+				end;
+				SongChosenMessageCommand=cmd(stoptweening;diffusealpha,1;linear,0.125;x,225*p;playcommand,"Refresh");
+				SongUnchosenMessageCommand=cmd(stoptweening;linear,0.125;x,900*p;diffusealpha,0);
+				ChangeStepsMessageCommand=cmd(finishtweening;playcommand,"Refresh");
+				StepsUnchosenMessageCommand=function(self)
+					if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
+						self:finishtweening():playcommand("Refresh");
+					end;
+				end;
+				RefreshStepMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
+				PlayerJoinedMessageCommand=cmd(finishtweening;playcommand,"On");
+				RefreshCommand=function(self)
+					if GAMESTATE:IsHumanPlayer(ARRAY[p]) then
+						self:visible(true);
+						local CurrentStep = GAMESTATE:GetCurrentSteps(ARRAY[p]);
+						if CurrentStep:GetStepsType() == 'StepsType_Pump_Single' then
+							self:diffuse(color("#944f00"));
+						end;
+						if CurrentStep:GetStepsType() == 'StepsType_Pump_Double' then
+							self:diffuse(color("#266219"));
+						end;
+						if CurrentStep:GetStepsType() == 'StepsType_Pump_Single_P' then
+							self:diffuse(color("#7e0c7e"));
+						end;
+						if CurrentStep:GetStepsType() == 'StepsType_Pump_Double_P' then
+							self:diffuse(color("#003391"));
+						end;
+						if  CurrentStep:GetStepsType() == 'StepsType_Pump_Halfdouble' then
+							self:diffuse(color("#007272"));
+						end;
+
+						local meter = CurrentStep:GetMeter();
+						meter = FixMeter(meter);
+						if (meter == "49" or meter == "50" or meter == "99") then
+							meter = "??";
+						end;
+						if meter == "51" then
+							meter = "!!";
+						end;
+						
+						
+						if CurrentStep:GetPlayers() ~= 1 then
+							meter = "x"..CurrentStep:GetPlayers();
+							self:diffuse(color("#8f752e"));
+						end;
+						
+						
+						if (GAMESTATE:GetMusicTrainChannel() or  GAMESTATE:GetProgressiveChannel() ) and #vpSteps > 0 then
+							local sType = vpSteps[1].modes;
+							local sVarType = nil;
+							
+							if (#vpSteps > 1) then
+								sVarType = vpSteps[2].modes;
+							end;
+							
+							if (sType == "pump-single") then
+								self:diffuse(color("#944f00"));
+							end;
+							if (sType == "pump-double") then
+								self:diffuse(color("#266219"));
+							end;
+							
+							
+							if (sType == "pump-single-p") then
+								if (sVarType ~= nil) then
+									if (sVarType == sType) then
+										self:diffuse(color("#ff00f4"));
+									else
+										self:diffuse(color("#944f00"));
+									end;
+								else
+									self:diffuse(color("#ff00f4"));
+								end;
+							end; 
+							
+							if (sType == "pump-double-p") then
+								if (sVarType ~= nil) then
+									if (sVarType == sType) then
+										self:diffuse(color("#7e0c7e"));
+									else
+										self:diffuse(color("#266219"));
+									end;
+								else
+									self:diffuse(color("#7e0c7e"));
+								end;
+							end; 
+							
+							if (sType == "pump-half") then
+								if (sVarType ~= nil) then
+									if (sVarType == sType) then
+										self:diffuse(color("#007272"));
+									else
+										self:diffuse(color("#266219"));
+									end;
+								else
+									self:diffuse(color("#007272"));
+								end;
+							end;
+							
+						end;
+						
+						
+						self:settext(meter);
+					end;
+				end;
+			};
+
 		};
 		
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/MusicWheel_Arrow"))..{
@@ -1178,156 +1322,10 @@ for p=-1,1,2 do
 					end;
 				end;
 			end;
-		};
-
-		
-		LoadFont("Level")..{
-			OnCommand=function(self)
-				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(900*p):y(205):zoomx(.85):zoomy(.95);
-			end;
-			SongChosenMessageCommand=cmd(stoptweening;diffusealpha,1;linear,0.125;x,225*p;playcommand,"Refresh");
-			SongUnchosenMessageCommand=cmd(stoptweening;linear,0.125;x,900*p;sleep,.1;diffusealpha,0);
-			ChangeStepsMessageCommand=cmd(finishtweening;playcommand,"Refresh");
-			RefreshStepMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
-			StepsUnchosenMessageCommand=function(self)
-				if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
-					self:finishtweening():playcommand("Refresh");
-				end;
-			end;
-			PlayerJoinedMessageCommand=cmd(finishtweening;playcommand,"On");
-			
-			RefreshCommand=function(self)
-				if GAMESTATE:IsHumanPlayer(ARRAY[p]) then
-					self:visible(true);
-					local CurrentStep = GAMESTATE:GetCurrentSteps(ARRAY[p]);
-					local meter = CurrentStep:GetMeter();
-					meter = FixMeter(meter);
-					if (meter == "49" or meter == "50" or meter == "99") then
-						meter = "??";
-					end;
-					if meter == "51" then
-						meter = "!!";
-					end;
-					if CurrentStep:GetPlayers() ~= 1 then
-						meter = "x"..CurrentStep:GetPlayers();
-					end;
-
-					self:settext(meter);
-					
-				end;
-			end;
-		};	
-
-		LoadFont("borderlevel")..{
-			OnCommand=function(self)
-				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(900*p):y(205):zoomx(.85):zoomy(.95);				
-			end;
-			SongChosenMessageCommand=cmd(stoptweening;diffusealpha,1;linear,0.125;x,225*p;playcommand,"Refresh");
-			SongUnchosenMessageCommand=cmd(stoptweening;linear,0.125;x,900*p;diffusealpha,0);
-			ChangeStepsMessageCommand=cmd(finishtweening;playcommand,"Refresh");
-			StepsUnchosenMessageCommand=function(self)
-				if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
-					self:finishtweening():playcommand("Refresh");
-				end;
-			end;
-			RefreshStepMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
-			PlayerJoinedMessageCommand=cmd(finishtweening;playcommand,"On");
-			RefreshCommand=function(self)
-				if GAMESTATE:IsHumanPlayer(ARRAY[p]) then
-					self:visible(true);
-					local CurrentStep = GAMESTATE:GetCurrentSteps(ARRAY[p]);
-					if CurrentStep:GetStepsType() == 'StepsType_Pump_Single' then
-						self:diffuse(color("#944f00"));
-					end;
-					if CurrentStep:GetStepsType() == 'StepsType_Pump_Double' then
-						self:diffuse(color("#266219"));
-					end;
-					if CurrentStep:GetStepsType() == 'StepsType_Pump_Single_P' then
-						self:diffuse(color("#7e0c7e"));
-					end;
-					if CurrentStep:GetStepsType() == 'StepsType_Pump_Double_P' then
-						self:diffuse(color("#003391"));
-					end;
-					if  CurrentStep:GetStepsType() == 'StepsType_Pump_Halfdouble' then
-						self:diffuse(color("#007272"));
-					end;
-
-					local meter = CurrentStep:GetMeter();
-					meter = FixMeter(meter);
-					if (meter == "49" or meter == "50" or meter == "99") then
-						meter = "??";
-					end;
-					if meter == "51" then
-						meter = "!!";
-					end;
-					
-					
-					if CurrentStep:GetPlayers() ~= 1 then
-						meter = "x"..CurrentStep:GetPlayers();
-						self:diffuse(color("#8f752e"));
-					end;
-					
-					
-					if (GAMESTATE:GetMusicTrainChannel() or  GAMESTATE:GetProgressiveChannel() ) and #vpSteps > 0 then
-						local sType = vpSteps[1].modes;
-						local sVarType = nil;
-						
-						if (#vpSteps > 1) then
-							sVarType = vpSteps[2].modes;
-						end;
-						
-						if (sType == "pump-single") then
-							self:diffuse(color("#944f00"));
-						end;
-						if (sType == "pump-double") then
-							self:diffuse(color("#266219"));
-						end;
-						
-						
-						if (sType == "pump-single-p") then
-							if (sVarType ~= nil) then
-								if (sVarType == sType) then
-									self:diffuse(color("#ff00f4"));
-								else
-									self:diffuse(color("#944f00"));
-								end;
-							else
-								self:diffuse(color("#ff00f4"));
-							end;
-						end; 
-						
-						if (sType == "pump-double-p") then
-							if (sVarType ~= nil) then
-								if (sVarType == sType) then
-									self:diffuse(color("#7e0c7e"));
-								else
-									self:diffuse(color("#266219"));
-								end;
-							else
-								self:diffuse(color("#7e0c7e"));
-							end;
-						end; 
-						
-						if (sType == "pump-half") then
-							if (sVarType ~= nil) then
-								if (sVarType == sType) then
-									self:diffuse(color("#007272"));
-								else
-									self:diffuse(color("#266219"));
-								end;
-							else
-								self:diffuse(color("#007272"));
-							end;
-						end;
-						
-					end;
-					
-					
-					self:settext(meter);
-				end;
-			end;
 		};		
+		
 	};
+	
 end;
 
 return t;
