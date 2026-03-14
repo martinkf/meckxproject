@@ -88,7 +88,10 @@ DifficultyListBackArtAssets_ZoomYSongChosen = 1.25
 --FloatingLabels_Visibility = true --original
 FloatingLabels_Visibility = false
 
+
 -- -- SCREEN SELECT MUSIC - SONG CHOSEN (CHART DETAILS)
+
+-- CHART DETAIL LABELS
 
 --DifficultyDetails_Y = -70 --original
 DifficultyDetails_Y = -90
@@ -96,6 +99,11 @@ DifficultyDetails_Y = -90
 DifficultyDetails_XPlayer1 = -400
 --DifficultyDetails_XPlayer2 = 556 --original
 DifficultyDetails_XPlayer2 = 400
+
+-- WHITE ARROWS
+
+--ChartSelectArrows_Y = 225 --original
+ChartSelectArrows_Y = -105
 
 
 -- -- -- 02 - FUNCTIONS

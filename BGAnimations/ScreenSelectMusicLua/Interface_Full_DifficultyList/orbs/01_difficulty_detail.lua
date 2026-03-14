@@ -1270,7 +1270,7 @@ for p=-1,1,2 do
 		
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/MusicWheel_Arrow"))..{
 			OnCommand=function(self)
-				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):rotationy(-180):animate(false):x(p == -1 and -335 or 115):y(225):zoom(0);
+				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):rotationy(-180):animate(false):x(p == -1 and -335 or 115):y(ChartSelectArrows_Y):zoom(0);
 			end;
 			SongChosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,.6);
 			SongUnchosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,0);
@@ -1298,7 +1298,7 @@ for p=-1,1,2 do
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/MusicWheel_Arrow"))..{
 			OnCommand=function(self)
-				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):animate(false):x(p == -1 and -115 or 335):y(225):zoom(0);
+				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):animate(false):x(p == -1 and -115 or 335):y(ChartSelectArrows_Y):zoom(0);
 			end;
 			SongChosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,.6);
 			SongUnchosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,0);
@@ -1325,7 +1325,7 @@ for p=-1,1,2 do
 		};		
 		
 	};
-	
+
 end;
 
 return t;
