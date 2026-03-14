@@ -52,11 +52,11 @@ SongIndexCounter_Y = 35
 -- PLAYER MOD ICONS
 
 --Player1ModIcons_X = SCREEN_CENTER_X-608 --original
-Player1ModIcons_X = SCREEN_CENTER_X-604
+Player1ModIcons_X = SCREEN_CENTER_X-606
 --Player2ModIcons_X = SCREEN_CENTER_X+610 --original
-Player2ModIcons_X = SCREEN_CENTER_X+606
+Player2ModIcons_X = SCREEN_CENTER_X+604
 --PlayerModIcons_Y = SCREEN_CENTER_Y-257 --original
-PlayerModIcons_Y = SCREEN_CENTER_Y-340
+PlayerModIcons_Y = SCREEN_CENTER_Y-376
 
 -- FLOATING CATEGORY AND CHANNEL LABELS
 
