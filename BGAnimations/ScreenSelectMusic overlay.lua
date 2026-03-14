@@ -726,6 +726,12 @@ t[#t+1] =  Def.ActorFrame{
 		CurrentSongChangedMessageCommand=function(self)			
 			self:finishtweening():queuecommand("Updateinfo"):diffusealpha(0):sleep(0.02):queuecommand("showInfo");	
 		end;
+		SongChosenMessageCommand=function(self)
+			self:stoptweening():linear(0.25):y(SongInfoStrip_YSongChosen);
+		end;
+		SongUnchosenMessageCommand=function(self)
+			self:stoptweening():linear(0.125):y(SongInfoStrip_Y);
+		end;
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/SM-BACKTITLE"))..{
 			Name="Basetitle";

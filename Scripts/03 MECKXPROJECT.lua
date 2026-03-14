@@ -1,5 +1,18 @@
 -- SCREEN SELECT MUSIC
 
+-- SONG INFORMATION STRIP
+
+--SongInfoStrip_Y = 0 --original
+SongInfoStrip_Y = 0
+
+--SongInfoStrip_YSongChosen = 0 --original
+SongInfoStrip_YSongChosen = -294
+
+-- SONG INDEX COUNTER
+
+--SongIndexCounter_Y = 106 --original
+SongIndexCounter_Y = 35
+
 -- MUSIC WHEEL
 
 -- Y position is done through metrics.ini ([ScreenSelectMusic] > MusicWheelY)
@@ -43,11 +56,6 @@ DifficultyListBackArtAssets_Y2 = SCREEN_CENTER_Y*1.86
 --DifficultyListBackArtAssets_SongUnchosenTransition
 -- original is: stoptweening;decelerate,0.2;diffusealpha,1;
 -- modified is: stoptweening;linear,0.125;y,SCREEN_CENTER_Y*1.86;zoomy,0.75;
-
--- SONG INDEX COUNTER
-
---SongIndexCounter_Y = 106 --original
-SongIndexCounter_Y = 35
 
 -- PLAYER MOD ICONS
 
