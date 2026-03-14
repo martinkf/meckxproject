@@ -444,11 +444,12 @@ local function BarTitle(self)
 				self:GetChild("Title"):settext("?????");
 			end;
 
-			local ftext = songartist .."  •  "..bpmActual.."  •  "..durationSong
+			local songOrigin = GAMESTATE:GetCurrentSong():GetOrigin();
+			local ftext = songartist .."  •  "..bpmActual.."  •  "..songOrigin
 			self:GetChild("Artist"):settext(ftext);
 			self:GetChild("Artist"):AddAttribute(0, {Length=#songartist, Diffuse=color("#ffe7c9"),StrokeColor=color("0,0,0,1")})
 			self:GetChild("Artist"):AddAttribute(#songartist + 5, {Length=#bpmActual, Diffuse=color("#c9fff3"),StrokeColor=color("0,0,0,1")})
-			self:GetChild("Artist"):AddAttribute(#songartist + #bpmActual + 10, {Length=#durationSong, Diffuse=color("#ffc9ea"),StrokeColor=color("0,0,0,1")})
+			self:GetChild("Artist"):AddAttribute(#songartist + #bpmActual + 10, {Length=#songOrigin, Diffuse=color("#ffc9ea"),StrokeColor=color("0,0,0,1")})
 		end;
 	end;
 end;
