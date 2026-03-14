@@ -286,12 +286,12 @@ t[#t+1] =  Def.ActorFrame
 
 --backsimpleDiffList
 t[#t + 1] = LoadActor(THEME:GetPathG("","ScreenSelectMusic/SM-BACKTITLE"))..{
-	InitCommand=cmd(xy,SCREEN_CENTER_X,SCREEN_CENTER_Y*1.37;zoomx,2.8;zoomy,0.75;diffusealpha,0.8;fadetop,0.1);
+	InitCommand=cmd(xy,SCREEN_CENTER_X,DifficultyListBackArtAssets_Y1;zoomx,2.8;zoomy,0.75;diffusealpha,0.8;fadetop,0.1);
 	CurrentSongChangedMessageCommand=function(self)			
 		self:finishtweening():diffusealpha(0.6):sleep(0.05):linear(0.2):diffusealpha(0.8);	
 	end;	
-	SongChosenMessageCommand=cmd(stoptweening;decelerate,0.2;diffusealpha,0;);
-	SongUnchosenMessageCommand=cmd(stoptweening;decelerate,0.2;diffusealpha,1;);	
+	SongChosenMessageCommand=cmd(stoptweening;linear,0.25;y,SCREEN_CENTER_Y*0.57;zoomy,1.25;);
+	SongUnchosenMessageCommand=cmd(stoptweening;linear,0.125;y,SCREEN_CENTER_Y*1.86;zoomy,0.75;);	
 
 	SelectChannelMessageCommand=function(self)
 		self:linear(0.2);
@@ -300,7 +300,7 @@ t[#t + 1] = LoadActor(THEME:GetPathG("","ScreenSelectMusic/SM-BACKTITLE"))..{
 		self:zoomx(2.1);
 	end;
 	ChannelChosenMessageCommand=function(self)
-		self:y(SCREEN_CENTER_Y*1.37);
+		self:y(DifficultyListBackArtAssets_Y1);
 		self:diffusealpha(0.8);
 		self:zoomx(2.8);
 	end;
@@ -310,7 +310,7 @@ t[#t + 1] = LoadActor(THEME:GetPathG("","ScreenSelectMusic/SM-BACKTITLE"))..{
 t[#t+1] =  Def.ActorFrame{
 
 	LoadActor(THEME:GetPathG("","ScreenSelectMusic/artifacts/lvplaceholderbase"))..{
-		InitCommand=cmd(xy,SCREEN_CENTER_X,SCREEN_CENTER_Y*1.35;zoom,1;diffusealpha,1;zoom,0.6;zoomx,0.65;);
+		InitCommand=cmd(xy,SCREEN_CENTER_X,DifficultyListBackArtAssets_Y2;zoom,1;diffusealpha,1;zoom,0.6;zoomx,0.65;);
 		CurrentSongChangedMessageCommand=function(self)			
 			--self:finishtweening():diffusealpha(0):sleep(0.05):linear(0.2):diffusealpha(0.8);
 			if GAMESTATE:GetGameMode() == 'Basic' then
@@ -329,7 +329,7 @@ t[#t+1] =  Def.ActorFrame{
 	};
 
 	LoadActor(THEME:GetPathG("","ScreenSelectMusic/artifacts/atype_lvbase"))..{
-		InitCommand=cmd(xy,SCREEN_CENTER_X,SCREEN_CENTER_Y*1.35;zoom,1;diffusealpha,1;zoom,0.6;zoomx,0.65;blend,"BlendMode_Add";queuecommand,"Ani");
+		InitCommand=cmd(xy,SCREEN_CENTER_X,DifficultyListBackArtAssets_Y2;zoom,1;diffusealpha,1;zoom,0.6;zoomx,0.65;blend,"BlendMode_Add";queuecommand,"Ani");
 		CurrentSongChangedMessageCommand=function(self)			
 			--self:finishtweening():diffusealpha(0):sleep(0.05):linear(0.2):diffusealpha(0.8):queuecommand("Ani");
 			if GAMESTATE:GetGameMode() == 'Basic' then
@@ -361,7 +361,7 @@ t[#t+1] =  Def.ActorFrame{
 	};
 
 	LoadActor(THEME:GetPathG("","ScreenSelectMusic/artifacts/btype_lvbase"))..{
-		InitCommand=cmd(xy,SCREEN_CENTER_X,SCREEN_CENTER_Y*1.35;zoom,1;diffusealpha,1;zoom,0.6;zoomx,0.65;blend,"BlendMode_Add";queuecommand,"Ani");
+		InitCommand=cmd(xy,SCREEN_CENTER_X,DifficultyListBackArtAssets_Y2;zoom,1;diffusealpha,1;zoom,0.6;zoomx,0.65;blend,"BlendMode_Add";queuecommand,"Ani");
 		CurrentSongChangedMessageCommand=function(self)			
 			--self:finishtweening():diffusealpha(0):sleep(0.05):linear(0.2):diffusealpha(0.8):queuecommand("Ani");
 			if GAMESTATE:GetGameMode() == 'Basic' then

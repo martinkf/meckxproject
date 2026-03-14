@@ -25,6 +25,17 @@ DifficultyListOrbs_SongChosenTransition1 = 0.25
 --DifficultyListOrbs_SongChosenTransition2 = 0.065 --original
 DifficultyListOrbs_SongChosenTransition2 = 0.125
 
+--DifficultyListBackArtAssets_Y1 = SCREEN_CENTER_Y*1.37 --original
+DifficultyListBackArtAssets_Y1 = SCREEN_CENTER_Y*1.86
+--DifficultyListBackArtAssets_Y2 = SCREEN_CENTER_Y*1.35 --original
+DifficultyListBackArtAssets_Y2 = SCREEN_CENTER_Y*1.86
+--DifficultyListBackArtAssets_SongChosenTransition
+-- original is: stoptweening;decelerate,0.2;diffusealpha,0;
+-- modified is: stoptweening;linear,0.25;y,SCREEN_CENTER_Y*0.57;zoomy,1.25;
+--DifficultyListBackArtAssets_SongUnchosenTransition
+-- original is: stoptweening;decelerate,0.2;diffusealpha,1;
+-- modified is: stoptweening;linear,0.125;y,SCREEN_CENTER_Y*1.86;zoomy,0.75;
+
 -- SONG INDEX COUNTER
 
 --SongIndexCounter_Y = 106 --original
