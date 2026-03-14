@@ -31,7 +31,7 @@ t[#t+1] =  Def.ActorFrame
 	Def.ActorFrame{
 		OnCommand=function(self)
 			self:x(SCREEN_CENTER_X-538);
-			self:y(SCREEN_CENTER_Y-320);
+			self:y(ChangeProfile_Y);
 
 			if isAspectRatio1610On then
 				self:y(SCREEN_CENTER_Y-360);
@@ -58,7 +58,7 @@ t[#t+1] =  Def.ActorFrame
 
 		OnCommand=function(self)
 			self:x(SCREEN_CENTER_X-197);
-			self:y(SCREEN_CENTER_Y-268);
+			self:y(ProfileEditorText_Y);
 			self:zoom(0.9);
 
 			if isAspectRatio1610On then
@@ -102,7 +102,7 @@ t[#t+1] =  Def.ActorFrame
 
 		OnCommand=function(self)
 			self:x(SCREEN_CENTER_X+530);
-			self:y(SCREEN_CENTER_Y-320);
+			self:y(ChangeProfile_Y);
 
 			if isAspectRatio1610On then
 				self:y(SCREEN_CENTER_Y-360);
@@ -131,7 +131,7 @@ t[#t+1] =  Def.ActorFrame
 
 		OnCommand=function(self)
 			self:x(SCREEN_CENTER_X+188);
-			self:y(SCREEN_CENTER_Y-268);
+			self:y(ProfileEditorText_Y);
 			self:zoom(0.9);
 
 			if isAspectRatio1610On then

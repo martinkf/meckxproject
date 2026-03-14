@@ -1,4 +1,28 @@
--- SCREEN SELECT MUSIC
+-- -- -- 01 - LEVERS
+
+-- -- SCREEN SELECT MUSIC
+
+-- PROFILE OVERLAY
+
+--ProfileBase_Y = 32 --original
+ProfileBase_Y = 32+546
+--Scorazones_Y = 65 --original
+Scorazones_Y = 65+546
+--ProfileEditorText_Y = SCREEN_CENTER_Y-268 --original
+ProfileEditorText_Y = SCREEN_CENTER_Y-268+546+83
+--ChangeProfile_Y = SCREEN_CENTER_Y-320 --original
+ChangeProfile_Y = SCREEN_CENTER_Y-320+546+83
+--AvatarPic_Y = 32 --original
+AvatarPic_Y = 32+546
+
+-- PLAYER MOD ICONS
+
+--Player1ModIcons_X = SCREEN_CENTER_X-608 --original
+Player1ModIcons_X = SCREEN_CENTER_X-606
+--Player2ModIcons_X = SCREEN_CENTER_X+610 --original
+Player2ModIcons_X = SCREEN_CENTER_X+604
+--PlayerModIcons_Y = SCREEN_CENTER_Y-257 --original
+PlayerModIcons_Y = SCREEN_CENTER_Y-376+338
 
 -- SONG INFORMATION STRIP
 
@@ -53,15 +77,6 @@ DifficultyListBackArtAssets_Y = SCREEN_CENTER_Y+40
 DifficultyListBackArtAssets_ZoomY = 0.75
 DifficultyListBackArtAssets_YSongChosen = SCREEN_CENTER_Y-80
 DifficultyListBackArtAssets_ZoomYSongChosen = 1.25
-
--- PLAYER MOD ICONS
-
---Player1ModIcons_X = SCREEN_CENTER_X-608 --original
-Player1ModIcons_X = SCREEN_CENTER_X-606
---Player2ModIcons_X = SCREEN_CENTER_X+610 --original
-Player2ModIcons_X = SCREEN_CENTER_X+604
---PlayerModIcons_Y = SCREEN_CENTER_Y-257 --original
-PlayerModIcons_Y = SCREEN_CENTER_Y-376
 
 -- FLOATING CATEGORY AND CHANNEL LABELS
 

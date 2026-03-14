@@ -7,7 +7,7 @@ function GetUsb()
 	xWidth[-1]=100;
 	xWidth[1]=100;
 
-	local yPosFix = 32;
+	local yPosFix = ProfileBase_Y;
 	
 	local fixp1pf=20; 
 	local fixp2pf=-20;
@@ -173,7 +173,7 @@ function GetUsb()
 			------------------------------------------------------------------------------------------------------------
 			--PROFILE IMAGE
 			LoadActor(THEME:GetPathG("","_blank"))..{
-				OnCommand=cmd(Center;addx,x[2];scaletoclipped,45,44;y,32;visible,GAMESTATE:IsHumanPlayer(ARRAY[p]);queuecommand,"Profile");
+				OnCommand=cmd(Center;addx,x[2];scaletoclipped,45,44;y,AvatarPic_Y;visible,GAMESTATE:IsHumanPlayer(ARRAY[p]);queuecommand,"Profile");
 				ProfileMessageCommand=function(self,params)
 					if params.Player == player then
 						self:finishtweening();
@@ -335,7 +335,7 @@ function GetUsb()
 				t[#t+1]=LoadActor(THEME:GetPathG("","ScreenSelectMusic/perfiles/scorazones")) .. {
 					InitCommand=cmd(diffusealpha,1);
 					OnCommand=function(self)
-						self:Center():addx(x[6] + 20 * (h*p)):y(65):zoom(0.85):animate(false):setstate(0):visible(GAMESTATE:IsHumanPlayer(ARRAY[p]));
+						self:Center():addx(x[6] + 20 * (h*p)):y(Scorazones_Y):zoom(0.85):animate(false):setstate(0):visible(GAMESTATE:IsHumanPlayer(ARRAY[p]));
 					end;
 					OffCommand=function(self)
 						self:linear(.4):addy(-200);
@@ -347,7 +347,7 @@ function GetUsb()
 				t[#t+1]=LoadActor(THEME:GetPathG("","ScreenSelectMusic/perfiles/scorazones")) .. {
 					InitCommand=cmd(diffusealpha,0);
 					OnCommand=function(self)
-						self:Center():addx(x[6] + 20 * (h*p)):y(65):zoom(0.85):animate(false):setstate(1):visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):diffuseshift():effectcolor1(color("1,1,1,1")):effectcolor2(color("1,1,1,1"));
+						self:Center():addx(x[6] + 20 * (h*p)):y(Scorazones_Y):zoom(0.85):animate(false):setstate(1):visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):diffuseshift():effectcolor1(color("1,1,1,1")):effectcolor2(color("1,1,1,1"));
 						if SCREENMAN:GetTopScreen():GetName() == "ScreenSelectMusic" then
 							self:queuecommand("Check");
 						end;
@@ -383,7 +383,7 @@ function GetUsb()
 
 				t[#t+1]=LoadActor(THEME:GetPathG("","ScreenSelectMusic/perfiles/scorazones")) .. {
 					InitCommand=cmd(diffusealpha,0);
-					OnCommand=cmd(diffusealpha,0;Center;addx,x[6] + 20 * (h*p);y,65;zoom,0.85;animate,false;setstate,1;visible,GAMESTATE:IsHumanPlayer(ARRAY[p]);queuecommand,"Check");
+					OnCommand=cmd(diffusealpha,0;Center;addx,x[6] + 20 * (h*p);y,Scorazones_Y;zoom,0.85;animate,false;setstate,1;visible,GAMESTATE:IsHumanPlayer(ARRAY[p]);queuecommand,"Check");
 					CheckCommand=function(self)
 						if GAMESTATE:GetCurrentSong() ~= nil then
 							local heart = GAMESTATE:GetCurrentSong():GetHearts();
