@@ -54,7 +54,8 @@ SongIndexCounter_Y = -252
 -- YELLOW ARROW TO THE LEFT OF THE MUSIC WHEEL
 
 --YellowArrows_Y = SCREEN_CENTER_Y*1.66; --original
-YellowArrows_Y = SCREEN_CENTER_Y-130
+YellowArrows_YLeftArrow = SCREEN_CENTER_Y-130
+YellowArrows_YRightArrow = SCREEN_CENTER_Y-130-4
 
 -- FAVORITE SONG ICON
 
@@ -103,7 +104,15 @@ DifficultyDetails_XPlayer2 = 400
 -- WHITE ARROWS
 
 --ChartSelectArrows_Y = 225 --original
-ChartSelectArrows_Y = -105
+ChartSelectArrows_Y = -16
+--ChartSelectArrows_XLeftArrowP1 = -335 --original
+ChartSelectArrows_XLeftArrowP1 = -576
+--ChartSelectArrows_XRightArrowP1 = -115 --original
+ChartSelectArrows_XRightArrowP1 = -225
+--ChartSelectArrows_XLeftArrowP2 = 115 --original
+ChartSelectArrows_XLeftArrowP2 = -ChartSelectArrows_XRightArrowP1
+--ChartSelectArrows_XRightArrowP2 = 335 --original
+ChartSelectArrows_XRightArrowP2 = -ChartSelectArrows_XLeftArrowP1
 
 
 -- -- -- 02 - FUNCTIONS

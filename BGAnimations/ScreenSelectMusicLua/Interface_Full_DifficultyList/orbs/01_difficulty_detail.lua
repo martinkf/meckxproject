@@ -1270,27 +1270,27 @@ for p=-1,1,2 do
 		
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/MusicWheel_Arrow"))..{
 			OnCommand=function(self)
-				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):rotationy(-180):animate(false):x(p == -1 and -335 or 115):y(ChartSelectArrows_Y):zoom(0);
+				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):rotationy(-180):animate(false):x(p == -1 and ChartSelectArrows_XLeftArrowP1 or ChartSelectArrows_XLeftArrowP2):y(ChartSelectArrows_Y):zoom(0);
 			end;
 			SongChosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,.6);
 			SongUnchosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,0);
 			ChangeStepsMessageCommand=function(self,params)
 				if params.Player == ARRAY[p] then
 					if params.Direction == 1 then
-						self:finishtweening():x(p == -1 and -335 or 115):sleep(0.25);
+						self:finishtweening():x(p == -1 and ChartSelectArrows_XLeftArrowP1 or ChartSelectArrows_XLeftArrowP2):sleep(0.25);
 					end;
 					if params.Direction == -1 then
-						self:finishtweening():x(p == -1 and -335 or 115):linear(0.125):x(p == -1 and -340 or 110):linear(0.125):x(p == -1 and -335 or 115);
+						self:finishtweening():x(p == -1 and ChartSelectArrows_XLeftArrowP1 or ChartSelectArrows_XLeftArrowP2):linear(0.125):x(p == -1 and (ChartSelectArrows_XLeftArrowP1-5) or (ChartSelectArrows_XLeftArrowP2-5)):linear(0.125):x(p == -1 and ChartSelectArrows_XLeftArrowP1 or ChartSelectArrows_XLeftArrowP2);
 					end;
 				end;
 			end;
 			StepsUnchosenMessageCommand=function(self,params)
 				if params.Player == ARRAY[p] then
 					if params.Direction == 1 then
-						self:finishtweening():x(p == -1 and -335 or 115):sleep(0.25);
+						self:finishtweening():x(p == -1 and ChartSelectArrows_XLeftArrowP1 or ChartSelectArrows_XLeftArrowP2):sleep(0.25);
 					end;
 					if params.Direction == -1 then
-						self:finishtweening():x(p == -1 and -335 or 115):linear(0.125):x(p == -1 and -340 or 110):linear(0.125):x(p == -1 and -335 or 115);
+						self:finishtweening():x(p == -1 and ChartSelectArrows_XLeftArrowP1 or ChartSelectArrows_XLeftArrowP2):linear(0.125):x(p == -1 and (ChartSelectArrows_XLeftArrowP1-5) or (ChartSelectArrows_XLeftArrowP2-5)):linear(0.125):x(p == -1 and ChartSelectArrows_XLeftArrowP1 or ChartSelectArrows_XLeftArrowP2);
 					end;
 				end;
 			end;
@@ -1298,27 +1298,27 @@ for p=-1,1,2 do
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/MusicWheel_Arrow"))..{
 			OnCommand=function(self)
-				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):animate(false):x(p == -1 and -115 or 335):y(ChartSelectArrows_Y):zoom(0);
+				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):animate(false):x(p == -1 and ChartSelectArrows_XRightArrowP1 or ChartSelectArrows_XRightArrowP2):y(ChartSelectArrows_Y):zoom(0);
 			end;
 			SongChosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,.6);
 			SongUnchosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,0);
 			ChangeStepsMessageCommand=function(self,params)
 				if params.Player == ARRAY[p] then
 					if params.Direction == 1 then
-						self:finishtweening():x(p == -1 and -115 or 335):linear(0.125):x(p == -1 and -110 or 340):linear(0.125):x(p == -1 and -115 or 335);
+						self:finishtweening():x(p == -1 and ChartSelectArrows_XRightArrowP1 or ChartSelectArrows_XRightArrowP2):linear(0.125):x(p == -1 and (ChartSelectArrows_XRightArrowP1+5) or (ChartSelectArrows_XRightArrowP2+5)):linear(0.125):x(p == -1 and ChartSelectArrows_XRightArrowP1 or ChartSelectArrows_XRightArrowP2);
 					end;
 					if params.Direction == -1 then
-						self:finishtweening():x(p == -1 and -115 or 335):sleep(0.25);
+						self:finishtweening():x(p == -1 and ChartSelectArrows_XRightArrowP1 or ChartSelectArrows_XRightArrowP2):sleep(0.25);
 					end;
 				end;
 			end;
 			StepsUnchosenMessageCommand=function(self,params)
 				if params.Player == ARRAY[p] then
 					if params.Direction == 1 then
-						self:finishtweening():x(p == -1 and -115 or 335):linear(0.125):x(p == -1 and -110 or 340):linear(0.125):x(p == -1 and -115 or 335);
+						self:finishtweening():x(p == -1 and ChartSelectArrows_XRightArrowP1 or ChartSelectArrows_XRightArrowP2):linear(0.125):x(p == -1 and (ChartSelectArrows_XRightArrowP1+5) or (ChartSelectArrows_XRightArrowP2+5)):linear(0.125):x(p == -1 and ChartSelectArrows_XRightArrowP1 or ChartSelectArrows_XRightArrowP2);
 					end;
 					if params.Direction == -1 then
-						self:finishtweening():x(p == -1 and -115 or 335):sleep(0.25);
+						self:finishtweening():x(p == -1 and ChartSelectArrows_XRightArrowP1 or ChartSelectArrows_XRightArrowP2):sleep(0.25);
 					end;
 				end;
 			end;
