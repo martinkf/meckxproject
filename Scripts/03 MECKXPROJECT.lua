@@ -55,7 +55,7 @@ SongIndexCounter_Y = -252
 
 --YellowArrows_Y = SCREEN_CENTER_Y*1.66; --original
 YellowArrows_YLeftArrow = SCREEN_CENTER_Y-130
-YellowArrows_YRightArrow = SCREEN_CENTER_Y-130-4
+YellowArrows_YRightArrow = SCREEN_CENTER_Y-130-5
 
 -- FAVORITE SONG ICON
 
