@@ -159,3 +159,67 @@ function Meckx_FetchFromChart(input_chart, fetch_details)
 	return output
 
 end
+
+-- BRAINSTORMING
+--
+-- AFTER PROFILE SELECT, SCREENSELECTGAMEMODE
+--
+-- 01 - PIU HISTORIA MODE
+--				1 OR 2 PLAYERS
+--				SINGLES, HALF-DOUBLES, DOUBLES [OK]
+--				CO-OP CHARTS FILTERED OUT [X]
+--				PLAYERS CAN SELECT DIFFERENT PLAYLISTS - THE CHARTS AVAILABLE TO PLAY IN ANY GIVEN OLD OFFICIAL VERSION
+--				WHAT HAPPENS WHEN PRESS 7 OR 9?
+--					DEFAULT: THE FOLLOWING DOUBLE-WHEEL SYSTEM
+--						WHEEL 1 - PLAYLISTS
+--							1ST
+--							2ND
+--							3RD
+--							(...)
+--						WHEEL 2 - FILTERS
+--							FULL DISPLAY MODE
+--							SHOW REMIX ONLY
+--							SHOW FULL SONG ONLY
+--							SHOW SHORT CUT ONLY
+--							SINGLE LV. 01 - make sure the first element is a "PICK ONE AT RANDOM"
+--							SINGLE LV. 02 - make sure the first element is a "PICK ONE AT RANDOM"
+--							(...)
+--							HALF-DOUBLE LV. 01 - make sure the first element is a "PICK ONE AT RANDOM"
+--							HALF-DOUBLE LV. 02 - make sure the first element is a "PICK ONE AT RANDOM"
+--							(...)
+--							DOUBLE LV. 01 - make sure the first element is a "PICK ONE AT RANDOM"
+--							DOUBLE LV. 02 - make sure the first element is a "PICK ONE AT RANDOM"
+--							(...)
+--							SURVIVAL MODE
+--
+-- 02 - HALLYU MODE
+--				1 OR 2 PLAYERS
+--				SINGLES, HALF-DOUBLES, DOUBLES [OK]
+--				CO-OP CHARTS FILTERED OUT [X]
+--				ONE UNIQUE PLAYLIST, MADE OF K-POP ONLY, BOTH FROM ANDAMIRO AND FROM FANS
+--				WHAT HAPPENS WHEN PRESS 7 OR 9?
+--					THE FOLLOWING SINGLE-WHEEL SYSTEM
+--						WHEEL 1 - FILTERS
+--							ORDER ALL SONGS BY YEAR > ARTIST
+--							ORDER ALL SONGS BY ARTIST > YEAR
+--							SINGLE LV. 01 - make sure the first element is a "PICK ONE AT RANDOM"
+--							SINGLE LV. 02 - make sure the first element is a "PICK ONE AT RANDOM"
+--							(...)
+--							HALF-DOUBLE LV. 01 - make sure the first element is a "PICK ONE AT RANDOM"
+--							HALF-DOUBLE LV. 02 - make sure the first element is a "PICK ONE AT RANDOM"
+--							(...)
+--							DOUBLE LV. 01 - make sure the first element is a "PICK ONE AT RANDOM"
+--							DOUBLE LV. 02 - make sure the first element is a "PICK ONE AT RANDOM"
+--							(...)
+--							SURVIVAL MODE
+--
+-- 03 - CO-OP MODE
+--				1 PLAYER ONLY (DON'T SELECT A PROFILE AND ALWAYS USE GUEST)
+--				CO-OP CHARTS [OK], BOTH FROM ANDAMIRO AND FROM FANS/UCS
+--				SINGLES, HALF-DOUBLES, DOUBLES FILTERED OUT [X]
+--				WHAT HAPPENS WHEN PRESS 7 OR 9?
+--					THE FOLLOWING SINGLE-WHEEL SYSTEM
+--						WHEEL 1 - FILTERS
+--							SHOW CO-OP 2P ONLY
+--							SHOW CO-OP 3P ONLY
+--							SHOW CO-OP 4P ONLY
