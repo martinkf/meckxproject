@@ -49,37 +49,44 @@ local cwMainDescription = {
 	
 	--noteskin
 	["EN-note skin/GENERICTEXT"] =		"Set ";
+	["EN-note skin/OLD"] =				"Set Classic Skin";
+	["EN-note skin/EXTRA_MIX"] =		"Set Extra Skin";
+	["EN-note skin/REBIRTH"] =			"Set Rebirth Skin";
+	["EN-note skin/EASY"] =				"Set Zero Easy Station Skin";
+	["EN-note skin/SHEEP"] =			"Set Dignity Sheep Skin";
+	["EN-note skin/NX"] =				"Set NX Skin";
+	["EN-note skin/NX2"] =				"Set NX2 Skin";
+	["EN-note skin/NXA"] =				"Set NX Absolute Skin";
+	["EN-note skin/FIESTA"] =			"Set Fiesta Skin";
+	["EN-note skin/BASIC"] =			"Set Basic Mode Skin";
+	["EN-note skin/INFINITY"] =			"Set Infinity Skin";
+	["EN-note skin/INFINITY-RHYTHM"] =	"Set Infinity Rhythm Skin";
+	["EN-note skin/FIESTA2"] =			"Set Fiesta 2 Skin";
+	["EN-note skin/PRIME"] =			"Set Prime Skin";
+	["EN-note skin/PRIME2"] =			"Set Prime 2 Skin";
+	["EN-note skin/XX"] =				"Set XX Skin";
+	["EN-note skin/PHOENIX"] =			"Set Phoenix Skin";
+	["EN-note skin/RISE"] =				"Set Rise Skin";
+	["EN-note skin/XSANITY"] =			"Set XSanity Skin";
+
 	["EN-note skin/FLOWER"] =			"Set Korean Trump Skin";
-	["EN-note skin/OLD"] =				"Set Old Skin";
-	["EN-note skin/EASY"] =				"Set Easy Skin";
 	["EN-note skin/SLIME"] =			"Set Slime Skin";
 	["EN-note skin/MUSIC"] =			"Set Music Skin";
 	["EN-note skin/CANON"] =			"Set Canon Skin";
-	["EN-note skin/NX"] =				"Set NX Skin";
-	["EN-note skin/SHEEP"] =			"Set Lamb Skin";
 	["EN-note skin/HORSE"] =			"Set Horse Skin";
+	["EN-note skin/POKER"] =			"Set Poker Skin";
 	["EN-note skin/DOG"] =				"Set Dog Skin";
 	["EN-note skin/GIRL"] =				"Set Girl Skin";
 	["EN-note skin/FIRE"] =				"Set Fire Skin";
 	["EN-note skin/ICE"] =				"Set Ice Skin";
 	["EN-note skin/WIND"] =				"Set Wind Skin";
-	["EN-note skin/NXA"] =				"Set NXA Skin";
-	["EN-note skin/NX2"] =				"Set NX2 Skin";
 	["EN-note skin/LIGHTNING"] =		"Set Lightning Skin";
 	["EN-note skin/DRUM"] =				"Set Drum Skin";
 	["EN-note skin/MISSILE"] =			"Set Missile Skin";
 	["EN-note skin/SOCCER"] =			"Set Football Skin";
-	["EN-note skin/REBIRTH"] =			"Set Rebirth Skin";
-	["EN-note skin/BASIC"] =			"Set Basic mode Skin";
-	["EN-note skin/FIESTA"] =			"Set Fiesta Skin";
-	["EN-note skin/FIESTA2"] =			"Set Fiesta 2 Skin";	
-	["EN-note skin/PRIME2"] =			"Set Prime 2 Skin";	
-	["EN-note skin/XX"] =				"Set XX Anniversary Skin";	
-	["EN-note skin/INFINITY"] =			"Set Infinity Skin";
-	["EN-note skin/INFINITY-RHYTHM"] =	"Set Infinity Rhythm Skin";
 	["EN-note skin/PRO-RHYTHM"] =		"Set Pro Rhythm Skin";
 	["EN-note skin/PRO2-RHYTHM"] =		"Set Pro 2 Rhythm Skin";
-	["EN-note skin/DEFAULT"] =			"Set Prime Skin";	
+	["EN-note skin/DEFAULT"] =			"Set default Skin";
 	
 	--path
 	["EN-path/X"] =			"Note moves diagonally";
@@ -622,39 +629,42 @@ local noteskin_BL = { "default", "xsanity", "perfor1", "perfor2", "perfor3", "aa
 sortMode = 0;
 
 local noteskin_Order = {
-	"flower",
 	"old",
+	"extra_mix",
+	"rebirth",
 	"easy",
+	"sheep",
+	"nx",
+	"nx2",
+	"nxa",
+	"fiesta",
+	"basic",
+	"infinity",
+	"infinity-rhythm",
+	"fiesta2",
+	"prime",
+	"prime2",
+	"xx",
+	"phoenix",
+	"rise",
+	"xsanity",
+	"flower",
 	"slime",
 	"music",
 	"canon",
 	"poker",
-	"nx",
-	"sheep",
 	"horse",
 	"dog",
 	"girl",
 	"fire",
 	"ice",
 	"wind",
-	"nxa",
-	"nx2",
 	"lightning",
 	"drum",
 	"missile",
 	"soccer",
-	"rebirth",
 	"pro-rhythm",
-	"pro2-rhythm",
-	"infinity",
-	"infinity-rhythm",
-	"basic",
-	"fiesta",
-	"fiesta2",
-	"prime",
-	"prime2",
-	"xx",
-	"phoenix"
+	"pro2-rhythm"
 };
 
 function GetNoteSkinLabel(player)
