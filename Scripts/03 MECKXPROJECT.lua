@@ -114,6 +114,24 @@ ChartSelectArrows_XLeftArrowP2 = -ChartSelectArrows_XRightArrowP1
 --ChartSelectArrows_XRightArrowP2 = 335 --original
 ChartSelectArrows_XRightArrowP2 = -ChartSelectArrows_XLeftArrowP1
 
+-- RECORDS GRID (MY BEST AND MACHINE BEST)
+--RecordsGrid_Y1 = 175 --original: MY BEST (Grade letter)
+RecordsGrid_Y1 = 175-52
+--RecordsGrid_Y2 = 142 --original: MY BEST (Grade commentary)
+RecordsGrid_Y2 = 142-52
+--RecordsGrid_Y3 = 172 --original: MY BEST (Numerical score)
+RecordsGrid_Y3 = 172-52
+--RecordsGrid_Y4 = 249 --original: MACHINE BEST (User name)
+RecordsGrid_Y4 = 249-52
+--RecordsGrid_Y5 = 262 --original: MACHINE BEST (Numerical score)
+RecordsGrid_Y5 = 262-52
+--RecordsGrid_Y6 = 218 --original: MACHINE BEST (Grade commentary)
+RecordsGrid_Y6 = 218-52
+--RecordsGrid_Y7 = 252 --original: MACHINE BEST (Grade letter)
+RecordsGrid_Y7 = 252-52
+RecordsGrid_Y8 = (SCREEN_CENTER_Y+90)-52
+RecordsGrid_Y9 = (SCREEN_CENTER_Y-140)-52
+RecordsGrid_YA = (SCREEN_CENTER_Y+125)-52
 
 -- -- -- 02 - FUNCTIONS
 -- inputs:
