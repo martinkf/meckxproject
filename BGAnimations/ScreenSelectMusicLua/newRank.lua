@@ -354,6 +354,7 @@ for i=1,5 do
 					self:x(-295);
 					self:settext("ANOTHERA");
 					self:shadowlength(2);
+					self:maxwidth(188);
 					self:shadowcolor(color("#191919"));
 
 				end;
