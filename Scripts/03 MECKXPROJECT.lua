@@ -241,3 +241,42 @@ end
 --							SHOW CO-OP 2P ONLY
 --							SHOW CO-OP 3P ONLY
 --							SHOW CO-OP 4P ONLY
+--
+--
+-- BRAINSTORM REGARDING SCORE
+-- PERCENT + GRADE
+-- PERCENT IS JUST PERCENT
+-- GRADE IS 0-4 STARS
+-- 4 STARS = "PERFECT GAME"
+--				MISS+BAD+GOOD+GREAT = 0
+--				COLOR OF PERFECT (BLUE PLATINUM)
+-- 3+ STARS = "FULL COMBO +"
+--				MISS+BAD+GOOD = 0
+--				&
+--				GREAT < 10
+--				COLOR OF GREAT (GREEN)
+-- 3 STARS = "FULL COMBO"
+--				MISS+BAD+GOOD = 0
+--				&
+--				GREAT > 9
+--				COLOR OF GREAT (GREEN)
+-- 2+ STARS = "NO MISS +"
+--				MISS = 0
+--				&
+--				BAD+GOOD < 10
+--				COLOR OF GOOD (YELLOW)
+-- 2 STARS = "NO MISS"
+--				MISS = 0
+--				&
+--				BAD+GOOD > 9
+--				COLOR OF GOOD (YELLOW)
+-- 1 STARS = "SINGLE DIGIT FAILS"
+--				MISS > 0
+--				&
+--				MISS+BAD+GOOD < 10
+--				COLOR OF BAD (PURPLE)
+-- 0 STARS = ANYTHING ELSE
+--				MISS > 0
+--				&
+--				MISS+BAD+GOOD > 9
+--				COLOR OF MISS (RED)
