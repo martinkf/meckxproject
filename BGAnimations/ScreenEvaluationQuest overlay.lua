@@ -141,9 +141,9 @@ local function CreateStats( pnPlayer )
 		BrainO		= pnStageStats:GetTapNoteScores("TapNoteScore_BrainO");
 		BrainX		= pnStageStats:GetTapNoteScores("TapNoteScore_BrainX");
 		Life		= pnStageStats:GetCurrentLife();
-		Score		= pnStageStats:GetScore();
+		Score		= pnStageStats:GetPhoenixScore();
 		Grade		= pnStageStats:GetGrade();
-		TierGrade	= gradeTransformState(pnStageStats:GetScore());
+		TierGrade	= gradeTransformState(pnStageStats:GetPhoenixScore());
 		
 		Failed		= pnStageStats:GetFailedAux();
 	};
@@ -392,7 +392,7 @@ local function CreateSeparateStats( pnPlayer )
 			BrainO		= pnStageStats:GetTapNoteScores("TapNoteScore_BrainO");
 			BrainX		= pnStageStats:GetTapNoteScores("TapNoteScore_BrainX");
 			Life		= pnStageStats:GetCurrentLife();
-			Score		= pnStageStats:GetScore();
+			Score		= pnStageStats:GetPhoenixScore();
 			Grade		= pnStageStats:GetGrade();		
 			
 			Failed		= pnStageStats:GetFailedAux();

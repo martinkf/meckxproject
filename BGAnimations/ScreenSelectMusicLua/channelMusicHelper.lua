@@ -111,6 +111,7 @@ function formatTextMaxLengh(text)
 end;
 
 function getMusicForChannelPlayer()
+	Trace("###################################----------------> music");
 	registerAllMusicAvailableForChannels();
 	--we check what player is playing, if there is 1 player, we only choose that song
 	--if there are 2 players we alternate the song, because both players needs love
@@ -131,10 +132,6 @@ function getMusicForChannelPlayer()
 
 		musicChannelMusic = getCustomOptionValuePlayer(playerActive,"channelMusic");
 		musicChannelMusicType = getCustomOptionValuePlayer(playerActive,"channelMusic_type");
-
-
-
-
 	else
 
 		if GAMESTATE:Env()["lastChannelMusic2players"] == "" then
@@ -156,19 +153,17 @@ function getMusicForChannelPlayer()
 
 	end;
 
-
 	if musicChannelMusic == nil or musicChannelMusic == "" or musicChannelMusic == "-" then
 		--default
 		musicChannelMusic = "default (loop).ogg";
-		musicChannelMusicType = "internal";
+		musicChannelMusicType = "internal";		
 	end;
-
 	--preparamos el path
 	if musicChannelMusicType == "internal" then
 	  	local activeTheme = THEME:GetCurThemeName();
 	  	pathMusic = "/Themes/"..activeTheme.."/Sounds/xsanity/ch/"..musicChannelMusic;	  	
 	else
-		pathMusic = "/ChannelMusic/"..musicChannelMusic;
+		pathMusic = "/Mods/ChannelMusic/"..musicChannelMusic;
 	end;
 
 	--we check if the file exist

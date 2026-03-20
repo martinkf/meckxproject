@@ -11,7 +11,7 @@ local t = Def.ActorFrame
 
 			if PROFILEMAN:IsPersistentProfile(PLAYER_1) then
 				PROFILEMAN:SaveProfile(PLAYER_1);
-				Trace("#SaveProfile:P1");
+				checkPlayerEvaluationSkinExist(PLAYER_1);
 			end;						
 		end;
 		if GAMESTATE:IsHumanPlayer(PLAYER_2) then
@@ -24,7 +24,7 @@ local t = Def.ActorFrame
 
 			if PROFILEMAN:IsPersistentProfile(PLAYER_2) then
 				PROFILEMAN:SaveProfile(PLAYER_2);
-				Trace("#SaveProfile:P2");
+				checkPlayerEvaluationSkinExist(PLAYER_2);
 			end;
 				
 		end;

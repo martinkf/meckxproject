@@ -1,12 +1,6 @@
-if PREFSMAN then
-  --PREFSMAN:SetPreference("AttractSoundFrequency", "Never");
-  PREFSMAN:SetPreference("PhoenixScoring", true);
-  PREFSMAN:SavePreferences();
-end
-
 function themeVersionData()
 	local vActual = "0.99";
-	return "THEME v"..vActual.."\nREV-15022026";
+	return "THEME v"..vActual.."\nREV-20032026-Nightly Build";
 end;
 
 function defaultDifficultyListSkin()
@@ -194,7 +188,7 @@ function getAllRankingFromSong(PLAYERNUM)
 		if #hsList > 0 then
 			local name = profileLocal:GetDisplayName();
 			local guidProfile = profileLocal:GetGUID();
-			local score = hsList[1]:GetScore();
+			local score = hsList[1]:GetPhoenixScore();
 			local failed = 0;
 			local dateScore = hsList[1]:GetDate();
 			local judgStateRecord = -1;
@@ -251,7 +245,7 @@ function GetHighScoreAndStateFromPlayer(PLAYERNUM)
 		assert(scorelist)
 		local scores = scorelist:GetHighScores();
 		if (scores[1] == nil ) then return dataHs end;
-		dataHs["score"] = scores[1]:GetScore();
+		dataHs["score"] = scores[1]:GetPhoenixScore();
 
 		local isFailed = 0;
 		if scores[1]:GetFailedAux() then
@@ -291,7 +285,7 @@ function printHighscoreDataPlayer(player,scoreData)
 				Miss		= scoreData:GetTapNoteScore("TapNoteScore_Miss") +
 							  scoreData:GetTapNoteScore("TapNoteScore_CheckpointMiss");
 				MaxCombo 	= scoreData:GetMaxCombo();
-				Score		= scoreData:GetScore();
+				Score		= scoreData:GetPhoenixScore();
 			};
 
 			local plStatsExtraJudg = {
@@ -345,7 +339,7 @@ function GetHighScoreAndStateFromStepsPlayer(steps,player)
 		assert(scorelist)
 		local scores = scorelist:GetHighScores();
 		if (scores[1] == nil ) then return dataHs end;
-		dataHs["score"] = scores[1]:GetScore();
+		dataHs["score"] = scores[1]:GetPhoenixScore();
 
 		local isFailed = 0;
 		if scores[1]:GetFailedAux() then
@@ -383,4 +377,19 @@ function getZeroStringFromScore(score)
 		end;
 	end;
 	return backScoreMb;
+end;
+
+--theme mods globals init
+--::Screen gameplay::--
+--this hide the counter sprite and number from the gameplay when is true.
+GAMESTATE:Env()["counterInGameplay"] = true;
+
+function getStageCounterInGameplay()
+	return GAMESTATE:Env()["counterInGameplay"];	
+end;
+function setStageCounterInGameplay(status)
+	GAMESTATE:Env()["counterInGameplay"] = status;
+end;
+function hideStageCounterInGameplay()
+	GAMESTATE:Env()["counterInGameplay"] = false;
 end;

@@ -3,6 +3,7 @@ local t = Def.ActorFrame {};
 local arrAvatars = GAMESTATE:GetAvatarFolder();
 local arrSkinsUsb = GAMESTATE:GetSkinUsbFolder();
 local arrDifficultyListPlugins = getDificultyListPlugins();
+local arrEvaluationSkinMods = GetEvaluationSkinInstalled();
 
 local optPlayerActive = {1,1};
 local optEntered = {false,false};
@@ -18,13 +19,15 @@ local pathDiffListPlugins = getPathDifficultyListPlugins();
 local difficultyListSelectedIndex = {"",""};
 local tempDifficultyListSelectedIndex = {"",""};
 
+local evaluationSkinModSelectedIndex = {"",""};
+local tempEvaluationSkinModSelectedIndex = {"",""};
 
 local dataOptions=
 {
 	{order="1",name="banner",index=1,imgfile="text_opt_1.png",active=true,exit=false,lang_en="Select your profile banner",lang_es="Selecciona el banner de tu perfil",lang_pt="Selecione o banner para o seu perfil"},
 	{order="2",name="background",index=2,imgfile="text_opt_2.png",active=true,exit=false,lang_en="Select your background profile",lang_es="Selecciona el fondo de tu perfil",lang_pt="Selecione o fundo do seu perfil"},
-	{order="3",name="difficulty",index=3,imgfile="text_opt_3.png",active=true,exit=false,lang_en="Select your profile’s difficulty list type",lang_es="Selecciona el tipo de lista de difficultad para tu perfil",lang_pt="Selecione o tipo de lista de dificuldade para o seu perfil"},
-	{order="4",name="cover",index=4,imgfile="text_opt_4.png",active=false,exit=false,lang_en="",lang_es="",lang_pt=""},
+	{order="3",name="difficulty",index=3,imgfile="text_opt_3.png",active=true,exit=false,lang_en="Select your profile’s difficulty list type",lang_es="Selecciona el tipo de lista de dificultad para tu perfil",lang_pt="Selecione o tipo de lista de dificuldade para o seu perfil"},
+	{order="4",name="evaluation",index=4,imgfile="text_opt_4.png",active=true,exit=false,lang_en="Select your Evaluation screen style",lang_es="Selecciona el estilo para tu pantalla de evaluación.",lang_pt="Selecione o estilo para sua tela de avaliação"},
 	{order="5",name="exit",index=5,imgfile="text_opt_5.png",active=true,exit=true,lang_en="Save and exit",lang_es="Guardar y salir",lang_pt="Save and exit"},
 };
 
@@ -66,6 +69,7 @@ function createProfileEditor(player)
 	else
 		optIndexPlayer = 2;
 	end;
+
 
 	local xBase=0;
 	local yBase=SCREEN_CENTER_Y+20;	
@@ -165,19 +169,43 @@ function createProfileEditor(player)
 			this.difficultyListActor:GetChild("nomDiffPlugin"):settext(diffListPlayer);
 
 
-			
+			--Evaluation
+			local evaluationSkinPlayer = getCustomOptionValuePlayer(player,"evaluationSkin");
+			local defaultIdEvaluationSkin = 1; --id for the default skin on the list.
+			local evaluationSkinListOk = false; -- if the player has the thing, if not, we get the default one
 
+			if evaluationSkinPlayer == nil or #evaluationSkinPlayer == 0 then
+				evaluationSkinPlayer = GetDefaultEvaluationSkinName();
+			end;
 
-			--this.difficultyListActor:GetChild("previewDiff"):Load();
+			for i = 1,#arrEvaluationSkinMods do
 
+				if GetDefaultEvaluationSkinName() == arrEvaluationSkinMods[i] then
+					defaultIdEvaluationSkin = i; --default id on the list.
+				end;
 
-			--Cover (titles)
+				--player skin found.
+				if arrEvaluationSkinMods[i] == evaluationSkinPlayer then 
+					evaluationSkinModSelectedIndex[optIndexPlayer] = i;
+					tempEvaluationSkinModSelectedIndex[optIndexPlayer] = i;
+					evaluationSkinListOk = true;
+				end;
 
+			end;
+
+			--nothing found, we put the default one.
+			if evaluationSkinListOk == false then
+				evaluationSkinModSelectedIndex[optIndexPlayer] = defaultIdEvaluationSkin;
+				tempEvaluationSkinModSelectedIndex[optIndexPlayer] = defaultIdEvaluationSkin;
+			end;
+
+			this.evaluationSkinListActor:GetChild("nomEvaluationSkin"):settext(evaluationSkinPlayer);
 
 			--task
 			self:queuecommand("reloadAvatar");
 			self:queuecommand("reloadBackground");
 			self:queuecommand("reloadDiffList");
+			self:queuecommand("reloadEvaluationSkin");
 
 		end;
 
@@ -203,9 +231,65 @@ function createProfileEditor(player)
 			else
 				this.difficultyListActor:GetChild("previewDiff"):Load(pathDiffListPlugins.."nopreview.png");
 			end;
-			this.difficultyListActor:GetChild("nomDiffPlugin"):settext(nomPlugin);
-			
+			this.difficultyListActor:GetChild("nomDiffPlugin"):settext(nomPlugin);			
 		end;		
+
+		--evaluation
+		reloadEvaluationSkinCommand=function(self)
+
+			--here we update the graphics of this option
+			local this = self:GetChildren();
+			local nomPlugin = arrEvaluationSkinMods[tempEvaluationSkinModSelectedIndex[optIndexPlayer]];
+			--we get the skin data
+			local skinData = CheckAndGetLuaEvaluationSkin(nomPlugin);
+			local finalPathSkin = skinData["path_skin"].."preview.png";
+
+			if FILEMAN:DoesFileExist(finalPathSkin) then
+				this.evaluationSkinListActor:GetChild("previewEvaluationSkin"):Load(finalPathSkin):zoom(0.75);
+			else
+				local defaultPath = getPathEvaluationSkinTheme();
+				this.evaluationSkinListActor:GetChild("previewEvaluationSkin"):Load(defaultPath.."nopreview.png"):zoom(0.75);
+			end;
+
+			this.evaluationSkinListActor:GetChild("nomEvaluationSkin"):settext(skinData["skin_name"]);	
+
+
+			hideModInfoCommand=function(self)
+				self:visible(false);
+			end;
+
+			showModInfoCommand=function(self)
+				self:visible(true);
+			end;
+
+
+			if optEntered[optIndexPlayer] == false then
+				this.modInfoDataActor:stoptweening():queuecommand("hideModInfo");
+			else
+				--ModInfo
+				local modInfo = getModInfo(skinData["path_skin"]);
+				if modInfo ~= nil then
+					this.modInfoDataActor:GetChild("nameModData"):settext(modInfo["Name"]);
+					this.modInfoDataActor:GetChild("authorModData"):settext(modInfo["Author"]);
+					this.modInfoDataActor:GetChild("versionModData"):settext(modInfo["Version"]);
+					this.modInfoDataActor:GetChild("descModData"):settext(modInfo["Description"]);
+					this.modInfoDataActor:stoptweening():queuecommand("showModInfo");
+				else
+					this.modInfoDataActor:GetChild("nameModData"):settext("-");
+					this.modInfoDataActor:GetChild("authorModData"):settext("-");
+					this.modInfoDataActor:GetChild("versionModData"):settext("-");
+					this.modInfoDataActor:GetChild("descModData"):settext("-");
+					this.modInfoDataActor:stoptweening():queuecommand("hideModInfo");
+				end;
+			end;
+
+
+
+			
+
+			
+			--modInfoDataActor
+		end;
 
 		reloadAvatarCommand=function(self)
 				local this = self:GetChildren();
@@ -412,7 +496,7 @@ function createProfileEditor(player)
 				self:zoom(zoomHeaderOptions);
 				self:y(yHoptions);
 				self:x(xHoptions+(xHmarginOptions*3));
-				self:diffusealpha(0);
+				self:diffusealpha(0.4);
 			end;
 		};	
 		LoadActor( THEME:GetPathG("","ScreenPlayerProfileCustom/opt 1x5") )..{
@@ -572,6 +656,171 @@ function createProfileEditor(player)
 			};
 		};
 
+		-- opt 4 evaluation 
+		Def.ActorFrame {
+			Name="evaluationSkinListActor";
+			OnCommand=function(self)
+				self:visible(false);
+			end;
+
+			LoadActor( THEME:GetPathG("","ScreenPlayerProfileCustom/back_background_opt_selected.png") )..{
+				Name="selectedEvaluationSkin";
+				OnCommand=function(self)	
+					self:scaletoclipped(140,20);
+					self:y(-98);
+				end;
+			};
+
+			LoadActor( THEME:GetPathG("","ScreenPlayerProfileCustom/base_selected.png") )..{
+				Name="selectedEvaluationSkinImage";
+				OnCommand=function(self)	
+				 	self:zoom(0.29);
+				 	self:zoomx(0.41);
+				 	self:y(20);
+				 	self:diffusealpha(1);
+				end;
+			};
+
+			LoadFont("_TitleXolonium")..{
+						Name="nomEvaluationSkin";
+						Text="-";
+						OnCommand=function(self)
+							self:y(-100);
+							self:zoom(0.6);
+						end;
+			};
+
+			Def.Sprite{
+				Name="previewEvaluationSkin";
+				OnCommand=function(self)
+				 	self:zoom(0.8);
+				 	self:y(20);
+				 	self:scaletoclipped(350,250);
+				end;
+			};
+		};
+
+		Def.ActorFrame {
+			Name="modInfoDataActor";
+			OnCommand=function(self)
+				self:visible(false);
+				self:y(240)
+				self:zoom(0.61);
+			end;
+
+			hideModInfoCommand=function(self)
+				self:visible(false);
+			end;
+
+			showModInfoCommand=function(self)
+				self:visible(true);
+			end;
+
+			LoadActor( THEME:GetPathG("","ScreenPlayerProfileCustom/en_info_mod.png") )..{
+				Name="baseModData";
+				OnCommand=function(self)
+				end;
+			};
+
+			LoadFont("Common Normal")..{
+					Text="NAME: ";
+					OnCommand=function(self)
+						self:y(-11);
+						self:x(-320);
+						self:zoom(0.7);
+						 self:maxwidth(750) -- ancho máximo en pixels
+						self:horizalign(left);
+					end;
+			};
+
+			LoadFont("Common Normal")..{
+					Name="nameModData";
+					Text="-";
+					OnCommand=function(self)
+						self:y(-10);
+						self:x(-260);
+						self:zoom(0.65);
+						self:horizalign(left);
+						self:maxwidth(370) -- ancho máximo en pixels
+					end;
+			};
+
+
+
+			LoadFont("Common Normal")..{
+					Text="AUTHOR: ";
+					OnCommand=function(self)
+						self:y(-11);
+						self:x(-10);
+						self:zoom(0.7);
+						 self:maxwidth(750) -- ancho máximo en pixels
+						self:horizalign(left);
+					end;
+			};
+
+			LoadFont("Common Normal")..{
+					Name="authorModData";
+					Text="-";
+					OnCommand=function(self)
+						self:y(-10);
+						self:x(70);
+						self:zoom(0.65);
+						self:horizalign(left);
+						self:maxwidth(190) -- ancho máximo en pixels
+					end;
+			};
+
+
+
+			LoadFont("Common Normal")..{
+					Text="VERSION: ";
+					OnCommand=function(self)
+						self:y(-11);
+						self:x(200);
+						self:zoom(0.7);
+						 self:maxwidth(750) -- ancho máximo en pixels
+						self:horizalign(left);
+					end;
+			};
+
+			LoadFont("Common Normal")..{
+					Name="versionModData";
+					Text="-";
+					OnCommand=function(self)
+						self:y(-10);
+						self:x(280);
+						self:zoom(0.65);
+						self:horizalign(left);
+						self:maxwidth(60) -- ancho máximo en pixels
+					end;
+			};
+
+
+			LoadFont("Common Normal")..{
+					Text="DESCRIPTION: ";
+					OnCommand=function(self)
+						self:y(15);
+						self:x(-320);
+						self:zoom(0.7);
+						 self:maxwidth(750) -- ancho máximo en pixels
+						self:horizalign(left);
+					end;
+			};
+
+			LoadFont("Common Normal")..{
+					Name="descModData";
+					Text="-";
+					OnCommand=function(self)
+						self:y(16);
+						self:x(-200);
+						self:zoom(0.65);
+						 self:maxwidth(750) -- ancho máximo en pixels
+						self:horizalign(left);
+					end;
+			};
+		};
+
+
 		--action arrows (corners)
 		Def.ActorFrame {
 			Name="actionSpritesFrame";
@@ -709,6 +958,12 @@ function createProfileEditor(player)
 						 this.difficultyListActor:GetChild("selectedDiffPlugin"):diffusealpha(1);
 					end;
 
+					if dataOptions[optPlayerActive[optIndexPlayer]]["name"] == "evaluation" then
+						 evaluationSkinModSelectedIndex[optIndexPlayer] = tempEvaluationSkinModSelectedIndex[optIndexPlayer];
+						 this.evaluationSkinListActor:GetChild("selectedEvaluationSkin"):diffusealpha(1);
+						 this.evaluationSkinListActor:GetChild("selectedEvaluationSkinImage"):diffusealpha(1);
+					end;
+
 
 				else
 					--exit
@@ -764,6 +1019,9 @@ function createProfileEditor(player)
 							local diffListType = arrDifficultyListPlugins[difficultyListSelectedIndex[optIndexPlayer]];
 							setCustomOptionValuePlayer(player,"difficultyListMode",diffListType);
 
+							local evaluationSkin = arrEvaluationSkinMods[evaluationSkinModSelectedIndex[optIndexPlayer]];
+							setCustomOptionValuePlayer(player,"evaluationSkin",evaluationSkin);
+
 							SOUND:PlayOnce(THEME:GetPathS("Common", "Start"));
 							SCREENMAN:GetTopScreen():StartTransitioningScreen("SM_GoToNextScreen");
 						end;
@@ -790,6 +1048,11 @@ function createProfileEditor(player)
 
 						if dataOptions[optPlayerActive[optIndexPlayer]]["name"] == "difficulty" then
 							this.difficultyListActor:visible(true);
+						end;
+
+						if dataOptions[optPlayerActive[optIndexPlayer]]["name"] == "evaluation" then
+							this.evaluationSkinListActor:visible(true);
+							self:queuecommand("reloadEvaluationSkin");
 						end;
 
 					end;
@@ -841,7 +1104,10 @@ function createProfileEditor(player)
 
 				--we check, if we are inside a option or in the main menu.
 				if optEntered[optIndexPlayer] then
-					
+
+					--INSIDE
+
+					--** BANNER LOGIC					
 					if dataOptions[optPlayerActive[optIndexPlayer]]["name"] == "banner" then
 						--this is the selected thing, we need to remark that.
 						if (tempAvatarPlayerSelectedIndex[optIndexPlayer] - 1) < 1 then
@@ -866,6 +1132,7 @@ function createProfileEditor(player)
 
 					end;
 
+					--** BACKGROUND LOGIC
 					if dataOptions[optPlayerActive[optIndexPlayer]]["name"] == "background" then
 
 						if (tempBackgroundPlayerSelectedIndex[optIndexPlayer] - 1) < 1 then
@@ -884,6 +1151,7 @@ function createProfileEditor(player)
 
 					end;
 
+					--** DIFFICULTY LIST LOGIC
 					if dataOptions[optPlayerActive[optIndexPlayer]]["name"] == "difficulty" then
 
 						if (tempDifficultyListSelectedIndex[optIndexPlayer] - 1) < 1 then
@@ -902,6 +1170,27 @@ function createProfileEditor(player)
 						self:queuecommand("reloadOptionDiffList");
 					end;
 
+					--** EVALUATION LOGIC
+					if dataOptions[optPlayerActive[optIndexPlayer]]["name"] == "evaluation" then
+
+
+						if (tempEvaluationSkinModSelectedIndex[optIndexPlayer] - 1) < 1 then
+							tempEvaluationSkinModSelectedIndex[optIndexPlayer] = #arrEvaluationSkinMods;
+						else
+							tempEvaluationSkinModSelectedIndex[optIndexPlayer]  = tempEvaluationSkinModSelectedIndex[optIndexPlayer] - 1;
+						end;
+
+						--it's our option?
+						if tempEvaluationSkinModSelectedIndex[optIndexPlayer] == evaluationSkinModSelectedIndex[optIndexPlayer] then
+							this.evaluationSkinListActor:GetChild("selectedEvaluationSkin"):diffusealpha(1);
+							this.evaluationSkinListActor:GetChild("selectedEvaluationSkinImage"):diffusealpha(1);
+						else
+							this.evaluationSkinListActor:GetChild("selectedEvaluationSkin"):diffusealpha(0);
+							this.evaluationSkinListActor:GetChild("selectedEvaluationSkinImage"):diffusealpha(0.2);
+						end;
+
+						self:queuecommand("reloadEvaluationSkin");
+					end;
 
 				else
 					--main menu
@@ -1013,6 +1302,28 @@ function createProfileEditor(player)
 						self:queuecommand("reloadOptionDiffList");
 					end;
 
+					--** EVALUATION LOGIC
+					if dataOptions[optPlayerActive[optIndexPlayer]]["name"] == "evaluation" then
+
+
+						if (tempEvaluationSkinModSelectedIndex[optIndexPlayer] + 1) > #arrEvaluationSkinMods then
+							tempEvaluationSkinModSelectedIndex[optIndexPlayer] = 1;
+						else
+							tempEvaluationSkinModSelectedIndex[optIndexPlayer]  = tempEvaluationSkinModSelectedIndex[optIndexPlayer] + 1;
+						end;
+
+						--it's our option?
+						if tempEvaluationSkinModSelectedIndex[optIndexPlayer] == evaluationSkinModSelectedIndex[optIndexPlayer] then
+							this.evaluationSkinListActor:GetChild("selectedEvaluationSkin"):diffusealpha(1);
+							this.evaluationSkinListActor:GetChild("selectedEvaluationSkinImage"):diffusealpha(1);
+						else
+							this.evaluationSkinListActor:GetChild("selectedEvaluationSkin"):diffusealpha(0);
+							this.evaluationSkinListActor:GetChild("selectedEvaluationSkinImage"):diffusealpha(0.2);
+						end;
+
+						self:queuecommand("reloadEvaluationSkin");
+					end;
+
 				else
 					--main menu
 					local optHeaderTemp = optPlayerActive[optIndexPlayer];
@@ -1053,6 +1364,9 @@ function createProfileEditor(player)
 			this.AvatarActor:visible(false);
 			this.BackgroundActor:visible(false);
 			this.difficultyListActor:visible(false);
+			this.evaluationSkinListActor:visible(false);
+
+			self:queuecommand("reloadEvaluationSkin");
 
 		end;
 

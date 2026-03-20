@@ -55,7 +55,8 @@ local t = Def.ActorFrame{
 
 	OnCommand=function(self)
 		self:zoom(1.03);
-		self:addx(-11);
+		self:addx(31);
+		--self:addx(-11);
 		self:zoomy(1.25);
 		self:addy(-2);
 	end;

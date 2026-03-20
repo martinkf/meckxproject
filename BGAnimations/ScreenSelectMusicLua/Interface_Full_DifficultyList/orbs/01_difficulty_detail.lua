@@ -219,7 +219,7 @@ for p=-1,1,2 do
 							local topscore = scores[1];
 							if topscore then
 								self:visible(true);
-								local iScore = topscore:GetScore();								
+								local iScore = topscore:GetPhoenixScore();								
 								local iGrade = gradeTransformState(iScore);
 
 								if (topscore:GetFailedAux()) then 
@@ -293,7 +293,7 @@ for p=-1,1,2 do
 					local topscore = scores[1];
 					if topscore then
 						self:visible(true);
-						local iScore = topscore:GetScore();
+						local iScore = topscore:GetPhoenixScore();
 						--pfc
 						if iScore > 999999 then
 							self:GetChild("pfc"):visible(true);
@@ -395,7 +395,7 @@ for p=-1,1,2 do
 					local topscore = scores[1];
 					if topscore then
 						self:visible(true);
-						local iScore = topscore:GetScore();								
+						local iScore = topscore:GetPhoenixScore();								
 						local iGrade = gradeTransformState(iScore);
 						local backScore = getZeroStringFromScore(iScore);
 
@@ -459,9 +459,9 @@ for p=-1,1,2 do
 						local topscore = scores[1];
 						if topscore  then
 							self:visible(false);
-							local iScore = topscore:GetScore();
+							local iScore = topscore:GetPhoenixScore();
 							if (iScore > 0) then self:visible(true); end;
-							self:settext(string.upper(topscore:GetScoreName()));
+							self:settext(string.upper(topscore:GetPhoenixScoreName()));
 						else
 							self:settext("");
 							self:visible(false);
@@ -549,7 +549,7 @@ for p=-1,1,2 do
 							local topscore = scores[1];
 							if topscore then
 								self:visible(true);
-								local iScore = topscore:GetScore();								
+								local iScore = topscore:GetPhoenixScore();								
 								local iGrade = gradeTransformState(iScore);
 
 								if (topscore:GetFailedAux()) then 
@@ -621,7 +621,7 @@ for p=-1,1,2 do
 					local topscore = scores[1];
 					if topscore then
 						self:visible(true);
-						local iScore = topscore:GetScore();
+						local iScore = topscore:GetPhoenixScore();
 						--pfc
 						if iScore > 999999 then
 							self:GetChild("pfc"):visible(true);
@@ -721,7 +721,7 @@ for p=-1,1,2 do
 					local topscore = scores[1];
 					if topscore then
 						self:visible(true);
-						local iScore = topscore:GetScore();								
+						local iScore = topscore:GetPhoenixScore();								
 						local iGrade = gradeTransformState(iScore);
 						local backScore = getZeroStringFromScore(iScore);
 

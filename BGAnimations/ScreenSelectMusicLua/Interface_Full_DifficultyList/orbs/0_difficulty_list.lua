@@ -615,7 +615,7 @@ for i=1,13,1 do
 									self:visible(false);
 								else
 									self:visible(true);
-									local iScore = topscore:GetScore();								
+									local iScore = topscore:GetPhoenixScore();								
 									local iGrade = gradeTransformState(iScore);
 									self:setstate(iGrade);
 								end;
@@ -653,7 +653,7 @@ for i=1,13,1 do
 
 								if topscore:GetFailedAux() then
 									self:visible(true);
-									local iScore = topscore:GetScore();								
+									local iScore = topscore:GetPhoenixScore();								
 									local iGrade = gradeTransformState(iScore);
 									self:setstate(iGrade);
 								else
@@ -696,7 +696,7 @@ for i=1,13,1 do
 									self:visible(false);
 								else
 									self:visible(true);
-									local iScore = topscore:GetScore();								
+									local iScore = topscore:GetPhoenixScore();								
 									local iGrade = gradeTransformState(iScore);
 									self:setstate(iGrade);
 								end;
@@ -730,7 +730,7 @@ for i=1,13,1 do
 
 								if topscore:GetFailedAux() then
 									self:visible(true);
-									local iScore = topscore:GetScore();								
+									local iScore = topscore:GetPhoenixScore();								
 									local iGrade = gradeTransformState(iScore);
 									self:setstate(iGrade);
 								else
@@ -788,7 +788,7 @@ for i=1,13,1 do
 		--					local topscore = scores[1];
 		--					if topscore then
 		--						local iNum = TierToState(topscore:GetGrade());
-		--						local iScore = topscore:GetScore();
+		--						local iScore = topscore:GetPhoenixScore();
 		--						if (topscore:GetFailedAux()) then iNum = iNum + 8; end;
 		--						self:setstate(iNum);
 		--						if (iScore > 0) then self:visible(true); end;
@@ -823,7 +823,7 @@ for i=1,13,1 do
 		--					local topscore = scores[1];
 		--					if topscore then
 		--						local iNum = TierToState(topscore:GetGrade());
-		--						local iScore = topscore:GetScore();
+		--						local iScore = topscore:GetPhoenixScore();
 		--						if (topscore:GetFailedAux()) then iNum = iNum + 8; end;
 		--						self:setstate(iNum);
 		--						if (iScore > 0) then self:visible(true); end;

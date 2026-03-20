@@ -10,8 +10,8 @@ t[#t+1] = Def.ActorFrame
 	end;
 
 	JudgmentMessageCommand=function(self,param)
-		local scorep1 = STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_1):GetScore();
-		local scorep2 = STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_2):GetScore();
+		local scorep1 = STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_1):GetPhoenixScore();
+		local scorep2 = STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_2):GetPhoenixScore();
 
 		local scoreStatP1 = scorep1 - scorep2;
 		local scoreStatP2 = scorep2 - scorep1;

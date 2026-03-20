@@ -30,6 +30,7 @@ end
 PAVenabled={};
 local notelist = GetNoteSkinList();
 local notelistPrimaryNum = GetPrimaryNoteSkinNum();
+local tmpNoteSkin={"",""};
 
 local judgeSkinList = GetJudgSkinList(); -- las carpetas vienen con i_/e_ donde i_=en el theme - e_= en la raiz del juego
 local lifebarSkinList = getLifeBarSkinList(); -- las carpetas vienen con i_/e_ donde i_=en el theme - e_= en la raiz del juego
@@ -2484,17 +2485,57 @@ function GetPreview(player)
 
 	local dataLifebarSkin = getLifebarSkinDataParsed(profileSkinLifeBar);
 	--CHART DEMO PREVIEW
+
+
 	local defaultChartShow = 
 	{
 		{1,0,0,0,0},
 		{0,0,0,0,1},
-		{0,0,0,0,0},
+		{0,1,0,0,0},
 		{0,0,1,1,0},
 		{0,1,0,0,0},
 		{0,0,0,0,0},
 		{0,0,0,0,0},
 		{0,0,0,0,0},		
 	};
+
+	local defaultMirrorShow = 
+	{
+		{0,0,0,0,1},
+		{1,0,0,0,0},
+		{0,0,0,1,0},
+		{0,1,1,0,0},
+		{0,0,0,1,0},
+		{0,0,0,0,0},
+		{0,0,0,0,0},
+		{0,0,0,0,0},		
+	};
+
+	local defaultRandomShow = 
+	{
+		{0,0,0,0,1},
+		{0,0,0,0,1},
+		{0,0,1,0,0},
+		{1,1,0,0,0},
+		{0,0,0,1,0},
+		{0,0,0,0,0},
+		{0,0,0,0,0},
+		{0,0,0,0,0},		
+	};
+
+	local defaultBackwardsShow = 
+	{
+		{0,0,0,1,0},
+		{0,1,0,0,0},
+		{0,0,0,0,1},
+		{1,0,1,0,0},
+		{0,0,0,0,1},
+		{0,0,0,0,0},
+		{0,0,0,0,0},
+		{0,0,0,0,0},
+	};
+
+	local chartDisplayed = defaultChartShow;
 
 	local af = Def.ActorFrame {};
 	--Agregamos el banner de la canción para mostrar de fondo.
@@ -2634,8 +2675,18 @@ function GetPreview(player)
 
     --Agregamos los receptores.
     local receptorArrayNames = {"DownLeft Ready Receptor","UpLeft Ready Receptor","Center Ready Receptor"}
+    
+    
     local posXBaseChart = {-52,-26,0,26,52};
+    -- different types
+	local posXBaseChartNormal = {-52,-26,0,26,52};    
+	local posXBaseChartMirror = {52,26,0,-26,-52};
+
     local posXBaseChartMini = {-37,-19,0,19,37};
+        -- different types
+    local posXBaseChartMini = {-37,-19,0,19,37};
+    local posXBaseChartMini = {-37,-19,0,19,37};
+
     local zoomOnMini = 0.35;
 	for i=1,5 do
 
@@ -2707,6 +2758,15 @@ function GetPreview(player)
 				end;
 			end;
 
+			CwNavigatePreviewMessageCommand=function(self,params)
+				if params.Player == player then
+		    		local STATE = GAMESTATE:GetPlayerState(player);
+		    		local noteSkinSelected = params.Mod;
+					local nomArchivoFull = FindFileWithPattern("NoteSkins/pump/".. noteSkinSelected.."/",receptorNameFile);
+					self:Load(nomArchivoFull);
+				end;
+			end;
+
 		    --Aca hay que evaluar las opciones para aplicarlas al menu.
 		    --si hay que mover las flechas o cosas
 			CommandWindowSelectModMessageCommand=function(self,params)
@@ -2740,7 +2800,7 @@ function GetPreview(player)
 
 				local esDropMode = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Drop();
 				if esDropMode then
-					self:y(yStartReceptor+84);
+					self:y(yStartReceptor+88);
 				else
 					self:y(yStartReceptor);
 				end;			
@@ -2761,6 +2821,247 @@ function GetPreview(player)
 		};
 
 	end;
+
+
+	-- new idea for printing chart preview.
+	--first we create the notes and then we placethem.
+	--we are recteating so we will use 6 rows maximum.
+	local chartActor = Def.ActorFrame{
+
+		OnCommand=function(self,params)
+			self:queuecommand("CheckCambio");
+		end;
+
+		CommandWindowSelectModMessageCommand=function(self,params)
+			self:queuecommand("CheckCambio");
+		end;
+
+		CheckCambioCommand = function(self)
+			local STATE = GAMESTATE:GetPlayerState(player);
+			self:diffusealpha(1);
+			--we read the chart used.
+			local isMirror = STATE:GetPlayerOptions('ModsLevel_Preferred'):Mirror();
+			if isMirror then
+				chartDisplayed = defaultMirrorShow;
+			end;
+
+			local isRandom = STATE:GetPlayerOptions('ModsLevel_Preferred'):SuperShuffle();
+			if isRandom then
+				chartDisplayed = defaultRandomShow;
+			end;
+
+			local isBackward = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Backwards();
+			if isBackward then
+				chartDisplayed = defaultBackwardsShow;
+			end;
+
+			if isMirror == false and isRandom == false and isBackward == false then
+				chartDisplayed = defaultChartShow;
+			end;
+
+			local isVanish = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Vanish();
+			local IsAppear = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Appear();
+			local isNonstep = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Nonstep();
+			local isFlash = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Flash();	
+			local isXmode = STATE:GetPlayerOptions('ModsLevel_Preferred'):Xmode();
+			local isNxMode = STATE:GetPlayerOptions('ModsLevel_Preferred'):NXMode();
+			local isSIMode = STATE:GetPlayerOptions('ModsLevel_Preferred'):Drop();
+			local isRIMode = STATE:GetPlayerOptions('ModsLevel_Preferred'):Rise();
+			local isMini = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Mini();	
+			
+			if isMini > 0 then
+				self:zoom(zoomOnMini+0.35);
+				self:y(23);
+
+			end;	
+			if isMini == 0 then
+				self:zoom(1);
+				self:y(0);
+			end;
+			
+
+
+			-- we read the chart and we display the chart.
+			for i=1,5 do
+				for x=1,5 do
+					if chartDisplayed[i][x] == 1 then
+						self:GetChild("arrow"..i.."-"..x):visible(true);
+						self:GetChild("arrow"..i.."-"..x):diffusealpha(1);
+						self:GetChild("arrow"..i.."-"..x):fadetop(0);
+						self:GetChild("arrow"..i.."-"..x):fadebottom(0);
+
+						if isVanish == 1 then
+							if i < 3 then
+								self:GetChild("arrow"..i.."-"..x):diffusealpha(0);
+							end;
+							if i == 3 then
+								self:GetChild("arrow"..i.."-"..x):fadetop(1);
+							end;
+						end;
+
+						if IsAppear == 1 then
+
+							if i == 3 then
+								self:GetChild("arrow"..i.."-"..x):fadebottom(0.7);
+							end;
+
+							if i > 3 then
+								self:GetChild("arrow"..i.."-"..x):diffusealpha(0);
+							end;
+						end;
+
+						if isNonstep == 1 then
+							self:diffusealpha(0);
+						end;	
+
+						if isFlash == 1 then
+							self:GetChild("arrow"..i.."-"..x):diffuseshift();
+							self:GetChild("arrow"..i.."-"..x):effectcolor1(Color.White)
+							self:GetChild("arrow"..i.."-"..x):effectcolor2(color("0,0,0,0"))
+							self:GetChild("arrow"..i.."-"..x):effectperiod(1);
+						else
+							self:GetChild("arrow"..i.."-"..x):stopeffect();
+						end;
+
+
+						if isXmode > 0 then
+							local newPos = 0;
+							if player == PLAYER_1 then
+								newPos = posXBaseChart[x]+((i-1)*14);
+							else
+								newPos = posXBaseChart[x]+((i-1)*-14);	
+							end;
+							self:GetChild("arrow"..i.."-"..x):x(newPos);
+						end;			
+						if isXmode == 0 then
+							self:GetChild("arrow"..i.."-"..x):x(posXBaseChart[x]);
+						end;
+
+						if isNxMode then
+							--esto esta raro tengo que acostar las flechas y el receptor D:
+							self:GetChild("arrow"..i.."-"..x):rotationx(60);
+						else
+							self:GetChild("arrow"..i.."-"..x):rotationx(0);
+						end;
+
+						if isRIMode > 0 or isRIMode < 0 then
+
+								if isRIMode > 0 then
+									if i <= 5 then
+										self:GetChild("arrow"..i.."-"..x):x( posXBaseChart[x]+((i-1)*-4) );
+									end;
+									self:GetChild("arrow"..i.."-"..x):zoom(0.5 - (i/60));
+								elseif isRIMode < 0 then
+									if i <= 5 then
+										self:GetChild("arrow"..i.."-"..x):x( posXBaseChart[x]+((i-1)*4) );
+									end;
+									self:GetChild("arrow"..i.."-"..x):zoom(0.5 + (i/40));
+								end;
+						else
+							self:GetChild("arrow"..i.."-"..x):zoom(0.5);
+						end;
+
+
+
+
+					else
+						self:GetChild("arrow"..i.."-"..x):visible(false);
+					end;
+				end;
+			end;
+
+
+
+		end;
+
+
+
+	};
+
+	for i=1,6 do
+		for x = 1,5 do
+
+			local archivoNote="";
+			local rotazionNote = 0;
+			local addxNote = 0;	
+			local distPerArrow = 22;		
+
+			if x == 1 then
+				archivoNote = "DownLeft Tap Note";
+				rotazionNote = 0;
+				addxNote = posXBaseChart[1];
+			end;
+
+			if x == 2 then
+				archivoNote = "UpLeft Tap Note";
+				rotazionNote = 0;
+				addxNote = posXBaseChart[2];					
+			end;
+
+			if x == 3 then
+				archivoNote = "Center Tap Note";
+				rotazionNote = 0;
+				addxNote = posXBaseChart[3];					
+			end;	
+
+			if x == 4 then
+				archivoNote = "UpLeft Tap Note";
+				rotazionNote = 180;
+				addxNote = posXBaseChart[4];
+			end;	
+
+			if x == 5 then
+				archivoNote = "DownLeft Tap Note";
+				rotazionNote = 180;
+				addxNote = posXBaseChart[5];
+			end;
+
+			chartActor[#chartActor+1] = Def.Sprite{
+						Name="arrow"..i.."-"..x;
+					    InitCommand=function(self)					    	
+					    		local STATE = GAMESTATE:GetPlayerState(player);
+					    		local noteSkinSelected = STATE:GetPlayerOptions('ModsLevel_Preferred' ):NoteSkin();
+								local nomArchivoFull = FindFileWithPattern("NoteSkins/pump/".. noteSkinSelected.."/",archivoNote);
+					    		self:Load(nomArchivoFull);
+					            self:zoomto(32, 32);
+					            self:rotationy(rotazionNote);
+					            self:addy(yStartChart+((i-1)*distPerArrow));
+					            self:x(xPosNoteFieldPrevBase+addxNote);
+					            self:visible(false);
+					    end;
+
+						CheckNoteSkinMessageCommand = function(self,params)
+							if params.Player == player then
+					    		local STATE = GAMESTATE:GetPlayerState(player);
+					    		local noteSkinSelected = STATE:GetPlayerOptions('ModsLevel_Preferred' ):NoteSkin();
+								local nomArchivoFull = FindFileWithPattern("NoteSkins/pump/".. noteSkinSelected.."/",archivoNote);
+								self:Load(nomArchivoFull);
+							end;
+						end;
+
+						CwNavigatePreviewMessageCommand=function(self,params)
+							if params.Player == player then
+					    		local STATE = GAMESTATE:GetPlayerState(player);
+					    		local noteSkinSelected = params.Mod;
+								local nomArchivoFull = FindFileWithPattern("NoteSkins/pump/".. noteSkinSelected.."/",archivoNote);
+								self:Load(nomArchivoFull);
+							end;
+						end;
+
+			};
+
+
+
+			
+		end;
+	end;
+
+	af[#af+1] = chartActor;
+
+
+
+
+--[[
 
     --buscamos el chart por fila
 	for i=1, #defaultChartShow do
@@ -2845,6 +3146,44 @@ function GetPreview(player)
 							self:fadebottom(0);
 							self:diffusealpha(1);
 
+							--MIRROR
+							local esMirror = STATE:GetPlayerOptions('ModsLevel_Preferred'):Mirror();
+							if esMirror then
+								if rotazionNote == 180 then
+					            	self:rotationy(0);
+					        	else
+					        		self:rotationy(180);
+					        	end;
+
+					        	if i == 1 then					        		
+					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[5]);
+					        	end;
+					        	if i == 2 then
+					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[1]);
+					        	end;
+					        	if i == 3 then
+					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[3]);
+					        	end;
+					        	if i == 4 then
+					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[2]);
+					        	end;
+					        	if i == 5 then
+					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[4]);
+					        	end;
+					        	if i == 6 then
+					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[3]);
+					        	end;
+					        	if i == 7 then
+					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[5]);
+					        	end;
+					        	if i == 8 then
+					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[1]);
+					        	end;	
+
+							else
+								self:rotationy(rotazionNote);
+							end;
+
 							--VANISH
 							local esVanish = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Vanish();							
 							if esVanish == 1 then
@@ -2925,43 +3264,7 @@ function GetPreview(player)
 									self:zoom(0.5 - (i/50));
 							end;							
 
-							local esMirror = STATE:GetPlayerOptions('ModsLevel_Preferred'):Mirror();
-							if esMirror then
-								if rotazionNote == 180 then
-					            	self:rotationy(0);
-					        	else
-					        		self:rotationy(180);
-					        	end;
-
-					        	if i == 1 then
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[5]);
-					        	end;
-					        	if i == 2 then
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[1]);
-					        	end;
-					        	if i == 3 then
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[3]);
-					        	end;
-					        	if i == 4 then
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[2]);
-					        	end;
-					        	if i == 5 then
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[4]);
-					        	end;
-					        	if i == 6 then
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[3]);
-					        	end;
-					        	if i == 7 then
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[5]);
-					        	end;
-					        	if i == 8 then
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[1]);
-					        	end;	
-
-							else
-								self:rotationy(rotazionNote);
-							end;
-
+							
 							local esMini = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Mini();							
 							if esMini > 0 then
 								self:zoom(zoomOnMini);
@@ -2972,6 +3275,7 @@ function GetPreview(player)
 								self:zoom(0.5);
 								self:x(posXBaseChart[x]);
 							end;
+							
 
 						end;
 
@@ -2992,7 +3296,7 @@ function GetPreview(player)
 
 	end;
 
-
+]]
 
 
 
@@ -3676,35 +3980,33 @@ function CreateCommandForPlayer(player)
 		-- name = nombre de la opción
 		-- index = ???
 		-- imgfile = sprite con opciones-> Icons[] NxN
-		-- arrayindex = num del indice en el array de mod titles, con esto la idea es que sea manual a donde cae y no si estan en la misma pos.
 
-		-- ** YOU NEED TO INDICATE CORRECTLY THE "indexInArrayModTitles" PARAMETER.
+		-- ** Every option here needs to have the list of in the same index.
+		-- ** For example: speed is the index 1, on the Mod array all the options needs to be on the index 1
 		local array=
 		{
-			{order="01",name="speed",index=2,imgfile="Icons02 13x1",indexInArrayModTitles= 1},
-			{order="11",name="av",index=2,imgfile="Icons11 6x1",indexInArrayModTitles= 2},
-			{order="02",name="display",index=3,imgfile="Icons03 13x1",indexInArrayModTitles= 3},
-			{order="03",name="note skin",index=4,imgfile=nil,indexInArrayModTitles= 4},
-			{order="04",name="path",index=5,imgfile="Icons05 8x1",indexInArrayModTitles= 5},
-			{order="05",name="alternate",index=6,imgfile="Icons06 3x1",indexInArrayModTitles= 6},
-			{order="06",name="judge",index=7,imgfile="Icons07 17x1",indexInArrayModTitles= 7},
-			{order="07",name="rush",index=7,imgfile="Icons07 17x1",indexInArrayModTitles= 8},
-			{order="12",name="sort",index=8,imgfile="Icons08 1x1",indexInArrayModTitles= 9},
-			{order="08",name="reset",index=0,imgfile=nil,indexInArrayModTitles= 10},						
-			{order="09",name="rank",index=1,imgfile="Icons01 1x1",indexInArrayModTitles= 11},
-				--opciones nuevas NW				
+			{order="01",name="speed",index=2,imgfile="Icons02 13x1"},
+			{order="11",name="av",index=2,imgfile="Icons11 6x1"},
+			{order="02",name="display",index=3,imgfile="Icons03 13x1"},
+			{order="03",name="note skin",index=4,imgfile=nil},
+			{order="04",name="path",index=5,imgfile="Icons05 8x1"},
+			{order="05",name="alternate",index=6,imgfile="Icons06 3x1"},
+			{order="06",name="judge",index=7,imgfile="Icons07 17x1"},
+			{order="07",name="rush",index=7,imgfile="Icons07 17x1"},
+			{order="12",name="sort",index=8,imgfile="Icons08 1x1"},
+			{order="08",name="reset",index=0,imgfile=nil},
 		};
 
 		--############################--
 		--		OPCIONES NUEVAS 	  --
 		--############################--
-		table.insert(array,{order="19",name="vsmode",index=15,imgfile="Icons20 2x1",indexInArrayModTitles=12});		
-		table.insert(array,{order="14",name="info",index=10,imgfile="Icons09 11x1",indexInArrayModTitles=13});
-		table.insert(array,{order="15",name="judgeskin",index=11,imgfile=nil,indexInArrayModTitles=14});
-		table.insert(array,{order="16",name="judgeskinzoom",index=12,imgfile="Icons16 6x1",indexInArrayModTitles=15});
-		table.insert(array,{order="17",name="lifebarskin",index=13,imgfile=nil,indexInArrayModTitles=16});
-		table.insert(array,{order="18",name="lifebarsettings",index=14,imgfile="Icons19 4x1",indexInArrayModTitles=17});
-		table.insert(array,{order="20",name="timingadj",index=16,imgfile="Icons21 6x1",indexInArrayModTitles=18});
+		table.insert(array,{order="19",name="vsmode",index=15,imgfile="Icons20 2x1"});		
+		table.insert(array,{order="14",name="info",index=10,imgfile="Icons09 11x1"});
+		table.insert(array,{order="15",name="judgeskin",index=11,imgfile=nil});
+		table.insert(array,{order="16",name="judgeskinzoom",index=12,imgfile="Icons16 6x1"});
+		table.insert(array,{order="17",name="lifebarskin",index=13,imgfile=nil});
+		table.insert(array,{order="18",name="lifebarsettings",index=14,imgfile="Icons19 4x1"});
+		table.insert(array,{order="20",name="timingadj",index=16,imgfile="Icons21 6x1"});
 
 		
 		
@@ -3784,7 +4086,7 @@ function CreateCommandForPlayer(player)
 		local noteindex = 0;
 		for ind=1,#Titles, 1 do
 			if (Titles[ind].name == "note skin") then
-				noteindex = Titles[ind]["indexInArrayModTitles"];
+				noteindex = ind;
 			end;
 		end;
 
@@ -3879,12 +4181,14 @@ function CreateCommandForPlayer(player)
 		-- 10: RESET
 		table.insert(array,{});
 
+		--[[
 		-- 11: RANK
 		table.insert(array,
 			{	
 				{order="RANK", command="rank",stateindex=0}
 			}
 		);	
+		]]
 
 		--12
 		-- vs mode
@@ -3917,7 +4221,7 @@ function CreateCommandForPlayer(player)
 		local judgeindex = 0;
 		for ind=1,#Titles, 1 do
 			if (Titles[ind].name == "judgeskin") then
-				judgeindex = Titles[ind]["indexInArrayModTitles"];
+				judgeindex = ind;
 			end;
 		end;
 
@@ -3971,7 +4275,7 @@ function CreateCommandForPlayer(player)
 		local lifebarindex = 0;
 		for ind=1,#Titles, 1 do
 			if (Titles[ind].name == "lifebarskin") then
-				lifebarindex = Titles[ind]["indexInArrayModTitles"];
+				lifebarindex = ind;
 			end;
 		end;
 
@@ -4036,6 +4340,263 @@ function CreateCommandForPlayer(player)
 
 			}
 		);	
+
+		local STATE = GAMESTATE:GetPlayerState(player);
+		if STATE:GetPlayerOptions('ModsLevel_Preferred'):MMod() ~= nil then
+			PAVenabled[player] = true;
+		else
+			PAVenabled[player] = false;
+		end;
+	
+		return array;
+
+	end;
+
+
+	local function GetModTitlesByName()
+		local array ={};
+		--##Struct##
+		-- order => name
+		-- command => command
+		--stateindex => state of the sprite for this item
+		--disablestate => the state in the sprite where the img shows a disable state of this item
+
+
+		-- 1: SPEED
+		array["speed"] = {	
+				{order="1X", command="1x", },
+				{order="2X", command="2x",},
+				{order="3X", command="3x",},
+				{order="4X", command="4x",},
+				{order="5X", command="5x",},
+				{order="6X", command="6x",},
+				{order="+0.25", command="0.25",},	
+				{order="+0.5", command="0.5",},	
+				{order="EW", command="expand",},
+				{order="RV", command="randomvel",},
+				{order="AV", command="m550",},
+				{order="AC", command="accel",},
+				{order="DC", command="decel",}
+		};
+
+		-- 2: AV
+		array["av"] = {
+				{order="100", command="av+100", stateindex=0},
+				{order="10", command="av+10", stateindex=1},
+				{order="1", command="av+1", stateindex=2},
+				{order="-1", command="av-1", stateindex=3},
+				{order="-10", command="av-10", stateindex=4},
+				{order="-100", command="av-100", stateindex=5},
+				{order="100", command="av+100", stateindex=0},
+				{order="10", command="av+10", stateindex=1},
+				{order="1", command="av+1", stateindex=2},
+				{order="-1", command="av-1", stateindex=3},
+				{order="-10", command="av-10", stateindex=4},
+				{order="-100", command="av-100", stateindex=5}
+		};
+
+		-- 3: DISPLAY
+		array["display"] = {	
+				{order="V", command="vanish",},
+				{order="AP", command="appear",},
+				{order="NS", command="nonstep",},
+				{order="FD", command="dark",},
+				{order="FL", command="flash",},
+				{order="RANDOM NOTE", command="randomnote",},
+				{order="MI", command="mini" },
+				{order="BGA OFF", command="bgaoff", stateindex=7, disablestate=8, },
+				{order="BGA DARK", command="bgadark", stateindex=9, disablestate=10, },
+				{order="BGA PARTIAL", command="bgapartial", stateindex=11, disablestate=12, },
+		};
+
+		-- 4: NOTESKIN
+		array["note skin"] = {};
+
+		for x=1,#notelist do
+			local fixedName = string.upper(notelist[x]);
+			fixedName = string.gsub(fixedName, "-", " ");
+			fixedName = string.gsub(fixedName, "_", " ");
+			if (string.len(fixedName) > 15) then
+				fixedName = string.sub(fixedName, 1, 15) .. "...";
+			end;
+
+			table.insert(array["note skin"], {order=fixedName, command=notelist[x],});
+		end;
+
+		--Insert additional noteskin copies to fill missing spots
+		while #array["note skin"] < minNumItemsCW do
+			for x=1,#notelist do
+				table.insert(array["note skin"], array["note skin"][x])
+			end
+		end
+
+		-- 5: PATH
+		array["path"] = {	
+				{order="X", command="xmode",},
+				{order="NX", command="nxmode",},
+				{order="UA", command="underattack",},
+				{order="DR", command="drop",},
+				{order="SI", command="sink",},
+				{order="RI", command="rise",},
+				{order="SN", command="snake",},	
+				{order="ZZ", command="zigzag",},
+		};
+
+		-- 6: ALTERNATE
+		array["alternate"] = {
+				{order="M", command="backwards", stateindex=0 },
+				{order="RS", command="supershuffle", stateindex=1 },
+				{order="SS", command="mirror", stateindex=2 },
+				{order="M", command="backwards", stateindex=0 },
+				{order="RS", command="supershuffle", stateindex=1 },
+				{order="SS", command="mirror", stateindex=2 },
+				{order="M", command="backwards", stateindex=0 },
+				{order="RS", command="supershuffle", stateindex=1 },
+				{order="SS", command="mirror", stateindex=2 }
+			};
+
+		-- 7: JUDGEMENT
+		array["judge"] = {
+				{order="HJ", command="hardjudgement",stateindex=0, },
+				{order="VJ", command="veryhardjudgement",stateindex=2,},
+				{order="XJ", command="extrajudgement",stateindex=3,},
+				{order="UJ", command="ultrahardjudgement",stateindex=4,},
+				{order="JR", command="judgereverse",stateindex=1, },
+				{order="HJ", command="hardjudgement",stateindex=0, },
+				{order="VJ", command="veryhardjudgement",stateindex=2,},
+				{order="XJ", command="extrajudgement",stateindex=3,},
+				{order="UJ", command="ultrahardjudgement",stateindex=4,},
+				{order="JR", command="judgereverse",stateindex=1, },
+			};
+
+		-- 8: RUSH
+		array["rush"] = {
+				{order="60", command="0.6", stateindex=5, disablestate=16, },
+				{order="70", command="0.7", stateindex=6, disablestate=16, },
+				{order="80", command="0.8", stateindex=7, disablestate=16, },
+				{order="90", command="0.9", stateindex=8, disablestate=16, },
+				{order="110", command="1.1", stateindex=9, disablestate=16, },
+				{order="120", command="1.2", stateindex=10, disablestate=16, },
+				{order="130", command="1.3", stateindex=11, disablestate=16, },
+				{order="140", command="1.4", stateindex=12, disablestate=16, },
+				{order="150", command="1.5", stateindex=13, disablestate=16, },
+				{order="160", command="1.6", stateindex=14, disablestate=16, },
+				{order="170", command="1.7", stateindex=15, disablestate=16, },
+		};
+
+		--SORT (ORDEN DE WHEEL)
+		array["sort"] = {
+			{order="TITLE", command="title",},
+		};		
+		--RESET
+		array["reset"] = {};
+
+		--RANK
+		array["rank"] = {
+			{order="RANK", command="rank",stateindex=0}
+		};
+
+		--vs mode
+		array["vsmode"] = {
+			{order="VSMODE", command="vsmode", stateindex=0,disablestate=1},
+		};
+
+		--INFO
+		array["info"] = {
+			{order="TIMING", command="timingui",stateindex=0},
+			{order="TIMINGBAR", command="timingbar",stateindex=10},
+			{order="BREAKICON", command="breakiconui",stateindex=1},
+			{order="SCORE", command="scoreui",stateindex=2},
+			{order="SCOREPERCENTAJE", command="scorepercentajeui",stateindex=9},
+			{order="JUDGEDATA", command="judgedataui",stateindex=3},
+			{order="MUSICDURATION", command="musicdurationui",stateindex=4},
+			{order="STEPLV", command="steplvui",stateindex=5},
+			--{order="RANKDATA", command="rankdataui",stateindex=6},
+			{order="ALL", command="allui",stateindex=7},
+			{order="NONE", command="noneui",stateindex=8}
+		};
+
+		-- 14: judg skins
+		array["judgeskin"] = {};
+		for x=1,#judgeSkinList do
+			local fixedName = string.upper(judgeSkinList[x]);
+			fixedName = string.gsub(fixedName, "i_", "");
+			fixedName = string.gsub(fixedName, "e_", "");
+			if (string.len(fixedName) > 15) then
+				fixedName = string.sub(fixedName, 1, 15) .. "...";
+			end;
+
+			table.insert(array["judgeskin"], {order=fixedName, command=judgeSkinList[x],});
+		end;	
+
+		--Insert additional judgeskin copies to fill missing spots
+		-- we update the base list to reflect those copies, the CW have a miss match of data :o
+		if #judgeSkinList > 0 then
+			while #array["judgeskin"] < minNumItemsCW do
+				for x=1,#judgeSkinList do
+					table.insert(array["judgeskin"], array["judgeskin"][x])
+				end
+			end
+		end
+
+		-- 15: judg zoom
+		array["judgeskinzoom"] = {
+				{order="25", command="zoomjdg+25", stateindex=0},
+				{order="10", command="zoomjdg+10", stateindex=1},
+				{order="1", command="zoomjdg+1", stateindex=2},
+				{order="-1", command="zoomjdg-1", stateindex=3},
+				{order="-10", command="zoomjdg-10", stateindex=4},
+				{order="-25", command="zoomjdg-25", stateindex=5},
+				{order="25", command="zoomjdg+25", stateindex=0},
+				{order="10", command="zoomjdg+10", stateindex=1},
+				{order="1", command="zoomjdg+1", stateindex=2},
+				{order="-1", command="zoomjdg-1", stateindex=3},
+				{order="-10", command="zoomjdg-10", stateindex=4},
+				{order="-25", command="zoomjdg-25", stateindex=5}
+		};
+
+		--Lifebar skins
+		array["lifebarskin"] = {};
+		--Agregamos la lista de skins disponibles a las opciones
+		for x=1,#lifebarSkinList do
+			local fixedName = string.upper(lifebarSkinList[x]);
+			fixedName = string.gsub(fixedName, "i_", "");
+			fixedName = string.gsub(fixedName, "e_", "");
+			if (string.len(fixedName) > 15) then
+				fixedName = string.sub(fixedName, 1, 15) .. "...";
+			end;
+
+			table.insert(array["lifebarskin"], {order=fixedName, command=lifebarSkinList[x],});
+		end;			
+
+		--Insert additional lifebarskin copies to fill missing spots
+		if #lifebarSkinList > 0 then
+			while #array["lifebarskin"] < minNumItemsCW do
+				for x=1,#lifebarSkinList do
+					table.insert(array["lifebarskin"], array["lifebarskin"][x])
+				end
+			end
+		end
+
+		--Judg zoom
+		array["lifebarsettings"] = {
+				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
+				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
+				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
+				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
+				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
+				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0}
+		};
+
+		-- 18: timing adj
+		array["timingadj"] = {
+				{order="01", command="timing+01", stateindex=3},
+				{order="-01", command="timing-01", stateindex=2},
+				{order="01", command="timing+01", stateindex=3},
+				{order="-01", command="timing-01", stateindex=2},
+				{order="01", command="timing+01", stateindex=3},
+				{order="-01", command="timing-01", stateindex=2},
+		};
 
 		local STATE = GAMESTATE:GetPlayerState(player);
 		if STATE:GetPlayerOptions('ModsLevel_Preferred'):MMod() ~= nil then
@@ -4337,8 +4898,10 @@ function CreateCommandForPlayer(player)
 	end;
 
 
+	--00--
 	local Titles = GetCommandTitles();
 	local Mods = GetModTitles();
+	local ModsAc = GetModTitlesByName();
 	local seted={};
 
 	local function ApplyAV(Splayer, Savcommand)
@@ -4391,8 +4954,6 @@ function CreateCommandForPlayer(player)
 
 		--MENU DE INFO PARA GAMEPLAY.
 		if Titles[Scommand].name == "info" then	
-			local indexModList = Titles[Scommand].indexInArrayModTitles;
-
 			if Mods[Scommand][Smod].command == "timingui" then	
 				local fastslowUi = getCustomOptionValuePlayer(Splayer,"gameplay_fastslow");
 
@@ -5454,7 +6015,14 @@ local InitPosCommandLess = {
 					SelectedMod=1;
 				end;
 				CurrentMods = GetCommands(Mods[SelectedTitle], SelectedMod);
-				MESSAGEMAN:Broadcast("MoveMods", {Player = params.Player, Direction = params.Direction} )
+				MESSAGEMAN:Broadcast("MoveMods", {Player = params.Player, Direction = params.Direction} );
+
+				-- we reload the noteskin preview.
+				local Title = Titles[SelectedTitle].name;				
+				if Title == "note skin" then
+					MESSAGEMAN:Broadcast("CwNavigatePreview" , {Player = params.Player, Mod = Mods[SelectedTitle][SelectedMod].command, Command = Titles[SelectedTitle].index } );
+				end;
+
 			end;
 		end;
 
@@ -5477,9 +6045,23 @@ local InitPosCommandLess = {
 			end;
 		end;
 
+		CommandWindowModCancelMessageCommand=function(self,params)
+			if params.Player == player then
+				-- we reload the noteskin preview.
+				MESSAGEMAN:Broadcast("CheckNoteSkin", {Player = player} );
+			end;
+		end;
+
 		CommandWindowSelectOptionMessageCommand=function(self,params)
 			if params.Player == player then
 				SCREENMAN:GetTopScreen():SetCommand(params.Player,Titles[SelectedTitle].name);
+
+				-- we reload the noteskin preview.
+				local Title = Titles[SelectedTitle].name;				
+				if Title == "note skin" then
+					MESSAGEMAN:Broadcast("CwNavigatePreview" , {Player = params.Player, Mod = Mods[SelectedTitle][SelectedMod].command, Command = Titles[SelectedTitle].index } );
+				end;
+
 			end;
 		end;
 		
@@ -6221,7 +6803,7 @@ local InitPosCommandLess = {
 	-- we search the index where is all the noteskin list in the mod array.
 	for ind=1,#Titles, 1 do
 		if (Titles[ind].name == "note skin") then
-			noteindex = Titles[ind]["indexInArrayModTitles"];
+			noteindex = ind;
 		end;
 	end;
 	
@@ -6372,7 +6954,7 @@ local InitPosCommandLess = {
 	-- we search of the correct index where all the skin list is listed.
 	for ind=1,#Titles, 1 do
 		if (Titles[ind].name == "judgeskin") then
-			judgeindex = Titles[ind]["indexInArrayModTitles"];
+			judgeindex = ind;
 		end;
 	end;
 
@@ -6543,7 +7125,7 @@ local InitPosCommandLess = {
 	--here we search of the correct index of the list
 	for ind=1,#Titles, 1 do
 		if (Titles[ind].name == "lifebarskin") then
-			lifebarindex = Titles[ind]["indexInArrayModTitles"];
+			lifebarindex = ind;
 		end;
 	end;
 
@@ -6722,7 +7304,8 @@ local InitPosCommandLess = {
 		if (Titles[ind].name ~= "note skin") then
 			--we switch C for the id asign for mods.
 			--with this we can switch the pos without much trouble
-			local c = Titles[ind]["indexInArrayModTitles"];
+			--local c = Titles[ind]["indexInArrayModTitles"];
+			local c = ind;
 			for m=1,#Mods[c], 1 do 
 				if (GetCommandTitles()[c].imgfile ~=nil ) then
 				

@@ -26,6 +26,119 @@ if GAMESTATE:IsHumanPlayer(PLAYER_2)  then
 	local judgtimingp2=GAMESTATE:GetPlayerState(PLAYER_2):GetPlayerOptions('ModsLevel_Preferred'):JudgeTiming();
 end;
 
+function getChartInfoBox(player)
+
+	local xPlayer=0;
+	if player == PLAYER_1 then
+		xPlayer = SCREEN_CENTER_X-446;
+	else
+		xPlayer = SCREEN_CENTER_X+446;
+	end;
+
+	return Def.ActorFrame{
+
+			OnCommand=function(self)
+				self:x(xPlayer);
+				self:y(SCREEN_CENTER_Y-190);
+				self:zoom(1.2);
+				self:zoomy(0)
+			end;
+
+			ChangeStepsMessageCommand=function(self,params)
+				if params.Player == player then
+					self:stoptweening();
+					self:zoomy(0);
+					self:queuecommand("artistStep");
+				end;
+			end;
+
+			SongChosenMessageCommand=function(self,params)				
+					self:stoptweening();
+					self:zoomy(0);
+					self:queuecommand("artistStep");				
+			end;
+
+
+			SongUnchosenMessageCommand=function(self,params)				
+					self:zoomy(0);
+					self:GetChild("titleSong"):settext("-");
+					self:GetChild("descSong"):settext("-");
+					self:stoptweening();
+			end;	
+
+
+
+			artistStepCommand=function(self)
+
+				local chartName = "";
+				local chartDescription = "";
+				local LabelType = "";
+				local steps = GAMESTATE:GetCurrentSteps(player);
+				local CustomLabel = DesCustomLabel(steps:GetDescription());
+
+				chartName = steps:GetChartName();
+				chartDescription = steps:GetDescription();
+				LabelType = steps:GetLabelType();
+
+				local showTextSteps=false;
+
+				if #chartName > 0 then
+					showTextSteps = true;
+				end;
+
+				--Not in quest, that thing has his own box.
+				if "LABELTYPE_QUEST" == LabelType or "quest" == CustomLabel then
+					showTextSteps=false;
+				end;
+
+				if showTextSteps then
+					self:visible(true);
+					if #chartName > 0 then							
+						self:GetChild("titleSong"):settext(chartName);
+						self:GetChild("descSong"):settext(chartDescription);
+					else
+						self:GetChild("titleSong"):settext("-");
+						self:GetChild("descSong"):settext("-");
+						--self:visible(false);
+					end;
+					self:queuecommand("Ani");
+				else
+					self:visible(false);
+				end;
+
+			end;
+
+			AniCommand=function(self)
+				self:stoptweening();
+				self:zoomy(0);
+				self:linear(0.05);
+				self:zoomy(1.2)
+			end;
+
+
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/chartInfo"))..{	
+				Name="charInfo";
+				InitCommand=function(self)
+					self:zoom(0.6);
+					self:zoomy(0.4);
+
+				end;
+				OffCommand=cmd(stoptweening;linear,.2;y,-200;diffusealpha,0);
+			};
+
+			LoadFont("_TitleXolonium")..{
+				Name="titleSong";
+				InitCommand=cmd(y,-10;zoom,0.4;maxwidth,480;);
+			};
+			LoadFont("_TitleXolonium")..{
+				Name="descSong";
+				InitCommand=cmd(y,5;zoom,0.35;maxwidth,480;);
+			};
+	};
+
+
+end;
+
 function breakOnItem(player)
 	local baseX = 0;
 	if player == PLAYER_1 then
@@ -1131,6 +1244,60 @@ if GAMESTATE:GetGameMode() == 'Basic' then
 	};
 end;
 
+--*************************
+--*** CHART INFO   ***
+--*************************
+
+
+
+if GAMESTATE:IsHumanPlayer(PLAYER_1) then
+	t[#t+1] = getChartInfoBox(PLAYER_1)..{
+		SaniNetMainMenuMessageCommand=function(self,params)
+			if params.Action == 1 then
+				self:visible(false);
+			else
+				self:visible(true);
+			end;
+		end;
+
+		FinalizedMessageCommand=function(self)
+			self:stoptweening();
+			self:linear(0.15);
+			self:diffusealpha(0);
+		end;		
+
+		OffCommand=function(self)
+			self:stoptweening();
+			self:linear(0.15);
+			self:diffusealpha(0);
+		end;
+
+	};
+end;
+if GAMESTATE:IsHumanPlayer(PLAYER_2) then
+	t[#t+1] = getChartInfoBox(PLAYER_2)..{
+
+		SaniNetMainMenuMessageCommand=function(self,params)
+			if params.Action == 1 then
+				self:visible(false);
+			else
+				self:visible(true);
+			end;
+		end;
+
+		FinalizedMessageCommand=function(self)
+			self:stoptweening();
+			self:linear(0.15);
+			self:diffusealpha(0);
+		end;		
+
+		OffCommand=function(self)
+			self:stoptweening();
+			self:linear(0.15);
+			self:diffusealpha(0);
+		end;
+	};
+end;
 
 --**********************************
 --*** 7 - FULL INTERFACE	   ***
@@ -2151,6 +2318,8 @@ t[#t+1] =  Def.ActorFrame
 	end;	
 };
 
+
+
 --*************************
 --*** GRAPH   ***
 --*************************
@@ -2200,6 +2369,9 @@ t[#t+1] = LoadActor("ScreenSelectMusicLua/graphsong")..{
 		end;
 
 };
+
+
+
 
 --*************************
 --*** VS   ***
@@ -2316,22 +2488,6 @@ else
 
 end;
 
-
-t[#t+1] = Def.ActorFrame{
-  OnCommand=function(self)
-    SCREENMAN:GetTopScreen():AddInputCallback(function(event)
-    	--Trace("#######"..event.type);
-    	--Trace("#######"..event.DeviceInput.button);
-      if event.type == "InputEventType_FirstPress" and event.DeviceInput.button == "DeviceButton_F8" then
-        local top = SCREENMAN:GetTopScreen()
-        top:SetNextScreenName("ScreenPlayerCustomProfile")
-        top:StartTransitioningScreen("SM_GoToNextScreen")
-        return true
-      end
-      return false
-    end)
-  end
-}
 
 --**********************
 --** PERFORMANCE MODE **
@@ -2491,26 +2647,32 @@ t[#t+1] = Def.ActorFrame{
   end
 }
 
---[[
+
 local profilerActive = false;
 t[#t+1] = LoadActor("Profiler/ProfilerBase")..{
 
 	  OnCommand=function(self)
 	  	self:visible(false);
 	    	SCREENMAN:GetTopScreen():AddInputCallback(function(event)
-	      if event.type == "InputEventType_FirstPress" and event.DeviceInput.button == "DeviceButton_F12" then
-	        if profilerActive then
-	        	self:visible(false);
-	        	profilerActive = false;
-	        else
-	        	self:visible(true);
-	        	profilerActive = true;
-	        end;
+	      if event.type == "InputEventType_FirstPress" and event.DeviceInput.button == "DeviceButton_F5" then
+
+		      if SCREENMAN:GetTopScreen():GetSelectionState() == "SelectingSong" then
+						
+		        if profilerActive then
+		        	self:visible(false);
+		        	profilerActive = false;
+		        else
+		        	self:visible(true);
+		        	profilerActive = true;
+		        end;
+
+		      end;
+
 	      end
 
 	    end)
 	  end
 };
-]]
+
 
 return t;

@@ -68,6 +68,17 @@ return Def.ActorFrame {
         end
     },
     
+    Def.BitmapText {
+        Font = "Common Normal",
+        Text = "CLOSE: KEY F5",
+        InitCommand = function(self)
+            self:y(-213)
+            self:zoom(0.45)
+            self:diffuse(1, 1, 1, 1)
+            self:shadowlength(2)
+        end
+    },
+
     -- Separador 1
     Def.Quad {
         InitCommand = function(self)

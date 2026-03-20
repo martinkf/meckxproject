@@ -142,7 +142,7 @@ local function GetHighScoreFromPlayer(PLAYERNUM)
 		assert(scorelist)
 		local scores = scorelist:GetHighScores();
 		if (scores[1] == nil ) then return 0 end;
-		local high = scores[1]:GetScore();
+		local high = scores[1]:GetPhoenixScore();
 		return high;
 	end;
 	
@@ -1013,6 +1013,30 @@ end;
 		};	
 
 
+		LoadActor(THEME:GetPathG("","ScreenEvaluation/information/actions 1x4"))..{
+			Name="dleft";
+			OnCommand=function(self)
+				self:y(yPlace+80);
+				self:x(xPlace-150);
+				self:animate(false);
+				self:setstate(2);
+				self:diffusealpha(1);
+				self:zoom(0.5);
+			end;
+			FinalizedMessageCommand=cmd(finishtweening;linear,0.02;diffusealpha,0);
+		};
+		LoadActor(THEME:GetPathG("","ScreenEvaluation/information/actions 1x4"))..{
+			Name="rleft";
+			OnCommand=function(self)
+				self:y(yPlace+80);
+				self:x(xPlace+200);
+				self:animate(false);
+				self:setstate(3);
+				self:diffusealpha(1);
+				self:zoom(0.5);
+			end;
+			FinalizedMessageCommand=cmd(finishtweening;linear,0.02;diffusealpha,0);
+		};
 
 		OnCommand= function(self)
 			SCREENMAN:GetTopScreen():AddInputCallback(input)

@@ -107,18 +107,6 @@ t[#t+1] = Def.ActorFrame {
 			Name="textsap2";
 			OnCommand=cmd(x,490;y,-3;zoom,0.8;horizalign,left);
 		};
-
-		FinalizedMessageCommand=function(self)
-			self:stoptweening();
-			--self:linear(0.05);
-			self:diffusealpha(0);
-		end;
-		OffCommand=function(self)
-			self:stoptweening();
-			--self:linear(0.05);
-			self:diffusealpha(0);
-		end;
-
 };
 
 
