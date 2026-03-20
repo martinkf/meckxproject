@@ -133,6 +133,17 @@ RecordsGrid_Y8 = (SCREEN_CENTER_Y+90)-52
 RecordsGrid_Y9 = (SCREEN_CENTER_Y-140)-52
 RecordsGrid_YA = (SCREEN_CENTER_Y+125)-52
 
+-- -- SCREEN STAGE INFORMATION
+
+-- CHART DETAIL LABELS
+
+LoadingDifficultyDetails_YAnchor = -250
+LoadingDifficultyDetails_XPlayer1 = -400
+LoadingDifficultyDetails_XPlayer2 = 400
+
+
+
+
 -- -- -- 02 - FUNCTIONS
 -- inputs:
 -- 1) a chart object
