@@ -38,6 +38,7 @@ function setVsCount(scorep1,scorep2)
 
 	--we add the data of this gameplay, we will only have 5 at maximum, so we delete the last one if there is more xD
 	local songName = GAMESTATE:GetCurrentSong():GetDisplayMainTitle();
+	--local getFolderSong = GAMESTATE:GetChannelName();
 	local CurrentStepP1 = GAMESTATE:GetCurrentSteps(PLAYER_1);
 	local CurrentStepP2 = GAMESTATE:GetCurrentSteps(PLAYER_2);
 	local meterP1 = CurrentStepP1:GetMeter();	
@@ -100,18 +101,18 @@ end;
 --### FIN VS ###
 
 iGrade = TierToState(vStats:GetPlayerStageStats(GAMESTATE:GetMasterPlayerNumber()):GetGrade()) ;
-iGradeAnnouncer = gradeTransformAnnouncer(vStats:GetPlayerStageStats(GAMESTATE:GetMasterPlayerNumber()):GetScore());
+iGradeAnnouncer = gradeTransformAnnouncer(vStats:GetPlayerStageStats(GAMESTATE:GetMasterPlayerNumber()):GetPhoenixScore());
 
 local bFailedAux = false;
 
 if GAMESTATE:GetNumPlayersEnabled() > 1 then
-	if pnStats2:GetScore() > pnStats1:GetScore() then
+	if pnStats2:GetPhoenixScore() > pnStats1:GetPhoenixScore() then
 		iGrade = TierToState(pnStats2:GetGrade());
-		iGradeAnnouncer =  gradeTransformAnnouncer(pnStats2:GetScore());
+		iGradeAnnouncer =  gradeTransformAnnouncer(pnStats2:GetPhoenixScore());
 		if (pnStats2:GetFailedAux()) then bFailedAux = true; end;
 	else
 		iGrade = TierToState(pnStats1:GetGrade());
-		iGradeAnnouncer =  gradeTransformAnnouncer(pnStats1:GetScore());
+		iGradeAnnouncer =  gradeTransformAnnouncer(pnStats1:GetPhoenixScore());
 		if (pnStats1:GetFailedAux()) then bFailedAux = true; end;
 	end;
 else
@@ -341,12 +342,12 @@ local function GetHighScoreDifference(PLAYERNUM)
 		
 		if (scores[1] == nil ) then return 0 end;
 		
-		local high = scores[1]:GetScore();
+		local high = scores[1]:GetPhoenixScore();
 
 		if ( scores[2] == nil) then 
 			low = 0;
 		else
-			low = scores[2]:GetScore();
+			low = scores[2]:GetPhoenixScore();
 		end;
 
 		local result = high - low;
@@ -402,7 +403,7 @@ local function getDifferenceBetweenRecordStats(PLAYER)
 				Miss		= statPlayer:GetTapNoteScores("TapNoteScore_Miss") +
 							  statPlayer:GetTapNoteScores("TapNoteScore_CheckpointMiss");
 				MaxCombo 	= statPlayer:MaxCombo();
-				Score		= statPlayer:GetScore();
+				Score		= statPlayer:GetPhoenixScore();
 			};
 
 			local plStatsExtraJudg = {
@@ -586,18 +587,6 @@ local function getDifferenceBetweenRecordStats(PLAYER)
 
 end;
 
-function calculatePercentage(score)
-    local maxScore = 1000000
-    if score == maxScore then
-        return "100%"
-    else
-        local percentage = (score / maxScore) * 100
-        -- Truncar a dos decimales sin redondear
-        local truncated = math.floor(percentage * 100) / 100
-        return string.format("%.2f%%", truncated)
-    end
-end
-
 local function CreateStats( pnPlayer )
 	-- Actor Templates
 	local aLabel = LoadFont("Common Normal") .. { InitCommand=cmd(shadowlength,1;horizalign,left); };
@@ -608,6 +597,7 @@ local function CreateStats( pnPlayer )
 
 	local bpmActual = "BPM " .. ProcessBPM(GAMESTATE:GetCurrentSong():GetCustomBPM());
 	local songartist = GAMESTATE:GetCurrentSong():GetDisplayArtist();
+	local getFolderSong = GAMESTATE:GetChannelName();
 	local MusicLength = GAMESTATE:GetCurrentSong():MusicLengthSeconds() or 0;
 	local durationSong = MusicLength > 0 and SecondsToMMSS(MusicLength) or "";
 
@@ -625,6 +615,7 @@ local function CreateStats( pnPlayer )
 	tStatsGlobal = {		
 		Title		 = GAMESTATE:GetCurrentSong():GetDisplayMainTitle();
 		fulltextData = ftext;
+		folder = getFolderSong;
 	};	
 	
 	local tStats = {
@@ -637,7 +628,7 @@ local function CreateStats( pnPlayer )
 		Miss		= pnStageStats:GetTapNoteScores("TapNoteScore_Miss") +
 					  pnStageStats:GetTapNoteScores("TapNoteScore_CheckpointMiss");
 		MaxCombo 	= pnStageStats:MaxCombo();
-		Score		= pnStageStats:GetScore();
+		Score		= pnStageStats:GetPhoenixScore();
 		Kcal		= pnStageStats:GetCaloriesBurned();
 		Grade		= pnStageStats:GetGrade();
 		
@@ -655,7 +646,7 @@ local function CreateStats( pnPlayer )
 
 
 	--Generamos la letra nueva
-	local scorePlayer = pnStageStats:GetScore();
+	local scorePlayer = pnStageStats:GetPhoenixScore();
 	local stateLetterSprite = gradeTransformState(scorePlayer);
 
     --obtenemos el ClearStatus
@@ -736,8 +727,8 @@ local function CreateStats( pnPlayer )
 	--
 
 
-	if topscore and topscore:GetScore() > 0 then
-		tStats["MyBest"]= topscore:GetScore();
+	if topscore and topscore:GetPhoenixScore() > 0 then
+		tStats["MyBest"]= topscore:GetPhoenixScore();
 	else
 		tStats["MyBest"]= 0;
 	end
@@ -748,7 +739,7 @@ local function CreateStats( pnPlayer )
 	assert(scorelist)
 	local topscore = scorelist:GetHighScores()[1];
 	if topscore then
-		tStats["MachineBest"].Score = topscore:GetScore();
+		tStats["MachineBest"].Score = topscore:GetPhoenixScore();
 	else
 		tStats["MachineBest"].Name = "";
 		tStats["MachineBest"].Score = 0;
@@ -800,6 +791,14 @@ local function CreateStats( pnPlayer )
 	
 	local t = Def.ActorFrame {};
 
+	
+	local evaluationSkinData = GetEvaluationSkinDataFromPlayer(pnPlayer);
+	local gradeLetterFunc = LoadActor(evaluationSkinData["grade_lua"]);
+	t[#t+1] = gradeLetterFunc(evaluationSkinData["path_skin"],pnPlayer,stateLetterSprite,tStats,tStatsExtraJudg);
+
+
+	--[[
+
 	if tStats["Failed"] then
 		t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
 			OnCommand=cmd(Center;addx,375*xSide;addy,0;animate,false;setstate,stateLetterSprite;zoom,1.2;diffusealpha,0;sleep,DelayGradeShow + 0.1;linear,0.13;diffusealpha,1;zoom,0.95;rotationz,-4;accelerate,.1;rotationz,4;accelerate,.1;rotationz,-2;linear,.05;rotationz,2;linear,.05;rotationz,0);			
@@ -822,6 +821,7 @@ local function CreateStats( pnPlayer )
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};		
 	end;
+	]]
 
 	--we build the score box (refactoring my shitty code)
 	local posP1ScoreFrameBase=SCREEN_CENTER_X-366; --p1
@@ -857,12 +857,12 @@ local function CreateStats( pnPlayer )
 						  pnStageStats:GetTapNoteScores("TapNoteScore_Miss") +
 						  pnStageStats:GetTapNoteScores("TapNoteScore_CheckpointMiss");
 
-			if tnsbadmiss == 0 and pnStageStats:GetScore() <= 999999 then
+			if tnsbadmiss == 0 and pnStageStats:GetPhoenixScore() <= 999999 then
 				self:GetChild("fcPlayerBg"):queuecommand("Ani");
 				self:GetChild("fcPlayerBgGlow"):queuecommand("Ani");
 			end;
 
-			if pnStageStats:GetScore() > 999999 then
+			if pnStageStats:GetPhoenixScore() > 999999 then
 				self:GetChild("ScorePlayerBg"):queuecommand("Ani");
 				self:GetChild("ScorePlayerBgGlow"):queuecommand("Ani");
 			end;
@@ -882,7 +882,7 @@ local function CreateStats( pnPlayer )
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};	
 
-		DrawRollingScoreNew(0, -12, pnStageStats:GetScore(), 'HorizAlign_Center', 1 ,"scorebg")..{
+		DrawRollingScoreNew(0, -12, pnStageStats:GetPhoenixScore(), 'HorizAlign_Center', 1 ,"scorebg")..{
 			Name="RollScoreNumber";
 			OnCommand=function(self)
 				self:zoom(1.1);
@@ -891,7 +891,7 @@ local function CreateStats( pnPlayer )
 
 		LoadFont("MenuTimer numbers")..{	
 			Name="percentageBg";
-			OnCommand=cmd(diffusealpha,1;y,21;x,146;settext,calculatePercentage(pnStageStats:GetScore());zoom,0.33;horizalign,"right");
+			OnCommand=cmd(diffusealpha,1;y,21;x,146;settext,string.format("%.2f%%", pnStageStats:GetPercentScore());zoom,0.33;horizalign,"right");
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
 
@@ -1080,14 +1080,14 @@ local function CreateStats( pnPlayer )
 		rollnumberScorex = 358;
 	end;
 
-	t[#t+1] = DrawRollingScoreNew(SCREEN_CENTER_X+rollnumberScorex*xSide, SCREEN_CENTER_Y-180, pnStageStats:GetScore(), 'HorizAlign_Center', 1 ,"scorebg")..{
+	t[#t+1] = DrawRollingScoreNew(SCREEN_CENTER_X+rollnumberScorex*xSide, SCREEN_CENTER_Y-180, pnStageStats:GetPhoenixScore(), 'HorizAlign_Center', 1 ,"scorebg")..{
 		OnCommand=function(self)
 			self:zoom(1.1);
 		end;
 	};
 
 	t[#t+1] = LoadFont("MenuTimer numbers")..{	
-		OnCommand=cmd(diffusealpha,0;Center;x,SCREEN_CENTER_X+400*xSide;y,SCREEN_CENTER_Y-145;settext,calculatePercentage(pnStageStats:GetScore());zoom,0.40;queuecommand,"SetPos");
+		OnCommand=cmd(diffusealpha,0;Center;x,SCREEN_CENTER_X+400*xSide;y,SCREEN_CENTER_Y-145;settext,string.format("%.2f%%", pnStageStats:GetPercentScore());zoom,0.40;queuecommand,"SetPos");
 		SetPosCommand=function(self)
 			if xSide < 0 then
 				self:x(SCREEN_CENTER_X-202);
@@ -1414,6 +1414,11 @@ local t = Def.ActorFrame {
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
 
+		LoadFont("_TitleXolonium 30px")..{
+			OnCommand=cmd(Center;addy,-290;settext,tStatsGlobal["folder"];zoomy,0;sleep,0.5;linear,0.125;zoom,0.3);
+			FinalizedMessageCommand=cmd(finishtweening;visible,false);
+		};
+
 	};
 
 
@@ -1433,20 +1438,6 @@ local t = Def.ActorFrame {
 	
 	Drum(WaitUntilDrum - 0.2, DelayDrum);
 	
-	LoadActor(THEME:GetPathS("","xsanity/eval/eval_song")) .. {
-		OnCommand=cmd(queuecommand,"Lot");
-		LotCommand=function(self)
-				self:play();
-		end;
-		FinalizedMessageCommand=function(self)
-			self:stop()
-		end;		
-		OffCommand=function(self)
-			self:stop()
-		end;
-	};
-
-
 	-- Usar GetTopScreen con callers siempre causa 'cierto' retraso, nocxq, solo dejare un boolean ahora
 	--[[
 	LoadActor(THEME:GetPathS("","NEW_RECORD")) .. {
@@ -1462,43 +1453,6 @@ local t = Def.ActorFrame {
 	};
 	]]
 	
-	
-	LoadActor(announcerGigglePath) .. {
-		OnCommand=cmd(sleep,DelayGradeShow + GiggleDelay[iGrade + 1];queuecommand,"Lot");
-		LotCommand=function(self)
-			if bFailedAux then
-				self:play();
-			end;
-		end;
-		OffCommand=function(self)
-			self:stop()
-		end;
-	};
-	
-	
-	Def.Sound {	--GRADE
-		OnCommand=cmd(sleep,DelayGradeShow - 0.1;queuecommand,"Lot");
-		LotCommand=function(self)
-			SOUND:PlayOnce(THEME:GetPathS("","NEW_RANK/NUC"));
-		end;
-	};
-	
-	-- JNC New Sounds -- AWFUL CODE
-	LoadActor(announcerGradePath) .. {
-		OnCommand=cmd(sleep,DelayGradeShow;queuecommand,"Lot");
-		LotCommand=cmd(play);
-		OffCommand=cmd(stop);
-	};
-	
-	LoadActor(announcerFXPath) .. {
-		OnCommand=cmd(sleep,DelayGradeShow;queuecommand,"Lot");
-		LotCommand=cmd(play);
-		OffCommand=cmd(stop);
-	};
-
-	
-
-
 	-------------------------------------------MOD ICONS-----------------------------------------------
 	LoadActor("ScreenSelectMusicLua/ScreenSelectMusicModIcons") .. {
 		CreateModForPlayer(PLAYER_1);
@@ -1515,7 +1469,129 @@ local t = Def.ActorFrame {
 
 };
 
---#### BASE STATS GAMEPLAY ####---
+--AUDIO.
+--Here if the EvaluationSkin mod has their own grade_soundsfx.lua we don't play this
+--and use the logic of that MOD
+local useMODAudio=false;
+local actorAudioMod;
+
+if GAMESTATE:GetNumPlayersEnabled() > 1 then
+
+
+	--if both players uses the same skin, we just use that.
+	local evaluationSkinDataP1 = GetEvaluationSkinDataFromPlayer(PLAYER_1);
+	local evaluationSkinDataP2 = GetEvaluationSkinDataFromPlayer(PLAYER_2);
+
+
+
+	if pnStats1:GetPhoenixScore() > pnStats2:GetPhoenixScore() then
+
+		local failedPlayer = pnStats1:GetFailedAux();
+		if #evaluationSkinDataP1["screen_sound"] > 0 then
+			useMODAudio = true;
+			local audioFunc = LoadActor(evaluationSkinDataP1["screen_sound"]);
+			actorAudioMod = audioFunc(evaluationSkinDataP1["path_skin"],PLAYER_1,pnStats1:GetPhoenixScore(),failedPlayer);
+		end;
+
+	elseif pnStats2:GetPhoenixScore() > pnStats1:GetPhoenixScore() then
+
+		local failedPlayer = pnStats2:GetFailedAux();
+		if #evaluationSkinDataP2["screen_sound"] > 0 then
+			useMODAudio = true;
+			local audioFunc = LoadActor(evaluationSkinDataP2["screen_sound"]);
+			actorAudioMod = audioFunc(evaluationSkinDataP2["path_skin"],PLAYER_2,pnStats2:GetPhoenixScore(),failedPlayer);
+		end;
+
+	else -- draw
+		--default because none win lol.
+		useMODAudio=false;
+	end;
+
+else
+	local failedPlayer;
+	local masterPlayer;
+	local scorePlayer = 0;
+
+	if GAMESTATE:IsSideJoined(PLAYER_1) then
+		failedPlayer = pnStats1:GetFailedAux();
+		masterPlayer = PLAYER_1;
+		scorePlayer = pnStats1:GetPhoenixScore();
+	elseif GAMESTATE:IsSideJoined(PLAYER_2) then
+		failedPlayer = pnStats2:GetFailedAux();
+		masterPlayer = PLAYER_2;
+		scorePlayer = pnStats2:GetPhoenixScore();
+	end;
+	
+	local evaluationSkinData = GetEvaluationSkinDataFromPlayer(masterPlayer);
+	if #evaluationSkinData["screen_sound"] > 0 then
+		useMODAudio = true;
+		local audioFunc = LoadActor(evaluationSkinData["screen_sound"]);
+		actorAudioMod = audioFunc(evaluationSkinData["path_skin"],masterPlayer,scorePlayer,failedPlayer);
+	end;
+end;
+
+if useMODAudio then
+	t[#t+1] = actorAudioMod;
+
+else
+
+	t[#t+1] = Def.ActorFrame{
+
+		LoadActor(THEME:GetPathS("","xsanity/eval/eval_song")) .. {
+			OnCommand=cmd(queuecommand,"Lot");
+			LotCommand=function(self)
+					self:play();
+			end;
+			FinalizedMessageCommand=function(self)
+				self:stop()
+			end;		
+			OffCommand=function(self)
+				self:stop()
+			end;
+		};
+
+		LoadActor(announcerGigglePath) .. {
+			OnCommand=cmd(sleep,DelayGradeShow + GiggleDelay[iGrade + 1];queuecommand,"Lot");
+			LotCommand=function(self)
+				if bFailedAux then
+					self:play();
+				end;
+			end;
+			OffCommand=function(self)
+				self:stop()
+			end;
+		};
+		
+		
+		Def.Sound {	--GRADE
+			OnCommand=cmd(sleep,DelayGradeShow - 0.1;queuecommand,"Lot");
+			LotCommand=function(self)
+				SOUND:PlayOnce(THEME:GetPathS("","NEW_RANK/NUC"));
+			end;
+		};
+		
+		-- JNC New Sounds -- AWFUL CODE
+		LoadActor(announcerGradePath) .. {
+			OnCommand=cmd(sleep,DelayGradeShow;queuecommand,"Lot");
+			LotCommand=cmd(play);
+			OffCommand=cmd(stop);
+		};
+		
+		LoadActor(announcerFXPath) .. {
+			OnCommand=cmd(sleep,DelayGradeShow;queuecommand,"Lot");
+			LotCommand=cmd(play);
+			OffCommand=cmd(stop);
+		};
+	};
+
+end;
+
+
+
+
+
+
+--[[
 local baseJudgmentActor = Def.ActorFrame{};
 if extraJudgment then
 	for i=1,2,1 do	-- extraJudg
@@ -1561,6 +1637,55 @@ baseJudgmentActor.InitCommand = function(self)
 	self:y(yTnsPlace);
 end;
 t[#t+1] = baseJudgmentActor;
+]]
+
+--#### BASE STATS GAMEPLAY ####---
+
+
+if GAMESTATE:IsPlayerEnabled(PLAYER_1) and GAMESTATE:IsPlayerEnabled(PLAYER_2) then
+
+	local evaluationSkinDataP1 = GetEvaluationSkinDataFromPlayer(PLAYER_1);
+	local evaluationSkinDataP2 = GetEvaluationSkinDataFromPlayer(PLAYER_2);
+
+	--ONLY if the 2 players has the same skin we will use thatskin.
+	-- if not, we'll be using the default one.
+	if evaluationSkinDataP1["skin_name"] == evaluationSkinDataP2["skin_name"] then
+		--here we will be taking the player 1 option, can be player 2 too.
+		local textGradeFunc = LoadActor(evaluationSkinDataP1["text_lua"]);
+		t[#t+1] = textGradeFunc(evaluationSkinDataP1["path_skin"],PLAYER_1);
+	else
+		--here who won the battle get the evaluation skin XD
+
+		if pnStats1:GetPhoenixScore() > pnStats2:GetPhoenixScore() then
+			local textGradeFunc = LoadActor(evaluationSkinDataP1["text_lua"]);
+			t[#t+1] = textGradeFunc(evaluationSkinDataP1["path_skin"],PLAYER_1);
+
+		elseif pnStats2:GetPhoenixScore() > pnStats1:GetPhoenixScore() then
+			local textGradeFunc = LoadActor(evaluationSkinDataP2["text_lua"]);
+			t[#t+1] = textGradeFunc(evaluationSkinDataP2["path_skin"],PLAYER_2);
+		else -- draw
+			--default because none win lol.
+			local defaultEvaluationSkin = GetDefaultEvaluationSkin();
+			local textGradeFunc = LoadActor(defaultEvaluationSkin["text_lua"]);
+			t[#t+1] = textGradeFunc(defaultEvaluationSkin["path_skin"],PLAYER_1);
+		end;
+
+
+	end;
+
+elseif GAMESTATE:IsPlayerEnabled(PLAYER_1) then
+
+	local evaluationSkinData = GetEvaluationSkinDataFromPlayer(PLAYER_1);
+	local textGradeFunc = LoadActor(evaluationSkinData["text_lua"]);
+	t[#t+1] = textGradeFunc(evaluationSkinData["path_skin"],PLAYER_1);
+
+elseif GAMESTATE:IsPlayerEnabled(PLAYER_2) then
+
+	local evaluationSkinData = GetEvaluationSkinDataFromPlayer(PLAYER_2);
+	local textGradeFunc = LoadActor(evaluationSkinData["text_lua"]);
+	t[#t+1] = textGradeFunc(evaluationSkinData["path_skin"],PLAYER_2);
+	
+end;
 
 
 if GAMESTATE:IsPlayerEnabled(PLAYER_1) then
@@ -1614,8 +1739,8 @@ t[#t+1] = Def.Quad{
 				local hashChartP2 = stepPlayedP2[#stepPlayedP2]:GetHash();
 
 				if hashChartP1 == hashChartP2 then
-					local p1Score = pnStats1:GetScore();
-					local p2Score = pnStats2:GetScore();
+					local p1Score = pnStats1:GetPhoenixScore();
+					local p2Score = pnStats2:GetPhoenixScore();
 					setVsCount(p1Score,p2Score);
 				end;
 			end;

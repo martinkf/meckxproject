@@ -13,7 +13,6 @@ local skinExterno = false; -- si se encuentran en la raiz del juego en la carpet
 --obtenemos y procesamos el nombre del skin para saber si es externo o no.
 local skinSelectedProfile = getCustomOptionValuePlayer(player,"judgmentSkin");
 
-
 --Si por alguna razon, esto esta nil.
 if skinSelectedProfile == nil then
 	skinSelectedProfile = "i_sanity";
@@ -23,6 +22,7 @@ local esExterno = string.find(skinSelectedProfile, "e_");
 if esExterno ~= nil then
 	skinExterno = true;
 end;
+
 
 --procesamos el nombre del perfil para obtener el nombre limpio.
 local skinSelectedProfileProc = string.gsub(skinSelectedProfile, "e_", "");
@@ -43,7 +43,7 @@ end;
 local skinHasLua = judgmentHasLua(skinSelected,skinExterno);
 if skinHasLua ~= "-" then
 	local luafilepath = "";
-	if external then
+	if skinExterno then
 		local judgExternalPath = GetJudgSkinExternalPath();
 		luafilepath = judgExternalPath..skinSelected.."/"..skinHasLua;
 	else  	 

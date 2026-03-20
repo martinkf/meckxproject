@@ -486,7 +486,7 @@ function getSongPlayedBanners()
 		    end
 
 		    if player1StageStats ~= nil then
-		    	ptPlayer1 = player1StageStats:GetScore();
+		    	ptPlayer1 = player1StageStats:GetPhoenixScore();
 		    	letraStateP1 = gradeTransformState(ptPlayer1);		    	
 		    	if player1StageStats:GetFailedAux() then
 		    		fileLetraP1 = "fail_pass_res";
@@ -513,7 +513,7 @@ function getSongPlayedBanners()
 		    end;
 
 		    if player2StageStats ~= nil then
-		    	ptPlayer2 = player2StageStats:GetScore();
+		    	ptPlayer2 = player2StageStats:GetPhoenixScore();
 		    	letraStateP2 = gradeTransformState(ptPlayer2);
 		    	if player2StageStats:GetFailedAux() then
 		    		fileLetraP2 = "fail_pass_res";

@@ -94,6 +94,11 @@
       "title": "difficultyListMode",
       "valuestype": "string",
       "defaultvalue": "list"
+    },
+    {
+      "title": "evaluationSkin",
+      "valuestype": "string",
+      "defaultvalue": "i_xsanity"
     }   
   ]
 }

@@ -17,12 +17,10 @@ local t = Def.ActorFrame
 local stage= GAMESTATE:GetCurrentStageIndex()+1;
 local oldnoteskin={};
 local TweakY = 28;
+setStageCounterInGameplay(true);
 
 
 function songBar()
-	local song = GAMESTATE:GetCurrentSong();	
-	local totalseconds = song:GetLastSecond();
-
 	return 	Def.SongMeterDisplay {
 		OnCommand=function(self)
 			if isAspectRatio1610() then
@@ -33,7 +31,6 @@ function songBar()
 		Stream=Def.Quad { 
 			InitCommand=cmd(diffusealpha,1;draworder,99;zoomto,1,4;diffuse,color("#ffffff")); 
 		};
-
 		Tip=LoadActor(THEME:GetPathG("","ScreenGameplay/song position tip"));
 	};
 end;
@@ -216,15 +213,9 @@ end;
 
 --
 
---STAGE BACKGROUND
-t[#t+1] = LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/SG-STAGEBACK")) .. {
-	InitCommand=cmd(x,SCREEN_CENTER_X;y,SCREEN_TOP+(TweakY);zoom,.5);
-	OnCommand=function(self)
-		if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_OnePlayerTwoSides" then
-			self:x(SCREEN_LEFT+214);
-		end;
-	end;
-};
+
+
+
 
 --FAST Y SLOW PARA EL SCREENEVALUATION
 local p1f=0;
@@ -303,22 +294,43 @@ t[#t+1] = Def.ActorFrame{
 
 };
 
-t[#t+1] = LoadFont("stagefull")..{
-	OnCommand=function(self)
-		self:zoom(.9);
-		self:settext(string.format("%02i", stage));
-		self:xy(SCREEN_CENTER_X,SCREEN_TOP+(TweakY+5));
-		
-		if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_OnePlayerTwoSides" then
-			self:x(SCREEN_LEFT+214);
+--this is my response to the fuckup hahahaha
+function fixPositionOnBetaLifebars(player)
+	local lifebarSkin = getCustomOptionValuePlayer(player,"lifebarSkin");
+	local listBetaLifeBars = {"e_Clean","e_Hatsune","e_IIDX-EXH","e_Simple","e_Steam","e_RED"};
+	if lifebarSkin == nil then
+		return false;
+	end;
+
+	if lifebarSkin == "" then
+		return false;
+	end;
+
+	for i=1,#listBetaLifeBars do
+		if listBetaLifeBars[i] == lifebarSkin then
+			return true;
 		end;
 	end;
-};
+	return false;
+end;
+
 
 --1P SOLO
 if GAMESTATE:IsHumanPlayer(PLAYER_1) and GAMESTATE:GetCurrentStyle():GetStyleType() ~= "StyleType_OnePlayerTwoSides" then
 		t[#t+1] = LoadActor("ScreenGameplayPlayer1") .. {
-			OnCommand=cmd(addx,42;addy,-1);
+			--OnCommand=cmd(addx,42;addy,-1);
+			--OnCommand=cmd(addx,0;addy,-1);
+			OnCommand=function(self)
+
+				--this is a fuckup xD
+				if fixPositionOnBetaLifebars(PLAYER_1) then
+					self:addx(42);
+				else
+					--everything else will be fixed, now screen_center_x is the center lol
+					self:addx(0);
+				end;
+				self:addy(-1);
+			end;
 		}; 
 end;
 
@@ -326,8 +338,17 @@ end;
 if GAMESTATE:IsHumanPlayer(PLAYER_2) and GAMESTATE:GetCurrentStyle():GetStyleType() ~= "StyleType_OnePlayerTwoSides" then
 	t[#t+1] = LoadActor("ScreenGameplayPlayer2") .. {
 		--OnCommand=cmd(addx,-42;addy,-1);
-		OnCommand=function(self)
-            self:addx(-42);
+		OnCommand=function(self)			
+            --self:addx(-42);
+
+            --this is a fuckup xD
+			if fixPositionOnBetaLifebars(PLAYER_2) then
+				self:addx(-42);
+			else
+				--everything else will be fixed, now screen_center_x is the center lol
+				self:addx(0);
+			end;
+
             self:addy(-1);			
 		end;
 	};
@@ -339,6 +360,48 @@ if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_OnePlayerTwoSides" t
 		OnCommand=cmd(addy,-1);
 	}; 
 end;
+
+--STAGE BACKGROUND
+t[#t+1] = Def.ActorFrame{
+	Name="HeaderCounter";
+	OnCommand=function(self)
+		self:x(SCREEN_CENTER_X);
+		self:y(SCREEN_TOP+TweakY);
+
+		if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_OnePlayerTwoSides" then
+			self:x(SCREEN_LEFT+214);
+		end;
+
+		if GAMESTATE:GetNumSidesJoined() == 1  then
+			if getStageCounterInGameplay() ~= nil and getStageCounterInGameplay() == false then
+					self:visible(false);
+			end;
+		end;
+
+
+	end;
+
+	ToggleOffCounterCommand=function(self)
+		self:visible(false);
+	end;
+
+	LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/SG-STAGEBACK")) .. {
+		InitCommand=function(self)
+			self:zoom(0.5);
+		end;
+	};
+
+	LoadFont("stagefull")..{
+		OnCommand=function(self)
+			self:zoom(.9);
+			self:settext(string.format("%02i", stage));
+			--self:xy(SCREEN_CENTER_X,SCREEN_TOP+(TweakY+5));
+			self:y(5);
+
+		end;
+	};
+};
+
 
 -- NUKE FX
 local NukePlaying = false;
@@ -387,7 +450,7 @@ local UI_display_LV_song = false;
 
 if GAMESTATE:IsHumanPlayer(PLAYER_1) then
 	local player_display_song_time_p1 = getCustomOptionValuePlayer(PLAYER_1,"gameplay_song_time_ui");
-	if player_display_song_time ~= nil and player_display_song_time == true then
+	if player_display_song_time_p1 ~= nil and player_display_song_time_p1 == true then
 		UI_display_song_time = true;
 	end;
 end;
@@ -682,7 +745,24 @@ if bShowTime or UI_display_song_time then
 	local player = GAMESTATE:GetMasterPlayerNumber();
 	local songPosition = GAMESTATE:GetPlayerState(player):GetSongPosition();
 	local song = GAMESTATE:GetCurrentSong();	
-	local totalseconds = song:GetLastSecond();
+
+	local totalseconds = 0;
+	local lastSecondSong = song:GetLastSecond() or 0;
+	local SongTotalSeconds = song:MusicLengthSeconds() or 0;
+
+
+	if lastSecondSong == 0 and SongTotalSeconds == 0 then -- no data for the time.
+		return;
+	elseif SongTotalSeconds > 0 then
+		totalseconds = SongTotalSeconds;
+	elseif lastSecondSong > 0 then 
+		totalseconds = lastSecondSong;
+	end;
+
+	if totalseconds == 0 then -- just in case lol
+		return;
+	end;
+
 	local lTimer;
 	local tFormat = nil
 
@@ -970,7 +1050,7 @@ function createScoreUiPlayer(player,pos_height,zoomBasePanel)
 
 		DrawDataCommand=function(self)
 			local this = self:GetChildren();
-			local score = STATSMAN:GetCurStageStats():GetPlayerStageStats(player):GetScore();
+			local score = STATSMAN:GetCurStageStats():GetPlayerStageStats(player):GetPhoenixScore();
 
 			if scorePercentaje then
 				local percData ="0"
@@ -1164,8 +1244,6 @@ function createTimingBarForPlayer(player)
 			end;
 
 			noteOffset = param.TapNoteOffset and math.floor(param.TapNoteOffset * 1000 + 0.5) or nil;
-			Trace("ParamNoteOffset raw: "..param.TapNoteOffset);
-			Trace("ParamNoteOffset proc: "..noteOffset);
 			local valueOnGraph = mapValue(noteOffset);
 			self:stoptweening():diffusealpha(1):sleep(0.5):linear(0.5):diffusealpha(0);
 			self:GetChild("timingbar"):stoptweening():x(valueOnGraph):diffusealpha(1):linear(2):diffusealpha(0);

@@ -15,25 +15,11 @@ function checkRoomSize()
 	return GAMESTATE:Env()["saninet_roomsize_game"];
 end;
 
-if GAMESTATE:Env()["myPosOnRoom"] == nil then
-	GAMESTATE:Env()["myPosOnRoom"] = -1;
-end; 
-
-function assignSaninetMyPosOnRoom(pos)
-	local myPos = -1;
-	if pos ~= nil then 
-		myPos = pos;
-	end;
-	GAMESTATE:Env()["myPosOnRoom"] = myPos;
-	Trace("############################## :: MY POSITION IN THIS ROOM IS :"..GAMESTATE:Env()["myPosOnRoom"]);
-end;
-
 local firstActionOcurred = false;
 
 -- COMBO (only for 1v1)
 local mcomboYoffset = 110;
 local isVisibleMpCombo=false;
-local myPosOnRoomMcombo=-1;
 local singlePlayRoom = false;
 
 --INIT
@@ -63,9 +49,7 @@ local t = Def.ActorFrame{
 		if params.Username ~= '' then
 			self:visible(true);
 
-			if params["saninetConnectionId"] == GAMESTATE:Env()["ConnectionId"] then
-				myPosOnRoomMcombo = params["Position"];
-				assignSaninetMyPosOnRoom(myPosOnRoomMcombo); --we need the position on the room.
+			if params["ConnectionId"] == GAMESTATE:Env()["saninetConnectionId"] then
 				assignSaninetRoomSizeGame(params["PartyCount"]);				
 			end;
 		end;
@@ -112,12 +96,6 @@ t[#t+1] = Def.ActorFrame{
 	end;
 
 	SaniNetClientStateMessageCommand=function(self,params)
-
-		if params["ConnectionId"] == GAMESTATE:Env()["saninetConnectionId"] then
-			myPosOnRoomMcombo = params["Position"];
-			assignSaninetMyPosOnRoom(myPosOnRoomMcombo); --we need the position on the room.				
-		end;
-
 		if params["PartyCount"] == 2 then
 			self:visible(false);
 			isVisibleMpCombo = true;
@@ -137,7 +115,7 @@ t[#t+1] = Def.ActorFrame{
 
 	SaniNetStatsMessageCommand=function(self,params)
 		if isVisibleMpCombo then
-			if myPosOnRoomMcombo ~= params.Position then
+			if params["ConnectionId"] ~= GAMESTATE:Env()["saninetConnectionId"] then
 				self:visible(true);
 
 				if firstActionOcurred == false then

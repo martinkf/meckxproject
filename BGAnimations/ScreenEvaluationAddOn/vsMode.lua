@@ -23,8 +23,8 @@ t[#t+1] = Def.ActorFrame
 
 			if hashChartP1 == hashChartP2 then
 
-				local scoreP1 = pnStageStatsP1:GetScore();
-				local scoreP2 = pnStageStatsP2:GetScore();
+				local scoreP1 = pnStageStatsP1:GetPhoenixScore();
+				local scoreP2 = pnStageStatsP2:GetPhoenixScore();
 
 				local playerCount = {GAMESTATE:Env()["p1vsCount"],GAMESTATE:Env()["p2vsCount"]};
 

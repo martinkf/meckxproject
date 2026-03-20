@@ -101,7 +101,7 @@ local function getGradePlayer(player,indexStep)
 		return resp; 
 	end;
 
-	local scorePlayer=scores[1]:GetScore();
+	local scorePlayer=scores[1]:GetPhoenixScore();
 
 	local statePlayer = gradeTransformState(scorePlayer);
 	local isFailed = 0;

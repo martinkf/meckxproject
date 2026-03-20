@@ -54,6 +54,12 @@ function getPathDifficultyListPlugins()
     return directory;
 end;
 
+function getPathEvaluationSkinTheme()
+    local themeName = THEME:GetCurThemeName();
+    local directory = "/Themes/" .. themeName .. "/Graphics/ScreenEvaluation/Skins/";
+    return directory;
+end;
+
 function FindFileWithPatternOnDirectory(directory, pattern)
     local files = FILEMAN:GetDirListing(directory, false,false) -- Solo archivos
     for _, file in ipairs(files) do
@@ -134,6 +140,39 @@ function checkForObjFilesPiuContent()
 
 end;
 
+--******** mod info ********--
+function getModInfo(pathFolderMod)
+	local modInfo = {};
+	if FILEMAN:DoesFileExist(pathFolderMod.."mod_info.lua") then
+		local modInfoFunction = LoadActor(pathFolderMod.."mod_info.lua");
+		modInfo = modInfoFunction();
+		local procData = {};
+		if modInfo["Name"] ~= nil then
+			procData["Name"] = modInfo["Name"];
+		else
+			procData["Name"] = "No Name";
+		end;
+		if modInfo["Author"] ~= nil then
+			procData["Author"] = modInfo["Author"];
+		else
+			procData["Author"] = "N/A";
+		end;
+		if modInfo["Description"] ~= nil then
+			procData["Description"] = modInfo["Description"];
+		else
+			procData["Description"] = "-";
+		end;
+		if modInfo["Version"] ~= nil then
+			procData["Version"] = modInfo["Version"];
+		else
+			procData["Version"] = "-";
+		end;
+		return procData;
+	else
+		return nil;
+	end;
+end;
+
 --****** Announcer ******--
 function getExternalAnnouncerPath()
 	--we check if there is a folder to select from the Mod/Announcers
@@ -164,7 +203,7 @@ function checkIfAnnouncerSoundExists(path,sound)
 end;
 
 --****** Channel music ******--
-local ChannelMusicExternalPath = "/Mod/ChannelMusic/";
+local ChannelMusicExternalPath = "/Mods/ChannelMusic/";
 function GetChannelMusicExternalPath()
 	return ChannelMusicExternalPath;
 end;
@@ -174,6 +213,156 @@ local lifebarSkinExternal = "/Mods/LifebarSkins/";
 function GetLifebarSkinExternalPath()
 	return lifebarSkinExternal;
 end;
+
+--***** Evaluation skin *****--
+local defaultEvaluationSkin = "i_xsanity";
+local gradePassImgName = "pass_res 1x16.png";
+local gradeFailImgName = "fail_pass_res 1x16.png";
+
+local evaluationSkinExternal = "/Mods/EvaluationSkins/";
+function GetEvaluationSkinExternalPath()
+	return evaluationSkinExternal;
+end;
+
+function GetEvaluationSkinInstalled()
+	local folders = {};
+    local themeName = THEME:GetCurThemeName();
+    local directory = "/Themes/" .. themeName .. "/Graphics/ScreenEvaluation/Skins/";
+    local entries = FILEMAN:GetDirListing(directory, true, false);
+
+    for _, entry in ipairs(entries) do
+        table.insert(folders, "i_"..entry);
+    end;
+
+    local directoryExternal = GetEvaluationSkinExternalPath();
+    local entriesExternal = FILEMAN:GetDirListing(directoryExternal, true, false);
+
+    for _, entry in ipairs(entriesExternal) do
+        table.insert(folders, "e_"..entry);
+    end;
+
+    return folders;
+end;
+
+--skinName: skinName to proc, default: skinName default if the skinName fails to exists.
+function CheckAndGetLuaEvaluationSkin(skinName)
+	if skinName == "" or skinName == false or skinName == nil then
+		skinName = defaultEvaluationSkin;		
+	end;
+
+	local procSkinName="";
+	local activeTheme = THEME:GetCurThemeName();
+	--here there are 3 files, you can use all of them or only 1 idk xD
+	-- ../grade_letters.lua
+	-- ../grade_text.lua
+	-- ../screen_sound.lua
+	--if any of those doesn't exists, it will get the default instead.
+
+	local pathSkin = "";
+	local isExternal = string.find(skinName, "e_");
+	local isInternal = string.find(skinName, "i_");
+
+	if isExternal ~= nil then
+		procSkinName = string.gsub(skinName, "e_", "");
+		pathSkin = GetEvaluationSkinExternalPath()..procSkinName.."/";		
+	end;
+
+	if isInternal ~= nil then
+		
+		procSkinName = string.gsub(skinName, "i_", "");
+		pathSkin = "/Themes/"..activeTheme.."/Graphics/ScreenEvaluation/Skins/"..procSkinName.."/";
+	end;
+
+	--default
+	if isExternal == nil and isInternal == nil then	
+		procSkinName = string.gsub(defaultEvaluationSkin, "i_", "");
+		pathSkin = "/Themes/"..activeTheme.."/Graphics/ScreenEvaluation/Skins/"..procSkinName.."/";
+	end;
+
+	local evalSkinData = {};
+	evalSkinData["skin_name"] = procSkinName;
+	evalSkinData["full_skin_name"] = skinName;
+	evalSkinData["path_skin"] = pathSkin;
+
+	if FILEMAN:DoesFileExist(pathSkin.."screen_sound.lua") then
+		evalSkinData["screen_sound"] = pathSkin.."screen_sound.lua";
+	else
+		evalSkinData["screen_sound"] = "";
+	end;
+
+	if FILEMAN:DoesFileExist(pathSkin.."grade_letters.lua") then
+		evalSkinData["grade_lua"] = pathSkin.."grade_letters.lua";
+	else
+		evalSkinData["grade_lua"] = "/Themes/"..activeTheme.."/Graphics/ScreenEvaluation/Skins/"..defaultEvaluationSkin.."/grade_letters.lua";
+	end;
+
+	if FILEMAN:DoesFileExist(pathSkin.."grade_text.lua") then
+		evalSkinData["text_lua"] = pathSkin.."grade_text.lua";
+	else
+		evalSkinData["text_lua"] = "/Themes/"..activeTheme.."/Graphics/ScreenEvaluation/Skins/"..defaultEvaluationSkin.."/grade_text.lua";
+	end;
+
+	if FILEMAN:DoesFileExist(pathSkin..gradePassImgName) then
+		evalSkinData["grade_pass"] = pathSkin..gradePassImgName;
+	else
+		evalSkinData["grade_pass"] = "/Themes/"..activeTheme.."/Graphics/ScreenEvaluation/Skins/"..defaultEvaluationSkin.."/"..gradePassImgName;
+	end;
+
+	if FILEMAN:DoesFileExist(pathSkin..gradeFailImgName) then
+		evalSkinData["grade_pass_fail"] = pathSkin..gradeFailImgName;
+	else
+		evalSkinData["grade_pass_fail"] = "/Themes/"..activeTheme.."/Graphics/ScreenEvaluation/Skins/"..defaultEvaluationSkin.."/"..gradeFailImgName;
+	end;
+
+	return evalSkinData;
+
+end;
+
+function checkPlayerEvaluationSkinExist(player)
+	--here we check if the skin of the player exist. in the case that not exist. 
+	--we put back the default one.
+	local playerProfileCustomSkinSelected = getCustomOptionValuePlayer(player,"evaluationSkin");
+
+	if playerProfileCustomSkinSelected == nil then
+		setCustomOptionValuePlayer(player,"evaluationSkin",defaultEvaluationSkin);
+	else
+		local skinsInstalled = GetEvaluationSkinInstalled();
+		local exist = false;
+		for i=1,#skinsInstalled do
+			if playerProfileCustomSkinSelected == skinsInstalled[i] then
+				exist = true;
+			end;
+		end;
+
+		if exist == false then
+			setCustomOptionValuePlayer(player,"evaluationSkin",defaultEvaluationSkin);
+		end;
+	end;
+
+
+	
+end;
+
+function GetEvaluationSkinDataFromPlayer(player)
+	local playerProfileCustomSkinSelected = getCustomOptionValuePlayer(player,"evaluationSkin");
+	if playerProfileCustomSkinSelected == nil then
+		playerProfileCustomSkinSelected = defaultEvaluationSkin;
+	end;
+	return CheckAndGetLuaEvaluationSkin(playerProfileCustomSkinSelected);
+end;
+
+function GetDefaultEvaluationSkin()
+	playerProfileCustomSkinSelected = defaultEvaluationSkin;
+	return CheckAndGetLuaEvaluationSkin(playerProfileCustomSkinSelected);
+end;
+
+function GetDefaultEvaluationSkinName()
+	return defaultEvaluationSkin;
+end;
+
+
+
+--** skin lifebar **--
 
 function getPathSkinLifeBar(skinName)
 	local activeTheme = THEME:GetCurThemeName();
@@ -218,7 +407,7 @@ function GetPNGIconJudgSkin(skinName)
 	local skinNameProcesado = "";
 	if esExterno ~= nil then
 		skinNameProcesado = string.gsub(skinName, "e_", "");
-		pathIcon = judgmentSkinExternal..skinNameProcesado.."/Icon.";		
+		pathIcon = judgmentSkinExternal..skinNameProcesado.."/Icon.";
 	else
 	  	local activeTheme = THEME:GetCurThemeName();
 	  	skinNameProcesado = string.gsub(skinName, "i_", "");

@@ -277,6 +277,17 @@ t[#t+1]=Def.ActorFrame{
 		end;
 	};
 
+	LoadActor(THEME:GetPathG("","SaniNet/login/qr_saninet"))..
+	{
+		OnCommand=cmd(visible,false;y,-70;x,-150;zoom,0.8);
+		SaniNetClientConnectedMessageCommand=function(self, params)
+			self:visible(true);
+		 end;
+		SaniNetAliveMessageCommand=function(self, params)
+			self:visible(params.Alive);
+		end;
+	};
+
 	LoadFont('_TitleXolonium 30px')..
 	{
 		--OnCommand=cmd(horizalign,center;y,-4;diffusealpha,0;zoom,0.9;sleep,0.25;diffusealpha,1;settext,'');

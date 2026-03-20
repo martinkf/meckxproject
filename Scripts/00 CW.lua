@@ -99,9 +99,9 @@ local cwMainDescription = {
 	["EN-path/ZZ"] =		"Notes move in zigzag";
 
 	--alternate
-	["EN-alternate/M"] =		"Rotate the song's steps by 180 degrees";
+	["EN-alternate/M"] =		"Swap sides song's steps";
 	["EN-alternate/RS"] =		"Randomize the appearance of the steps";
-	["EN-alternate/SS"] =		"Swap sides song's steps";
+	["EN-alternate/SS"] =		"Rotate the song's steps by 180 degrees";
 	
 	--judge
 	["EN-judge/HJ"] =		"Change to a Hard Judgement";
@@ -396,9 +396,9 @@ local cwMainDescription = {
 	["PT-path/ZZ"] =		"Setas se movem em zigzag";
 
 	--alternate
-	["PT-alternate/M"] =		"Rotaciona os passos em 180 graus";
+	["PT-alternate/M"] =		"Trocar os lados das etapas da música";
 	["PT-alternate/RS"] =		"As setas surgem de modo aleatório";
-	["PT-alternate/SS"] =		"Trocar os lados das etapas da música ";
+	["PT-alternate/SS"] =		"Rotaciona os passos em 180 graus";
 	
 	--judge
 	["PT-judge/HJ"] =		"Altera para julgamento Hard";

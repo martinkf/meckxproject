@@ -209,13 +209,128 @@ for p=-1,1,2 do
 	--********* MACHINE BEST **********
 	--*********************************
 
-	LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/THEME-HIGHSCOREPANEL"))..{
-		OnCommand=function(self)
-			self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):animate(false):x(510*p):y(RecordsGrid_Y8):zoom(1):diffusealpha(0);	
-			if (p == -1) then
-				self:setstate(0);
-			else
-				self:setstate(1);
+		Def.ActorFrame{
+
+					OnCommand=cmd(xy,(p == -1 and -423 or 418),252;animate,false;visible,false);
+
+					LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+						Name="LetterMyBest";
+						OnCommand=cmd(y,0;x,0;animate,false;setstate,0;queuecommand,"SetLetter");
+						SetLetterCommand=function(self)
+							self:zoom(0.24);
+						end;
+						FinalizedMessageCommand=function(self)
+							self:stoptweening();
+							self:linear(0.15);
+							self:diffusealpha(0);
+						end;	
+						OffCommand=function(self)
+							self:stoptweening();
+							self:linear(0.15);
+							self:diffusealpha(0);
+						end;	
+					};
+
+					--letra my best
+					LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+						Name="LetterMyBestFail";
+						OnCommand=cmd(y,0;x,0;animate,false;setstate,0;queuecommand,"SetLetter");
+						SetLetterCommand=function(self)
+							self:zoom(0.24);
+						end;
+						FinalizedMessageCommand=function(self)
+							self:stoptweening();
+							self:linear(0.15);
+							self:diffusealpha(0);
+						end;	
+						OffCommand=function(self)
+							self:stoptweening();
+							self:linear(0.15);
+							self:diffusealpha(0);
+						end;	
+					};
+
+
+					SongChosenMessageCommand=cmd(finishtweening;sleep,0.2;queuecommand,"Set");
+					SongUnchosenMessageCommand=cmd(finishtweening;visible,false);
+
+					ChangeStepsMessageCommand=function(self,param)
+						self:stoptweening();
+						self:queuecommand("Set");
+					end;
+
+					StepsUnchosenMessageCommand=function(self)
+						if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
+							self:playcommand("Set");
+						end;
+					end;
+
+					SetCommand=function(self)
+						self:GetChild("LetterMyBestFail"):visible(false);
+						self:GetChild("LetterMyBest"):visible(true);
+
+						local song, steps;
+						song = GAMESTATE:GetCurrentSong();
+						steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);	
+
+						local scorelist;
+						if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel() then
+							scorelist = PROFILEMAN:GetMachineProfile():GetHighScoreList(song,steps);
+							local scores = scorelist:GetHighScores();
+							local topscore = scores[1];
+							if topscore then
+								self:visible(true);
+								local iScore = topscore:GetPhoenixScore();								
+								local iGrade = gradeTransformState(iScore);
+
+								if (topscore:GetFailedAux()) then 
+									self:GetChild("LetterMyBestFail"):setstate(iGrade);
+									self:GetChild("LetterMyBestFail"):visible(true);									
+									self:GetChild("LetterMyBest"):visible(false);
+								else
+									self:GetChild("LetterMyBest"):setstate(iGrade);
+									self:GetChild("LetterMyBestFail"):visible(false);									
+									self:GetChild("LetterMyBest"):visible(true);
+
+								end;
+							else
+								self:visible(false);
+							end;
+						else
+							self:visible(false);
+						end;
+
+					end;
+
+					FinalizedMessageCommand=cmd(finishtweening;visible,false);
+
+		};
+
+
+		-- Machine Best Score
+
+		--medals.
+		Def.ActorFrame{
+			OnCommand=cmd(xy,(p == -1 and -418 or 423),218;animate,false;visible,false);
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/fullcombo"))..{
+				Name="fullcombo";
+				OnCommand=function(self)
+					self:zoom(0.5);
+				end;
+			};
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/pfg"))..{
+				Name="pfc";
+				OnCommand=function(self)
+					self:zoom(0.5);
+				end;
+			};
+
+			SongChosenMessageCommand=cmd(stoptweening;queuecommand,"Set");
+			SongUnchosenMessageCommand=cmd(stoptweening;visible,false);
+
+			ChangeStepsMessageCommand=function(self,param)
+				self:stoptweening();
+				self:queuecommand("Set");
 			end;
 		end;
 		
@@ -227,11 +342,57 @@ for p=-1,1,2 do
 
 				OnCommand=cmd(xy,(p == -1 and -423 or 418),RecordsGrid_Y7;animate,false;visible,false);
 
-				LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
-					Name="LetterMyBest";
-					OnCommand=cmd(y,0;x,0;animate,false;setstate,0;queuecommand,"SetLetter");
-					SetLetterCommand=function(self)
-						self:zoom(0.24);
+				local song, steps;
+				song = GAMESTATE:GetCurrentSong();
+				steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);	
+
+				local scorelist;
+				if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel() then
+					scorelist = PROFILEMAN:GetMachineProfile():GetHighScoreList(song,steps);
+					local scores = scorelist:GetHighScores();
+					local topscore = scores[1];
+					if topscore then
+						self:visible(true);
+						local iScore = topscore:GetPhoenixScore();
+						--pfc
+						if iScore > 999999 then
+							self:GetChild("pfc"):visible(true);
+							
+						else
+							--full combo
+							local tnsbadmiss 	= scores[1]:GetTapNoteScore('TapNoteScore_W5') +
+											  scores[1]:GetTapNoteScore("TapNoteScore_Miss") +
+											  scores[1]:GetTapNoteScore("TapNoteScore_CheckpointMiss");
+							if tnsbadmiss == 0 then
+								self:GetChild("fullcombo"):visible(true);
+							end;
+
+						end;
+
+					else
+						self:visible(false);
+					end;
+				else
+					self:visible(false);
+				end;
+
+			end;
+
+
+		};
+
+
+		Def.ActorFrame{
+			OnCommand=cmd(xy,(p == -1 and -405 or 445),262;animate,false;zoom,1.4;visible,false);
+
+			LoadFont("scorebg")..{	
+					Name="scoreBackMyBest";
+					OnCommand=cmd(queuecommand,"SetPos";xy,(p == -1 and -162 or 24),8);
+					SetPosCommand=function(self)
+						self:diffusecolor(color("#787878"));
+						self:zoom(0.4);
+						self:horizalign("left");
+						self:settext("1000000");
 					end;
 					FinalizedMessageCommand=function(self)
 						self:stoptweening();
@@ -262,7 +423,54 @@ for p=-1,1,2 do
 						self:linear(0.15);
 						self:diffusealpha(0);
 					end;	
-				};
+			};
+
+			SongChosenMessageCommand=cmd(stoptweening;queuecommand,"Set");
+			SongUnchosenMessageCommand=cmd(stoptweening;visible,false);
+
+			ChangeStepsMessageCommand=function(self,param)
+				self:stoptweening();
+				self:queuecommand("Set");
+			end;
+
+			StepsUnchosenMessageCommand=function(self)
+				if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
+					self:playcommand("Set");
+				end;
+			end;
+
+			SetCommand=function(self)
+				self:GetChild("scoreFrontMyBest"):settext("");
+				self:GetChild("scoreBackMyBest"):settext("0000000");
+
+				local song, steps;
+				song = GAMESTATE:GetCurrentSong();
+				steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);	
+
+				local scorelist;
+				if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel() then
+					scorelist = PROFILEMAN:GetMachineProfile():GetHighScoreList(song,steps);
+					local scores = scorelist:GetHighScores();
+					local topscore = scores[1];
+					if topscore then
+						self:visible(true);
+						local iScore = topscore:GetPhoenixScore();								
+						local iGrade = gradeTransformState(iScore);
+						local backScore = getZeroStringFromScore(iScore);
+
+						self:GetChild("scoreFrontMyBest"):settext(iScore);
+						self:GetChild("scoreBackMyBest"):settext(backScore);
+
+					else
+						self:visible(false);
+					end;
+				else
+					self:visible(false);
+				end;
+
+			end;
+
+		};
 
 
 				SongChosenMessageCommand=cmd(finishtweening;sleep,0.2;queuecommand,"Set");
@@ -292,15 +500,111 @@ for p=-1,1,2 do
 						scorelist = PROFILEMAN:GetMachineProfile():GetHighScoreList(song,steps);
 						local scores = scorelist:GetHighScores();
 						local topscore = scores[1];
-						if topscore then
-							self:visible(true);
-							local iScore = topscore:GetScore();								
-							local iGrade = gradeTransformState(iScore);
+						if topscore  then
+							self:visible(false);
+							local iScore = topscore:GetPhoenixScore();
+							if (iScore > 0) then self:visible(true); end;
+							self:settext(string.upper(topscore:GetPhoenixScoreName()));
+						else
+							self:settext("");
+							self:visible(false);
 
-							if (topscore:GetFailedAux()) then 
-								self:GetChild("LetterMyBestFail"):setstate(iGrade);
-								self:GetChild("LetterMyBestFail"):visible(true);									
-								self:GetChild("LetterMyBest"):visible(false);
+						end;
+					else
+						self:settext("");
+						self:visible(false);
+					end;
+				end;
+
+		};	
+		
+		--****************************
+		--********* MY BEST **********
+		--****************************
+		Def.ActorFrame{
+
+					OnCommand=cmd(xy,(p == -1 and -423 or 418),175;animate,false;visible,false);
+
+					LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+						Name="LetterMyBest";
+						OnCommand=cmd(y,0;x,0;animate,false;setstate,0;queuecommand,"SetLetter");
+						SetLetterCommand=function(self)
+							self:zoom(0.24);
+						end;
+						FinalizedMessageCommand=function(self)
+							self:stoptweening();
+							self:linear(0.15);
+							self:diffusealpha(0);
+						end;	
+						OffCommand=function(self)
+							self:stoptweening();
+							self:linear(0.15);
+							self:diffusealpha(0);
+						end;	
+					};
+
+					--letra my best
+					LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+						Name="LetterMyBestFail";
+						OnCommand=cmd(y,0;x,0;animate,false;setstate,0;queuecommand,"SetLetter");
+						SetLetterCommand=function(self)
+							self:zoom(0.24);
+						end;
+						FinalizedMessageCommand=function(self)
+							self:stoptweening();
+							self:linear(0.15);
+							self:diffusealpha(0);
+						end;	
+						OffCommand=function(self)
+							self:stoptweening();
+							self:linear(0.15);
+							self:diffusealpha(0);
+						end;	
+					};
+
+
+					SongChosenMessageCommand=cmd(finishtweening;sleep,0.2;queuecommand,"Set");
+					SongUnchosenMessageCommand=cmd(finishtweening;visible,false);
+
+					ChangeStepsMessageCommand=function(self,param)
+						self:stoptweening();
+						self:queuecommand("Set");
+					end;
+
+					StepsUnchosenMessageCommand=function(self)
+						if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
+							self:playcommand("Set");
+						end;
+					end;
+
+					SetCommand=function(self)
+						self:GetChild("LetterMyBestFail"):visible(false);
+						self:GetChild("LetterMyBest"):visible(true);
+
+						local song, steps;
+						song = GAMESTATE:GetCurrentSong();
+						steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);	
+
+						local scorelist;
+						if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel() then
+							scorelist =PROFILEMAN:GetProfile(ARRAY[p]):GetHighScoreList(song,steps);
+							local scores = scorelist:GetHighScores();
+							local topscore = scores[1];
+							if topscore then
+								self:visible(true);
+								local iScore = topscore:GetPhoenixScore();								
+								local iGrade = gradeTransformState(iScore);
+
+								if (topscore:GetFailedAux()) then 
+									self:GetChild("LetterMyBestFail"):setstate(iGrade);
+									self:GetChild("LetterMyBestFail"):visible(true);									
+									self:GetChild("LetterMyBest"):visible(false);
+								else
+									self:GetChild("LetterMyBest"):setstate(iGrade);
+									self:GetChild("LetterMyBestFail"):visible(false);									
+									self:GetChild("LetterMyBest"):visible(true);
+
+								end;
 							else
 								self:GetChild("LetterMyBest"):setstate(iGrade);
 								self:GetChild("LetterMyBestFail"):visible(false);									
@@ -532,14 +836,19 @@ for p=-1,1,2 do
 					scorelist = PROFILEMAN:GetMachineProfile():GetHighScoreList(song,steps);
 					local scores = scorelist:GetHighScores();
 					local topscore = scores[1];
-					if topscore  then
-						self:visible(false);
-						local iScore = topscore:GetScore();
-						if (iScore > 0) then self:visible(true); end;
-						self:settext(string.upper(topscore:GetScoreName()));
-					else
-						self:settext("");
-						self:visible(false);
+					if topscore then
+						self:visible(true);
+						local iScore = topscore:GetPhoenixScore();
+						--pfc
+						if iScore > 999999 then
+							self:GetChild("pfc"):visible(true);
+							
+						else
+							--full combo
+							local tnsbadmiss 	= scores[1]:GetTapNoteScore('TapNoteScore_W5') + scores[1]:GetTapNoteScore("TapNoteScore_Miss") + scores[1]:GetTapNoteScore("TapNoteScore_CheckpointMiss");
+							if tnsbadmiss == 0 then
+								self:GetChild("fullcombo"):visible(true);
+							end;
 
 					end;
 				else
@@ -789,16 +1098,16 @@ for p=-1,1,2 do
 			song = GAMESTATE:GetCurrentSong();
 			steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);	
 
-			local scorelist;
-			if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel() then
-				scorelist =PROFILEMAN:GetProfile(ARRAY[p]):GetHighScoreList(song,steps);
-				local scores = scorelist:GetHighScores();
-				local topscore = scores[1];
-				if topscore then
-					self:visible(true);
-					local iScore = topscore:GetScore();								
-					local iGrade = gradeTransformState(iScore);
-					local backScore = getZeroStringFromScore(iScore);
+				local scorelist;
+				if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel() then
+					scorelist =PROFILEMAN:GetProfile(ARRAY[p]):GetHighScoreList(song,steps);
+					local scores = scorelist:GetHighScores();
+					local topscore = scores[1];
+					if topscore then
+						self:visible(true);
+						local iScore = topscore:GetPhoenixScore();								
+						local iGrade = gradeTransformState(iScore);
+						local backScore = getZeroStringFromScore(iScore);
 
 					self:GetChild("scoreFrontMyBest"):settext(iScore);
 					self:GetChild("scoreBackMyBest"):settext(backScore);
