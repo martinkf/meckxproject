@@ -1553,7 +1553,7 @@ t[#t+1] =Def.ActorFrame{
 			self:GetChild("sPaused"):visible(not ispaused);
 			self:GetChild("GroupScroller"):visible(not ispaused);
 			self:GetChild("Desc"):visible(not ispaused);
-			SCREENMAN:SetNewScreen("ScreenStageInformation");
+			SCREENMAN:SetNewScreen("ScreenMeckxStageInformation");
 		elseif iMenuP == 2 then									--return
 			self:GetChild("Quad"):diffusealpha(.95);
 			self:GetChild("sPaused"):visible(not ispaused);
