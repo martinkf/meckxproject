@@ -1424,7 +1424,12 @@ local t = Def.ActorFrame {
 		OnCommand=cmd(visible,GAMESTATE:GetGameMode() ~= 'Basic');
 	};
 	]]
-	LoadActor("profile/default")..{};
+	LoadActor("profile/default")..{
+		OnCommand=function(self)
+			self:zoom(1.15);
+			self:x(-100);
+		end;
+	};
 	
 	Drum(WaitUntilDrum - 0.2, DelayDrum);
 	
