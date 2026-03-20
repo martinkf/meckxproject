@@ -350,6 +350,7 @@ local function BarTitle(self)
 
 				bpmActual = "BPM " .. ProcessBPM(GAMESTATE:GetCurrentSong():GetCustomBPM());
 				songartist = GAMESTATE:GetCurrentSong():GetDisplayArtist();
+				songcategory = GAMESTATE:GetCurrentSong():GetCategory();
 				local MusicLength = GAMESTATE:GetCurrentSong():MusicLengthSeconds() or 0;
 				durationSong = MusicLength > 0 and SecondsToMMSS(MusicLength) or "";
 
@@ -365,10 +366,15 @@ local function BarTitle(self)
 
 			local songOrigin = GAMESTATE:GetCurrentSong():GetOrigin();
 			local ftext = songartist .."  •  "..bpmActual.."  •  "..songOrigin
+			self:GetChild("MeckxArtist"):settext(songartist);
+			self:GetChild("MeckxBPM"):settext(bpmActual);
+			self:GetChild("MeckxCategory"):settext(songcategory);
+			self:GetChild("MeckxOrigin"):settext(songOrigin);
 			self:GetChild("Artist"):settext(ftext);
 			self:GetChild("Artist"):AddAttribute(0, {Length=#songartist, Diffuse=color("#ffe7c9"),StrokeColor=color("0,0,0,1")})
 			self:GetChild("Artist"):AddAttribute(#songartist + 5, {Length=#bpmActual, Diffuse=color("#c9fff3"),StrokeColor=color("0,0,0,1")})
 			self:GetChild("Artist"):AddAttribute(#songartist + #bpmActual + 10, {Length=#songOrigin, Diffuse=color("#ffc9ea"),StrokeColor=color("0,0,0,1")})
+			self:GetChild("Artist"):settext("");
 		end;
 	end;
 end;
@@ -657,7 +663,7 @@ t[#t+1] =  Def.ActorFrame{
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/SM-BACKTITLE"))..{
 			Name="Basetitle";
-			InitCommand=cmd(xy,-2,2;zoomy,0.8;diffusealpha,0.95;fadeleft,0.3;faderight,0.3);		
+			InitCommand=cmd(xy,-2,14;zoomy,1.2;diffusealpha,0.95;fadeleft,0.3;faderight,0.3);		
 		};
 
 
@@ -671,7 +677,77 @@ t[#t+1] =  Def.ActorFrame{
 			Name="Artist";
 			Text="SongArtist Test";
 			InitCommand=cmd(zoom,.5;xy,0,12;skewx,0;maxwidth,700/.54;);
-		};	
+		};
+		
+		LoadFont("_TitleXolonium")..{
+			Name="MeckxArtist";
+			Text="SongArtist Test";
+			InitCommand=function(self)
+				self:zoom(0.5);
+				self:x(-12);
+				self:y(12);
+				self:halign(1);
+				self:diffuse(color("#FFE7C9"));
+			end;
+		};
+		
+		LoadFont("_TitleXolonium")..{
+			Name="UpperDot";
+			Text="•";
+			InitCommand=function(self)
+				self:zoom(0.5);
+				self:x(0);
+				self:y(12);
+				self:halign(0.5);
+			end;
+		};
+
+		LoadFont("_TitleXolonium")..{
+			Name="MeckxBPM";
+			Text="000.000 BPM";
+			InitCommand=function(self)
+				self:zoom(0.5);
+				self:x(12);
+				self:y(12);
+				self:halign(0);
+				self:diffuse(color("#C9FFF3"));
+			end;
+		};
+
+		LoadFont("_TitleXolonium")..{
+			Name="MeckxCategory";
+			Text="SongCategory Test";
+			InitCommand=function(self)
+				self:zoom(0.5);
+				self:x(-12);
+				self:y(32);
+				self:halign(1);
+				self:diffuse(color("#C9FFC9"));
+			end;
+		};
+
+		LoadFont("_TitleXolonium")..{
+			Name="LowerDot";
+			Text="•";
+			InitCommand=function(self)
+				self:zoom(0.5);
+				self:x(0);
+				self:y(32);
+				self:halign(0.5);
+			end;
+		};
+
+		LoadFont("_TitleXolonium")..{
+			Name="MeckxOrigin";
+			Text="SongOrigin Test";
+			InitCommand=function(self)
+				self:zoom(0.5);
+				self:x(12);
+				self:y(32);
+				self:halign(0);
+				self:diffuse(color("#FFC9EA"));
+			end;
+		};
 	};
 
 	Def.ActorFrame{

@@ -32,7 +32,7 @@ FunctionKeysSearch_Y = SCREEN_CENTER_Y-350
 -- SONG INFORMATION STRIP
 
 --SongInfoStrip_Y = 0 --original
-SongInfoStrip_Y = -294
+SongInfoStrip_Y = -320
 
 --SongInfoStrip_YSongChosen = 0 --original
 SongInfoStrip_YSongChosen = -278
@@ -43,7 +43,7 @@ SongInfoStrip_ZoomSongChosen = 1.5
 -- SONG INDEX COUNTER
 
 --SongIndexCounter_Y = 106 --original
-SongIndexCounter_Y = -252
+SongIndexCounter_Y = -243
 
 -- MUSIC WHEEL
 
@@ -60,10 +60,10 @@ YellowArrows_YRightArrow = SCREEN_CENTER_Y-130-5
 -- FAVORITE SONG ICON
 
 --FavoriteIcon_Y = -40 --original
-FavoriteIcon_Y = -334
+FavoriteIcon_Y = -354
 
 --FavoriteIcon_YSongChosen = -40 --original
-FavoriteIcon_YSongChosen = -334
+FavoriteIcon_YSongChosen = -354
 
 -- DIFFICULTY LIST
 
