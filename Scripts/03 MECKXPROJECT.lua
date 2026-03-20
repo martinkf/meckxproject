@@ -133,11 +133,11 @@ RecordsGrid_Y8 = (SCREEN_CENTER_Y+90)-52
 RecordsGrid_Y9 = (SCREEN_CENTER_Y-140)-52
 RecordsGrid_YA = (SCREEN_CENTER_Y+125)-52
 
--- -- SCREEN STAGE INFORMATION
+-- -- SCREEN MECKX STAGE INFORMATION
 
 -- CHART DETAIL LABELS
 
-LoadingDifficultyDetails_YAnchor = -250
+LoadingDifficultyDetails_YAnchor = -150
 LoadingDifficultyDetails_XPlayer1 = -400
 LoadingDifficultyDetails_XPlayer2 = 400
 
