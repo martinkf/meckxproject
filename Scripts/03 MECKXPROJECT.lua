@@ -5,15 +5,18 @@
 -- PROFILE OVERLAY
 
 --ProfileBase_Y = 32 --original
-ProfileBase_Y = 32+546+24
+ProfileBase_Y = 32+570-570-7
 --Scorazones_Y = 65 --original
-Scorazones_Y = 65+546+24-42
+Scorazones_Y = 65+528-528-28
+Scorazones_XOffsetBase = 93
+Scorazones_XOffsetBias = -96
 --ProfileEditorText_Y = SCREEN_CENTER_Y-268 --original
-ProfileEditorText_Y = SCREEN_CENTER_Y-268+546+88
+ProfileEditorText_Y = SCREEN_CENTER_Y-328
 --ChangeProfile_Y = SCREEN_CENTER_Y-320 --original
-ChangeProfile_Y = SCREEN_CENTER_Y-320+546+83+26
+ChangeProfile_Y = SCREEN_CENTER_Y-320+655-655-7
+ChangeProfile_Visibility = false
 --AvatarPic_Y = 32 --original
-AvatarPic_Y = 32+546+24
+AvatarPic_Y = 32+570-570-7
 
 -- PLAYER MOD ICONS
 
@@ -22,16 +25,15 @@ Player1ModIcons_X = SCREEN_CENTER_X-604
 --Player2ModIcons_X = SCREEN_CENTER_X+610 --original
 Player2ModIcons_X = SCREEN_CENTER_X+604
 --PlayerModIcons_Y = SCREEN_CENTER_Y-257 --original
-PlayerModIcons_Y = SCREEN_CENTER_Y-376+338
+PlayerModIcons_Y = SCREEN_CENTER_Y-376+338-338-54
 
--- FUNCTION KEYS HELPER INFORMATION
+-- FAVORITE SONG ICON
 
---FunctionKeysSearch_X = SCREEN_CENTER_X+400 --original
-FunctionKeysSearch_X = SCREEN_CENTER_X+400-350
---FunctionKeysPerformance_X = SCREEN_CENTER_X+190 --original
-FunctionKeysPerformance_X = SCREEN_CENTER_X+190-350
---FunctionKeys_Y = SCREEN_CENTER_Y+347 --original
-FunctionKeys_Y = SCREEN_CENTER_Y+326
+--FavoriteIcon_Y = -40 --original
+FavoriteIcon_Y = -355
+
+--FavoriteIcon_YSongChosen = -40 --original
+FavoriteIcon_YSongChosen = -355
 
 -- SONG INFORMATION STRIP
 
@@ -39,15 +41,15 @@ FunctionKeys_Y = SCREEN_CENTER_Y+326
 SongInfoStrip_Y = -320
 
 --SongInfoStrip_YSongChosen = 0 --original
-SongInfoStrip_YSongChosen = -278
+SongInfoStrip_YSongChosen = -320
 
 SongInfoStrip_Zoom = 1
-SongInfoStrip_ZoomSongChosen = 1.5
+SongInfoStrip_ZoomSongChosen = 1
 
 -- SONG INDEX COUNTER
 
 --SongIndexCounter_Y = 106 --original
-SongIndexCounter_Y = -243
+SongIndexCounter_Y = -257
 
 -- MUSIC WHEEL
 
@@ -58,16 +60,8 @@ SongIndexCounter_Y = -243
 -- YELLOW ARROW TO THE LEFT OF THE MUSIC WHEEL
 
 --YellowArrows_Y = SCREEN_CENTER_Y*1.66; --original
-YellowArrows_YLeftArrow = SCREEN_CENTER_Y-130
-YellowArrows_YRightArrow = SCREEN_CENTER_Y-130-5
-
--- FAVORITE SONG ICON
-
---FavoriteIcon_Y = -40 --original
-FavoriteIcon_Y = -354
-
---FavoriteIcon_YSongChosen = -40 --original
-FavoriteIcon_YSongChosen = -354
+YellowArrows_YLeftArrow = SCREEN_CENTER_Y-144
+YellowArrows_YRightArrow = SCREEN_CENTER_Y-144-5
 
 -- DIFFICULTY LIST
 
@@ -88,11 +82,19 @@ DifficultyListBackArtAssets_ZoomY = 0.75
 DifficultyListBackArtAssets_YSongChosen = DifficultyListOrbs_YSongChosen
 DifficultyListBackArtAssets_ZoomYSongChosen = 1.25
 
--- FLOATING CATEGORY AND CHANNEL LABELS
+-- ORIGINAL THEME FLOATING CATEGORY AND CHANNEL LABELS
 
 --FloatingLabels_Visibility = true --original
 FloatingLabels_Visibility = false
 
+-- FUNCTION KEYS HELPER INFORMATION
+
+--FunctionKeysSearch_X = SCREEN_CENTER_X+400 --original
+FunctionKeysSearch_X = SCREEN_CENTER_X+400+108
+--FunctionKeysPerformance_X = SCREEN_CENTER_X+190 --original
+FunctionKeysPerformance_X = SCREEN_CENTER_X+190+108
+--FunctionKeys_Y = SCREEN_CENTER_Y+347 --original
+FunctionKeys_Y = SCREEN_CENTER_Y+348
 
 -- -- SCREEN SELECT MUSIC - SONG CHOSEN (CHART DETAILS)
 

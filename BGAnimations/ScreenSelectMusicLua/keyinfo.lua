@@ -18,6 +18,7 @@ t[#t+1] =  Def.ActorFrame
 		OnCommand=function(self)
 			self:x(SCREEN_CENTER_X-538);
 			self:y(ChangeProfile_Y);
+			self:visible(ChangeProfile_Visibility)
 
 			if isAspectRatio1610On then
 				self:y(SCREEN_CENTER_Y-360);
@@ -43,7 +44,7 @@ t[#t+1] =  Def.ActorFrame
 	Def.ActorFrame{
 
 		OnCommand=function(self)
-			self:x(SCREEN_CENTER_X-197);
+			self:x(SCREEN_CENTER_X-198);
 			self:y(ProfileEditorText_Y);
 			self:zoom(0.9);
 
@@ -63,11 +64,6 @@ t[#t+1] =  Def.ActorFrame
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/keys/f12"))..{
 			Name="f12plugin";
 			InitCommand=cmd(zoom,0.45;y,-21);
-		};	
-
-		LoadFont("_century gothic")..{
-			OnCommand=cmd(y,-23;x,-78;settext,"PROFILE EDITOR";shadowcolor,color("0,0,0,1");shadowlength,2;zoom,0.75);
-
 		};
 	};
 
@@ -89,6 +85,7 @@ t[#t+1] =  Def.ActorFrame
 		OnCommand=function(self)
 			self:x(SCREEN_CENTER_X+530);
 			self:y(ChangeProfile_Y);
+			self:visible(ChangeProfile_Visibility);
 
 			if isAspectRatio1610On then
 				self:y(SCREEN_CENTER_Y-360);
@@ -116,7 +113,7 @@ t[#t+1] =  Def.ActorFrame
 		--OnCommand=cmd(x,SCREEN_CENTER_X+187;y,SCREEN_CENTER_Y-268;zoom,0.9);
 
 		OnCommand=function(self)
-			self:x(SCREEN_CENTER_X+188);
+			self:x(SCREEN_CENTER_X+198+290);
 			self:y(ProfileEditorText_Y);
 			self:zoom(0.9);
 
@@ -136,14 +133,10 @@ t[#t+1] =  Def.ActorFrame
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/keys/f12"))..{
 			Name="f12plugin";
 			InitCommand=cmd(zoom,0.45;y,-21);
-		};	
-
-		LoadFont("_century gothic")..{
-			OnCommand=cmd(y,-23;x,75;settext,"PROFILE EDITOR";shadowcolor,color("0,0,0,1");shadowlength,2;zoom,0.75);
-
 		};
 	};
-}
+};
+
 
 --######
 local yBaseForInfoKeys=FunctionKeys_Y;

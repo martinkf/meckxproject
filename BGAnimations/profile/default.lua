@@ -335,7 +335,7 @@ function GetUsb()
 				t[#t+1]=LoadActor(THEME:GetPathG("","ScreenSelectMusic/perfiles/scorazones")) .. {
 					InitCommand=cmd(diffusealpha,1);
 					OnCommand=function(self)
-						self:Center():addx(x[6] + 20 * (h*p)):y(Scorazones_Y):zoom(0.85):animate(false):setstate(0):visible(GAMESTATE:IsHumanPlayer(ARRAY[p]));
+						self:Center():addx((x[6] + 20 * (h*p))+Scorazones_XOffsetBase+(Scorazones_XOffsetBias*p)):y(Scorazones_Y):zoom(0.85):animate(false):setstate(0):visible(GAMESTATE:IsHumanPlayer(ARRAY[p]));
 					end;
 					OffCommand=function(self)
 						self:linear(.4):addy(-200);
@@ -347,7 +347,7 @@ function GetUsb()
 				t[#t+1]=LoadActor(THEME:GetPathG("","ScreenSelectMusic/perfiles/scorazones")) .. {
 					InitCommand=cmd(diffusealpha,0);
 					OnCommand=function(self)
-						self:Center():addx(x[6] + 20 * (h*p)):y(Scorazones_Y):zoom(0.85):animate(false):setstate(1):visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):diffuseshift():effectcolor1(color("1,1,1,1")):effectcolor2(color("1,1,1,1"));
+						self:Center():addx((x[6] + 20 * (h*p))+Scorazones_XOffsetBase+(Scorazones_XOffsetBias*p)):y(Scorazones_Y):zoom(0.85):animate(false):setstate(1):visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):diffuseshift():effectcolor1(color("1,1,1,1")):effectcolor2(color("1,1,1,1"));
 						if SCREENMAN:GetTopScreen():GetName() == "ScreenSelectMusic" then
 							self:queuecommand("Check");
 						end;
@@ -383,7 +383,7 @@ function GetUsb()
 
 				t[#t+1]=LoadActor(THEME:GetPathG("","ScreenSelectMusic/perfiles/scorazones")) .. {
 					InitCommand=cmd(diffusealpha,0);
-					OnCommand=cmd(diffusealpha,0;Center;addx,x[6] + 20 * (h*p);y,Scorazones_Y;zoom,0.85;animate,false;setstate,1;visible,GAMESTATE:IsHumanPlayer(ARRAY[p]);queuecommand,"Check");
+					OnCommand=cmd(diffusealpha,0;Center;addx,(x[6] + 20 * (h*p))+Scorazones_XOffsetBase+(Scorazones_XOffsetBias*p);y,Scorazones_Y;zoom,0.85;animate,false;setstate,1;visible,GAMESTATE:IsHumanPlayer(ARRAY[p]);queuecommand,"Check");
 					CheckCommand=function(self)
 						if GAMESTATE:GetCurrentSong() ~= nil then
 							local heart = GAMESTATE:GetCurrentSong():GetHearts();

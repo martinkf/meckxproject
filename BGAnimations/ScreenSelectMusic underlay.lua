@@ -214,6 +214,7 @@ t[#t+1] =  Def.ActorFrame{
 
 t[#t+1] =  Def.ActorFrame{
 	InitCommand=cmd(Center;);
+
 	LoadActor(THEME:GetPathG("","ScreenSelectMusic/bg/back3"))..{
 		Name="GrayGridThatEffectsTheVideoPreview";
 		InitCommand=cmd(zoomto,SCREEN_WIDTH,SCREEN_HEIGHT;diffusealpha,0.8;);
@@ -221,8 +222,20 @@ t[#t+1] =  Def.ActorFrame{
 		SelectChannelMessageCommand=cmd(fadetop,0);
 	};
 	Def.Quad {
+		Name="TopMeckxArt";
+		InitCommand=function(self)
+			self:y(-SCREEN_CENTER_Y+28)
+			self:zoomto(SCREEN_WIDTH,57)
+			self:diffuse(0,0,0,0.9);
+		end;
+	};
+	Def.Quad {
 		Name="BottomMeckxArt";
-		InitCommand=cmd(zoomto,SCREEN_WIDTH,56;y,SCREEN_CENTER_Y-28;diffuse,color("#101010ee"));
+		InitCommand=function(self)
+			self:y(SCREEN_CENTER_Y-12)
+			self:zoomto(SCREEN_WIDTH,24)
+			self:diffuse(0,0,0,0.9);
+		end;
 	};
 };
 

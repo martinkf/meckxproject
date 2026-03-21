@@ -463,7 +463,8 @@ local function BarTitle(self)
 
 				bpmActual = "BPM " .. ProcessBPM(GAMESTATE:GetCurrentSong():GetCustomBPM());
 				songartist = GAMESTATE:GetCurrentSong():GetDisplayArtist();
-				songcategory = GAMESTATE:GetCurrentSong():GetCategory();
+				--songcategory = GAMESTATE:GetCurrentSong():GetCategory();
+				songcategory = CHGetCategory(0)
 				local MusicLength = GAMESTATE:GetCurrentSong():MusicLengthSeconds() or 0;
 				durationSong = MusicLength > 0 and SecondsToMMSS(MusicLength) or "";
 
@@ -541,18 +542,159 @@ t[#t+1] =  Def.ActorFrame{
 	SelectChannelMessageCommand=cmd(finishtweening;decelerate,0.1;diffusealpha,0);
 	ChannelChosenMessageCommand=cmd(stoptweening;diffusealpha,0;sleep,0.1;linear,0.3;diffusealpha,1);	
 
-	--[[
-	LoadActor(THEME:GetPathG("","ScreenSelectMusic/BackTitle"))..{
-		InitCommand=cmd(zoom,1.1;zoomy,.9;fadeleft,0.15;faderight,0.15;);
+	Def.ActorFrame{
+		Name="Fonts";
+		InitCommand = function(self)
+			self:y(SongInfoStrip_Y)
+		end;
+		UpdateinfoCommand=function(self)
+			BarTitle(self);
+
+			local title = self:GetChild("Title");
+			local Artist = self:GetChild("Artist");
+			local basetitle = self:GetChild("Basetitle");
+
+			if title and basetitle then
+				local textWidth = title:GetZoomedWidth();
+				local textWidthArtist = Artist:GetZoomedWidth();
+
+				local baseWidth = basetitle:GetWidth();
+				local margin = 250; -- Total extra ancho (10px a cada lado)
+				local marginArtist = 250; -- Total extra ancho (10px a cada lado)
+
+				local zoomXName=0;
+				local zoomXArtis=0;
+
+				if baseWidth > 0 then
+					zoomXName = (textWidth + margin) / baseWidth;
+					zoomXArtis = (textWidthArtist + marginArtist) / baseWidth;
+					--basetitle:zoomx(newZoomX);
+				end
+
+				if zoomXName >= zoomXArtis then
+					basetitle:zoomx(zoomXName);
+				end;
+
+				if zoomXArtis >= zoomXName then
+					basetitle:zoomx(zoomXArtis);
+				end;				
+
+
+			end
+		end;
+		showInfoCommand=function(self)
+			self:finishtweening():diffusealpha(0):accelerate(0.25):diffusealpha(1);	
+		end;
+		CurrentSongChangedMessageCommand=function(self)			
+			self:finishtweening():queuecommand("Updateinfo"):diffusealpha(0):sleep(0.02):queuecommand("showInfo");	
+		end;
+		SongChosenMessageCommand=function(self)
+			self:stoptweening():linear(0.25):y(SongInfoStrip_YSongChosen):zoom(SongInfoStrip_ZoomSongChosen);
+		end;
+		SongUnchosenMessageCommand=function(self)
+			self:stoptweening():linear(0.125):y(SongInfoStrip_Y):zoom(SongInfoStrip_Zoom);
+		end;
+
+		Def.Quad {
+			InitCommand=function(self)
+				self:x(0)
+				self:y(-43)
+				self:valign(0)
+				self:setsize(SCREEN_WIDTH-110,108)
+				self:diffuse(0,0,0,0.7)
+				self:fadeleft(0.2)
+				self:faderight(0.2)
+			end;
+		};
+
+		LoadFont("_TitleXolonium")..{
+			Name="Title";
+			Text="SongName Test";
+			InitCommand=cmd(zoom,1.5;xy,0,-10;maxwidth,750/.78;);
+		};
+
+		LoadFont("_TitleXolonium")..{
+			Name="Artist";
+			Text="SongArtist Test";
+			InitCommand=cmd(zoom,.5;xy,0,12;skewx,0;maxwidth,700/.54;);
+		};
+		
+		LoadFont("_TitleXolonium")..{
+			Name="MeckxArtist";
+			Text="SongArtist Test";
+			InitCommand=function(self)
+				self:zoom(0.5);
+				self:x(-12);
+				self:y(34);
+				self:halign(1);
+				self:diffuse(color("#FFE7C9"));
+			end;
+		};
+		
+		LoadFont("_TitleXolonium")..{
+			Name="UpperDot";
+			Text="•";
+			InitCommand=function(self)
+				self:zoom(0.5);
+				self:x(0);
+				self:y(34);
+				self:halign(0.5);
+			end;
+		};
+
+		LoadFont("_TitleXolonium")..{
+			Name="MeckxBPM";
+			Text="000.000 BPM";
+			InitCommand=function(self)
+				self:zoom(0.5);
+				self:x(12);
+				self:y(34);
+				self:halign(0);
+				self:diffuse(color("#C9FFF3"));
+			end;
+		};
+
+		LoadFont("_TitleXolonium")..{
+			Name="MeckxCategory";
+			Text="SongCategory Test";
+			InitCommand=function(self)
+				self:zoom(0.5);
+				self:x(-12);
+				self:y(54);
+				self:halign(1);
+				self:diffuse(color("#C9FFC9"));
+			end;
+		};
+
+		LoadFont("_TitleXolonium")..{
+			Name="LowerDot";
+			Text="•";
+			InitCommand=function(self)
+				self:zoom(0.5);
+				self:x(0);
+				self:y(54);
+				self:halign(0.5);
+			end;
+		};
+
+		LoadFont("_TitleXolonium")..{
+			Name="MeckxOrigin";
+			Text="SongOrigin Test";
+			InitCommand=function(self)
+				self:zoom(0.5);
+				self:x(12);
+				self:y(54);
+				self:halign(0);
+				self:diffuse(color("#FFC9EA"));
+			end;
+		};
 	};
-	]]
 
 	Def.Sound {
 	    Name = "favActivateSound";
 	    File = THEME:GetPathS("", "xsanity/favActivate");
 	};
-
-
+	
 	--Favorite
 	LoadActor(THEME:GetPathG("", "ScreenSelectMusic/"..langMessageFav))..{
 		name="favoriteMessage";
@@ -601,8 +743,6 @@ t[#t+1] =  Def.ActorFrame{
 			self:diffusealpha(0);
 		end;		
 	};
-
-
 
 	--Favorite
 	LoadActor(THEME:GetPathG("", "ScreenSelectMusic/favorite"))..{
@@ -720,147 +860,6 @@ t[#t+1] =  Def.ActorFrame{
 			self:linear(0.15);
 			self:diffusealpha(0);
 		end;		
-	};
-	Def.ActorFrame{
-		Name="Fonts";
-		InitCommand = function(self)
-			self:y(SongInfoStrip_Y)
-		end;
-		UpdateinfoCommand=function(self)
-			BarTitle(self);
-
-			local title = self:GetChild("Title");
-			local Artist = self:GetChild("Artist");
-			local basetitle = self:GetChild("Basetitle");
-
-			if title and basetitle then
-				local textWidth = title:GetZoomedWidth();
-				local textWidthArtist = Artist:GetZoomedWidth();
-
-				local baseWidth = basetitle:GetWidth();
-				local margin = 250; -- Total extra ancho (10px a cada lado)
-				local marginArtist = 250; -- Total extra ancho (10px a cada lado)
-
-				local zoomXName=0;
-				local zoomXArtis=0;
-
-				if baseWidth > 0 then
-					zoomXName = (textWidth + margin) / baseWidth;
-					zoomXArtis = (textWidthArtist + marginArtist) / baseWidth;
-					--basetitle:zoomx(newZoomX);
-				end
-
-				if zoomXName >= zoomXArtis then
-					basetitle:zoomx(zoomXName);
-				end;
-
-				if zoomXArtis >= zoomXName then
-					basetitle:zoomx(zoomXArtis);
-				end;				
-
-
-			end
-		end;
-		showInfoCommand=function(self)
-			self:finishtweening():diffusealpha(0):accelerate(0.25):diffusealpha(1);	
-		end;
-		CurrentSongChangedMessageCommand=function(self)			
-			self:finishtweening():queuecommand("Updateinfo"):diffusealpha(0):sleep(0.02):queuecommand("showInfo");	
-		end;
-		SongChosenMessageCommand=function(self)
-			self:stoptweening():linear(0.25):y(SongInfoStrip_YSongChosen):zoom(SongInfoStrip_ZoomSongChosen);
-		end;
-		SongUnchosenMessageCommand=function(self)
-			self:stoptweening():linear(0.125):y(SongInfoStrip_Y):zoom(SongInfoStrip_Zoom);
-		end;
-
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/SM-BACKTITLE"))..{
-			Name="Basetitle";
-			InitCommand=cmd(xy,-2,14;zoomy,1.2;diffusealpha,0.95;fadeleft,0.3;faderight,0.3);		
-		};
-
-
-		LoadFont("_TitleXolonium")..{
-			Name="Title";
-			Text="SongName Test";
-			InitCommand=cmd(zoom,0.8;xy,0,-14;maxwidth,750/.78;);
-		};
-
-		LoadFont("_TitleXolonium")..{
-			Name="Artist";
-			Text="SongArtist Test";
-			InitCommand=cmd(zoom,.5;xy,0,12;skewx,0;maxwidth,700/.54;);
-		};
-		
-		LoadFont("_TitleXolonium")..{
-			Name="MeckxArtist";
-			Text="SongArtist Test";
-			InitCommand=function(self)
-				self:zoom(0.5);
-				self:x(-12);
-				self:y(12);
-				self:halign(1);
-				self:diffuse(color("#FFE7C9"));
-			end;
-		};
-		
-		LoadFont("_TitleXolonium")..{
-			Name="UpperDot";
-			Text="•";
-			InitCommand=function(self)
-				self:zoom(0.5);
-				self:x(0);
-				self:y(12);
-				self:halign(0.5);
-			end;
-		};
-
-		LoadFont("_TitleXolonium")..{
-			Name="MeckxBPM";
-			Text="000.000 BPM";
-			InitCommand=function(self)
-				self:zoom(0.5);
-				self:x(12);
-				self:y(12);
-				self:halign(0);
-				self:diffuse(color("#C9FFF3"));
-			end;
-		};
-
-		LoadFont("_TitleXolonium")..{
-			Name="MeckxCategory";
-			Text="SongCategory Test";
-			InitCommand=function(self)
-				self:zoom(0.5);
-				self:x(-12);
-				self:y(32);
-				self:halign(1);
-				self:diffuse(color("#C9FFC9"));
-			end;
-		};
-
-		LoadFont("_TitleXolonium")..{
-			Name="LowerDot";
-			Text="•";
-			InitCommand=function(self)
-				self:zoom(0.5);
-				self:x(0);
-				self:y(32);
-				self:halign(0.5);
-			end;
-		};
-
-		LoadFont("_TitleXolonium")..{
-			Name="MeckxOrigin";
-			Text="SongOrigin Test";
-			InitCommand=function(self)
-				self:zoom(0.5);
-				self:x(12);
-				self:y(32);
-				self:halign(0);
-				self:diffuse(color("#FFC9EA"));
-			end;
-		};
 	};
 
 	Def.ActorFrame{
@@ -2007,7 +2006,7 @@ t[#t+1] = LoadActor("ScreenSelectMusicLua/keyinfo")..{
 };
 
 t[#t+1] = LoadActor("ScreenSelectMusicLua/parts")..{
-		OnCommand=cmd(visible,true);
+		OnCommand=cmd(visible,false);
 		FinalizedMessageCommand=function(self)
 			self:stoptweening();
 			self:linear(0.15);
