@@ -95,24 +95,11 @@ FloatingLabels_Visibility = false
 -- CHART DETAIL LABELS
 
 --DifficultyDetails_Y = -70 --original
-DifficultyDetails_Y = -90
+DifficultyDetails_Y = -98
 --DifficultyDetails_XPlayer1 = -568 --original
-DifficultyDetails_XPlayer1 = -400
+DifficultyDetails_XPlayer1 = -480
 --DifficultyDetails_XPlayer2 = 556 --original
-DifficultyDetails_XPlayer2 = 400
-
--- WHITE ARROWS
-
---ChartSelectArrows_Y = 225 --original
-ChartSelectArrows_Y = -16
---ChartSelectArrows_XLeftArrowP1 = -335 --original
-ChartSelectArrows_XLeftArrowP1 = -576
---ChartSelectArrows_XRightArrowP1 = -115 --original
-ChartSelectArrows_XRightArrowP1 = -225
---ChartSelectArrows_XLeftArrowP2 = 115 --original
-ChartSelectArrows_XLeftArrowP2 = -ChartSelectArrows_XRightArrowP1
---ChartSelectArrows_XRightArrowP2 = 335 --original
-ChartSelectArrows_XRightArrowP2 = -ChartSelectArrows_XLeftArrowP1
+DifficultyDetails_XPlayer2 = 480
 
 -- RECORDS GRID (MY BEST AND MACHINE BEST)
 --RecordsGrid_Y1 = 175 --original: MY BEST (Grade letter)
@@ -132,6 +119,21 @@ RecordsGrid_Y7 = 252-52
 RecordsGrid_Y8 = (SCREEN_CENTER_Y+90)-52
 RecordsGrid_Y9 = (SCREEN_CENTER_Y-140)-52
 RecordsGrid_YA = (SCREEN_CENTER_Y+125)-52
+
+-- BIG UGLY ASS BALL
+--BigBall_Y1 = 220 --original
+BigBall_Y1 = 220-80
+--BigBall_Y2 = 290 --original
+BigBall_Y2 = 290-80
+--BigBall_Y3 = -380 --original
+BigBall_Y3 = -380-80
+--BigBall_Y4 = 205 --original
+BigBall_Y4 = 205-80
+
+-- WHITE ARROWS
+
+--ChartSelectArrows_Y = 225 --original
+ChartSelectArrows_Y = 225-80
 
 -- -- SCREEN MECKX STAGE INFORMATION
 

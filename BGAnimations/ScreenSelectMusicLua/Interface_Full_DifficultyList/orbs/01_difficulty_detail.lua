@@ -68,9 +68,23 @@ end;
 for p=-1,1,2 do
 	t[#t+1] = Def.ActorFrame{
 
-		--****************************************
-		--********* DIFFICULTY DETAILS  **********
-		--****************************************
+	LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/THEME-HIGHSCOREPANEL"))..{
+		OnCommand=function(self)
+			self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):animate(false):x(510*p):y(RecordsGrid_Y8):zoom(1):diffusealpha(0);	
+			if (p == -1) then
+				self:setstate(0);
+			else
+				self:setstate(1);
+			end;
+		end;
+		
+		SongChosenMessageCommand=cmd(stoptweening;diffusealpha,GAMESTATE:GetQuestZoneChannel() and 0 or 1;linear,0.1;zoom,0.65;y,RecordsGrid_Y9);
+		SongUnchosenMessageCommand=cmd(stoptweening;linear,0.1;zoom,1.2;y,RecordsGrid_YA;zoom,1;diffusealpha,0);
+	};
+
+	--****************************************
+	--********* DIFFICULTY DETAILS  **********
+	--****************************************
 
 	Def.ActorFrame{
 		OnCommand=function(self)
@@ -205,13 +219,13 @@ for p=-1,1,2 do
 
 	};
 		
-	--*********************************
-	--********* MACHINE BEST **********
-	--*********************************
+		--*********************************
+		--********* MACHINE BEST **********
+		--*********************************
 
 		Def.ActorFrame{
 
-					OnCommand=cmd(xy,(p == -1 and -423 or 418),252;animate,false;visible,false);
+					OnCommand=cmd(xy,(p == -1 and -423 or 418),RecordsGrid_Y7;animate,false;visible,false);
 
 					LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
 						Name="LetterMyBest";
@@ -311,7 +325,7 @@ for p=-1,1,2 do
 
 		--medals.
 		Def.ActorFrame{
-			OnCommand=cmd(xy,(p == -1 and -418 or 423),218;animate,false;visible,false);
+			OnCommand=cmd(xy,(p == -1 and -418 or 423),RecordsGrid_Y6;animate,false;visible,false);
 			LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/fullcombo"))..{
 				Name="fullcombo";
 				OnCommand=function(self)
@@ -332,15 +346,16 @@ for p=-1,1,2 do
 				self:stoptweening();
 				self:queuecommand("Set");
 			end;
-		end;
-		
-		SongChosenMessageCommand=cmd(stoptweening;diffusealpha,GAMESTATE:GetQuestZoneChannel() and 0 or 1;linear,0.1;zoom,0.65;y,RecordsGrid_Y9);
-		SongUnchosenMessageCommand=cmd(stoptweening;linear,0.1;zoom,1.2;y,RecordsGrid_YA;zoom,1;diffusealpha,0);
-	};
 
-	Def.ActorFrame{
+			StepsUnchosenMessageCommand=function(self)
+				if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
+					self:playcommand("Set");
+				end;
+			end;
 
-				OnCommand=cmd(xy,(p == -1 and -423 or 418),RecordsGrid_Y7;animate,false;visible,false);
+			SetCommand=function(self)
+				self:GetChild("pfc"):visible(false);
+				self:GetChild("fullcombo"):visible(false);
 
 				local song, steps;
 				song = GAMESTATE:GetCurrentSong();
@@ -383,7 +398,7 @@ for p=-1,1,2 do
 
 
 		Def.ActorFrame{
-			OnCommand=cmd(xy,(p == -1 and -405 or 445),262;animate,false;zoom,1.4;visible,false);
+			OnCommand=cmd(xy,(p == -1 and -405 or 445),RecordsGrid_Y5;animate,false;zoom,1.4;visible,false);
 
 			LoadFont("scorebg")..{	
 					Name="scoreBackMyBest";
@@ -404,14 +419,15 @@ for p=-1,1,2 do
 						self:linear(0.15);
 						self:diffusealpha(0);
 					end;	
-				};
+			};
 
-				--letra my best
-				LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
-					Name="LetterMyBestFail";
-					OnCommand=cmd(y,0;x,0;animate,false;setstate,0;queuecommand,"SetLetter");
-					SetLetterCommand=function(self)
-						self:zoom(0.24);
+			LoadFont("scorebg")..{	
+					Name="scoreFrontMyBest";
+					OnCommand=cmd(queuecommand,"SetPos";xy,(p == -1 and -56 or 130),8);
+					SetPosCommand=function(self)
+						self:zoom(0.4);
+						self:horizalign("right");
+						self:settext("1000000");
 					end;
 					FinalizedMessageCommand=function(self)
 						self:stoptweening();
@@ -473,8 +489,28 @@ for p=-1,1,2 do
 		};
 
 
-				SongChosenMessageCommand=cmd(finishtweening;sleep,0.2;queuecommand,"Set");
-				SongUnchosenMessageCommand=cmd(finishtweening;visible,false);
+		--Name Machine Best
+		LoadFont("_TitleXolonium")..{	
+				Name="PlayerNameBestMachine";
+				OnCommand=cmd(xy,(p == -1 and -555 or 555),RecordsGrid_Y4;animate,false;zoom,1.4;visible,true;queuecommand,"SetPos";);
+				SetPosCommand=function(self)
+					self:zoom(0.6);
+					self:horizalign("center");
+					self:settext("");
+				end;
+				FinalizedMessageCommand=function(self)
+					self:stoptweening();
+					self:linear(0.15);
+					self:diffusealpha(0);
+				end;	
+				OffCommand=function(self)
+					self:stoptweening();
+					self:linear(0.15);
+					self:diffusealpha(0);
+				end;	
+
+				SongChosenMessageCommand=cmd(stoptweening;queuecommand,"Set");
+				SongUnchosenMessageCommand=cmd(stoptweening;visible,false);
 
 				ChangeStepsMessageCommand=function(self,param)
 					self:stoptweening();
@@ -488,15 +524,11 @@ for p=-1,1,2 do
 				end;
 
 				SetCommand=function(self)
-					self:GetChild("LetterMyBestFail"):visible(false);
-					self:GetChild("LetterMyBest"):visible(true);
-
 					local song, steps;
 					song = GAMESTATE:GetCurrentSong();
-					steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);	
-
+					steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);			
 					local scorelist;
-					if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel() then
+					if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel()  then
 						scorelist = PROFILEMAN:GetMachineProfile():GetHighScoreList(song,steps);
 						local scores = scorelist:GetHighScores();
 						local topscore = scores[1];
@@ -523,7 +555,7 @@ for p=-1,1,2 do
 		--****************************
 		Def.ActorFrame{
 
-					OnCommand=cmd(xy,(p == -1 and -423 or 418),175;animate,false;visible,false);
+					OnCommand=cmd(xy,(p == -1 and -423 or 418),RecordsGrid_Y1;animate,false;visible,false);
 
 					LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
 						Name="LetterMyBest";
@@ -606,212 +638,34 @@ for p=-1,1,2 do
 
 								end;
 							else
-								self:GetChild("LetterMyBest"):setstate(iGrade);
-								self:GetChild("LetterMyBestFail"):visible(false);									
-								self:GetChild("LetterMyBest"):visible(true);
-
+								self:visible(false);
 							end;
 						else
 							self:visible(false);
 						end;
-					else
-						self:visible(false);
-					end;
-
-				end;
-
-				FinalizedMessageCommand=cmd(finishtweening;visible,false);
-
-	};
-
-
-	-- Machine Best Score
-
-	--medals.
-	Def.ActorFrame{
-		OnCommand=cmd(xy,(p == -1 and -418 or 423),RecordsGrid_Y6;animate,false;visible,false);
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/fullcombo"))..{
-			Name="fullcombo";
-			OnCommand=function(self)
-				self:zoom(0.5);
-			end;
-		};
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/pfg"))..{
-			Name="pfc";
-			OnCommand=function(self)
-				self:zoom(0.5);
-			end;
-		};
-
-		SongChosenMessageCommand=cmd(stoptweening;queuecommand,"Set");
-		SongUnchosenMessageCommand=cmd(stoptweening;visible,false);
-
-		ChangeStepsMessageCommand=function(self,param)
-			self:stoptweening();
-			self:queuecommand("Set");
-		end;
-
-		StepsUnchosenMessageCommand=function(self)
-			if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
-				self:playcommand("Set");
-			end;
-		end;
-
-		SetCommand=function(self)
-			self:GetChild("pfc"):visible(false);
-			self:GetChild("fullcombo"):visible(false);
-
-			local song, steps;
-			song = GAMESTATE:GetCurrentSong();
-			steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);	
-
-			local scorelist;
-			if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel() then
-				scorelist = PROFILEMAN:GetMachineProfile():GetHighScoreList(song,steps);
-				local scores = scorelist:GetHighScores();
-				local topscore = scores[1];
-				if topscore then
-					self:visible(true);
-					local iScore = topscore:GetScore();
-					--pfc
-					if iScore > 999999 then
-						self:GetChild("pfc"):visible(true);
-						
-					else
-						--full combo
-						local tnsbadmiss 	= scores[1]:GetTapNoteScore('TapNoteScore_W5') +
-											scores[1]:GetTapNoteScore("TapNoteScore_Miss") +
-											scores[1]:GetTapNoteScore("TapNoteScore_CheckpointMiss");
-						if tnsbadmiss == 0 then
-							self:GetChild("fullcombo"):visible(true);
-						end;
 
 					end;
 
-				else
-					self:visible(false);
-				end;
-			else
-				self:visible(false);
-			end;
+					FinalizedMessageCommand=cmd(finishtweening;visible,false);
 
-		end;
-
-
-	};
-
-
-	Def.ActorFrame{
-		OnCommand=cmd(xy,(p == -1 and -405 or 445),RecordsGrid_Y5;animate,false;zoom,1.4;visible,false);
-
-		LoadFont("scorebg")..{	
-				Name="scoreBackMyBest";
-				OnCommand=cmd(queuecommand,"SetPos";xy,(p == -1 and -162 or 24),8);
-				SetPosCommand=function(self)
-					self:diffusecolor(color("#787878"));
-					self:zoom(0.4);
-					self:horizalign("left");
-					self:settext("1000000");
-				end;
-				FinalizedMessageCommand=function(self)
-					self:stoptweening();
-					self:linear(0.15);
-					self:diffusealpha(0);
-				end;	
-				OffCommand=function(self)
-					self:stoptweening();
-					self:linear(0.15);
-					self:diffusealpha(0);
-				end;	
 		};
 
-		LoadFont("scorebg")..{	
-				Name="scoreFrontMyBest";
-				OnCommand=cmd(queuecommand,"SetPos";xy,(p == -1 and -56 or 130),8);
-				SetPosCommand=function(self)
-					self:zoom(0.4);
-					self:horizalign("right");
-					self:settext("1000000");
+
+		--medals.
+		Def.ActorFrame{
+			OnCommand=cmd(xy,(p == -1 and -418 or 423),RecordsGrid_Y2;animate,false;visible,false);
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/fullcombo"))..{
+				Name="fullcombo";
+				OnCommand=function(self)
+					self:zoom(0.5);
 				end;
-				FinalizedMessageCommand=function(self)
-					self:stoptweening();
-					self:linear(0.15);
-					self:diffusealpha(0);
-				end;	
-				OffCommand=function(self)
-					self:stoptweening();
-					self:linear(0.15);
-					self:diffusealpha(0);
-				end;	
-		};
-
-		SongChosenMessageCommand=cmd(stoptweening;queuecommand,"Set");
-		SongUnchosenMessageCommand=cmd(stoptweening;visible,false);
-
-		ChangeStepsMessageCommand=function(self,param)
-			self:stoptweening();
-			self:queuecommand("Set");
-		end;
-
-		StepsUnchosenMessageCommand=function(self)
-			if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
-				self:playcommand("Set");
-			end;
-		end;
-
-		SetCommand=function(self)
-			self:GetChild("scoreFrontMyBest"):settext("");
-			self:GetChild("scoreBackMyBest"):settext("0000000");
-
-			local song, steps;
-			song = GAMESTATE:GetCurrentSong();
-			steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);	
-
-			local scorelist;
-			if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel() then
-				scorelist = PROFILEMAN:GetMachineProfile():GetHighScoreList(song,steps);
-				local scores = scorelist:GetHighScores();
-				local topscore = scores[1];
-				if topscore then
-					self:visible(true);
-					local iScore = topscore:GetScore();								
-					local iGrade = gradeTransformState(iScore);
-					local backScore = getZeroStringFromScore(iScore);
-
-					self:GetChild("scoreFrontMyBest"):settext(iScore);
-					self:GetChild("scoreBackMyBest"):settext(backScore);
-
-				else
-					self:visible(false);
+			};
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/pfg"))..{
+				Name="pfc";
+				OnCommand=function(self)
+					self:zoom(0.5);
 				end;
-			else
-				self:visible(false);
-			end;
-
-		end;
-
-	};
-
-
-	--Name Machine Best
-	LoadFont("_TitleXolonium")..{	
-			Name="PlayerNameBestMachine";
-			OnCommand=cmd(xy,(p == -1 and -555 or 555),RecordsGrid_Y4;animate,false;zoom,1.4;visible,true;queuecommand,"SetPos";);
-			SetPosCommand=function(self)
-				self:zoom(0.6);
-				self:horizalign("center");
-				self:settext("");
-			end;
-			FinalizedMessageCommand=function(self)
-				self:stoptweening();
-				self:linear(0.15);
-				self:diffusealpha(0);
-			end;	
-			OffCommand=function(self)
-				self:stoptweening();
-				self:linear(0.15);
-				self:diffusealpha(0);
-			end;	
+			};
 
 			SongChosenMessageCommand=cmd(stoptweening;queuecommand,"Set");
 			SongUnchosenMessageCommand=cmd(stoptweening;visible,false);
@@ -828,12 +682,16 @@ for p=-1,1,2 do
 			end;
 
 			SetCommand=function(self)
+				self:GetChild("pfc"):visible(false);
+				self:GetChild("fullcombo"):visible(false);
+
 				local song, steps;
 				song = GAMESTATE:GetCurrentSong();
-				steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);			
+				steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);	
+
 				local scorelist;
-				if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel()  then
-					scorelist = PROFILEMAN:GetMachineProfile():GetHighScoreList(song,steps);
+				if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel() then
+					scorelist =PROFILEMAN:GetProfile(ARRAY[p]):GetHighScoreList(song,steps);
 					local scores = scorelist:GetHighScores();
 					local topscore = scores[1];
 					if topscore then
@@ -850,253 +708,86 @@ for p=-1,1,2 do
 								self:GetChild("fullcombo"):visible(true);
 							end;
 
-					end;
-				else
-					self:settext("");
-					self:visible(false);
-				end;
-			end;
-
-	};	
-	
-	--****************************
-	--********* MY BEST **********
-	--****************************
-	Def.ActorFrame{
-
-				OnCommand=cmd(xy,(p == -1 and -423 or 418),RecordsGrid_Y1;animate,false;visible,false);
-
-				LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
-					Name="LetterMyBest";
-					OnCommand=cmd(y,0;x,0;animate,false;setstate,0;queuecommand,"SetLetter");
-					SetLetterCommand=function(self)
-						self:zoom(0.24);
-					end;
-					FinalizedMessageCommand=function(self)
-						self:stoptweening();
-						self:linear(0.15);
-						self:diffusealpha(0);
-					end;	
-					OffCommand=function(self)
-						self:stoptweening();
-						self:linear(0.15);
-						self:diffusealpha(0);
-					end;	
-				};
-
-				--letra my best
-				LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
-					Name="LetterMyBestFail";
-					OnCommand=cmd(y,0;x,0;animate,false;setstate,0;queuecommand,"SetLetter");
-					SetLetterCommand=function(self)
-						self:zoom(0.24);
-					end;
-					FinalizedMessageCommand=function(self)
-						self:stoptweening();
-						self:linear(0.15);
-						self:diffusealpha(0);
-					end;	
-					OffCommand=function(self)
-						self:stoptweening();
-						self:linear(0.15);
-						self:diffusealpha(0);
-					end;	
-				};
-
-
-				SongChosenMessageCommand=cmd(finishtweening;sleep,0.2;queuecommand,"Set");
-				SongUnchosenMessageCommand=cmd(finishtweening;visible,false);
-
-				ChangeStepsMessageCommand=function(self,param)
-					self:stoptweening();
-					self:queuecommand("Set");
-				end;
-
-				StepsUnchosenMessageCommand=function(self)
-					if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
-						self:playcommand("Set");
-					end;
-				end;
-
-				SetCommand=function(self)
-					self:GetChild("LetterMyBestFail"):visible(false);
-					self:GetChild("LetterMyBest"):visible(true);
-
-					local song, steps;
-					song = GAMESTATE:GetCurrentSong();
-					steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);	
-
-					local scorelist;
-					if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel() then
-						scorelist =PROFILEMAN:GetProfile(ARRAY[p]):GetHighScoreList(song,steps);
-						local scores = scorelist:GetHighScores();
-						local topscore = scores[1];
-						if topscore then
-							self:visible(true);
-							local iScore = topscore:GetScore();								
-							local iGrade = gradeTransformState(iScore);
-
-							if (topscore:GetFailedAux()) then 
-								self:GetChild("LetterMyBestFail"):setstate(iGrade);
-								self:GetChild("LetterMyBestFail"):visible(true);									
-								self:GetChild("LetterMyBest"):visible(false);
-							else
-								self:GetChild("LetterMyBest"):setstate(iGrade);
-								self:GetChild("LetterMyBestFail"):visible(false);									
-								self:GetChild("LetterMyBest"):visible(true);
-
-							end;
-						else
-							self:visible(false);
 						end;
+
 					else
 						self:visible(false);
 					end;
-
-				end;
-
-				FinalizedMessageCommand=cmd(finishtweening;visible,false);
-
-	};
-
-
-	--medals.
-	Def.ActorFrame{
-		OnCommand=cmd(xy,(p == -1 and -418 or 423),RecordsGrid_Y2;animate,false;visible,false);
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/fullcombo"))..{
-			Name="fullcombo";
-			OnCommand=function(self)
-				self:zoom(0.5);
-			end;
-		};
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/pfg"))..{
-			Name="pfc";
-			OnCommand=function(self)
-				self:zoom(0.5);
-			end;
-		};
-
-		SongChosenMessageCommand=cmd(stoptweening;queuecommand,"Set");
-		SongUnchosenMessageCommand=cmd(stoptweening;visible,false);
-
-		ChangeStepsMessageCommand=function(self,param)
-			self:stoptweening();
-			self:queuecommand("Set");
-		end;
-
-		StepsUnchosenMessageCommand=function(self)
-			if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
-				self:playcommand("Set");
-			end;
-		end;
-
-		SetCommand=function(self)
-			self:GetChild("pfc"):visible(false);
-			self:GetChild("fullcombo"):visible(false);
-
-			local song, steps;
-			song = GAMESTATE:GetCurrentSong();
-			steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);	
-
-			local scorelist;
-			if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel() then
-				scorelist =PROFILEMAN:GetProfile(ARRAY[p]):GetHighScoreList(song,steps);
-				local scores = scorelist:GetHighScores();
-				local topscore = scores[1];
-				if topscore then
-					self:visible(true);
-					local iScore = topscore:GetScore();
-					--pfc
-					if iScore > 999999 then
-						self:GetChild("pfc"):visible(true);
-						
-					else
-						--full combo
-						local tnsbadmiss 	= scores[1]:GetTapNoteScore('TapNoteScore_W5') + scores[1]:GetTapNoteScore("TapNoteScore_Miss") + scores[1]:GetTapNoteScore("TapNoteScore_CheckpointMiss");
-						if tnsbadmiss == 0 then
-							self:GetChild("fullcombo"):visible(true);
-						end;
-
-					end;
-
 				else
 					self:visible(false);
 				end;
-			else
-				self:visible(false);
+
 			end;
 
-		end;
 
-
-	};
-
-
-	Def.ActorFrame{
-		OnCommand=cmd(xy,(p == -1 and -405 or 445),RecordsGrid_Y3;animate,false;zoom,1.4;visible,false);
-
-		LoadFont("scorebg")..{	
-				Name="scoreBackMyBest";
-				OnCommand=cmd(queuecommand,"SetPos";xy,(p == -1 and -162 or 24),8);
-				SetPosCommand=function(self)
-					self:diffusecolor(color("#787878"));
-					self:zoom(0.4);
-					self:horizalign("left");
-					self:settext("1000000");
-				end;
-				FinalizedMessageCommand=function(self)
-					self:stoptweening();
-					self:linear(0.15);
-					self:diffusealpha(0);
-				end;	
-				OffCommand=function(self)
-					self:stoptweening();
-					self:linear(0.15);
-					self:diffusealpha(0);
-				end;	
 		};
 
-		LoadFont("scorebg")..{	
-				Name="scoreFrontMyBest";
-				OnCommand=cmd(queuecommand,"SetPos";xy,(p == -1 and -56 or 130),8);
-				SetPosCommand=function(self)
-					self:zoom(0.4);
-					self:horizalign("right");
-					self:settext("1000000");
-				end;
-				FinalizedMessageCommand=function(self)
-					self:stoptweening();
-					self:linear(0.15);
-					self:diffusealpha(0);
-				end;	
-				OffCommand=function(self)
-					self:stoptweening();
-					self:linear(0.15);
-					self:diffusealpha(0);
-				end;	
-		};
 
-		SongChosenMessageCommand=cmd(finishtweening;sleep,0.2;queuecommand,"Set");
-		SongUnchosenMessageCommand=cmd(finishtweening;visible,false);
+		Def.ActorFrame{
+			OnCommand=cmd(xy,(p == -1 and -405 or 445),RecordsGrid_Y3;animate,false;zoom,1.4;visible,false);
 
-		ChangeStepsMessageCommand=function(self,param)
-			self:stoptweening();
-			self:queuecommand("Set");
-		end;
+			LoadFont("scorebg")..{	
+					Name="scoreBackMyBest";
+					OnCommand=cmd(queuecommand,"SetPos";xy,(p == -1 and -162 or 24),8);
+					SetPosCommand=function(self)
+						self:diffusecolor(color("#787878"));
+						self:zoom(0.4);
+						self:horizalign("left");
+						self:settext("1000000");
+					end;
+					FinalizedMessageCommand=function(self)
+						self:stoptweening();
+						self:linear(0.15);
+						self:diffusealpha(0);
+					end;	
+					OffCommand=function(self)
+						self:stoptweening();
+						self:linear(0.15);
+						self:diffusealpha(0);
+					end;	
+			};
 
-		StepsUnchosenMessageCommand=function(self)
-			if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
-				self:playcommand("Set");
+			LoadFont("scorebg")..{	
+					Name="scoreFrontMyBest";
+					OnCommand=cmd(queuecommand,"SetPos";xy,(p == -1 and -56 or 130),8);
+					SetPosCommand=function(self)
+						self:zoom(0.4);
+						self:horizalign("right");
+						self:settext("1000000");
+					end;
+					FinalizedMessageCommand=function(self)
+						self:stoptweening();
+						self:linear(0.15);
+						self:diffusealpha(0);
+					end;	
+					OffCommand=function(self)
+						self:stoptweening();
+						self:linear(0.15);
+						self:diffusealpha(0);
+					end;	
+			};
+
+			SongChosenMessageCommand=cmd(finishtweening;sleep,0.2;queuecommand,"Set");
+			SongUnchosenMessageCommand=cmd(finishtweening;visible,false);
+
+			ChangeStepsMessageCommand=function(self,param)
+				self:stoptweening();
+				self:queuecommand("Set");
 			end;
-		end;
 
-		SetCommand=function(self)
-			self:GetChild("scoreFrontMyBest"):settext("");
-			self:GetChild("scoreBackMyBest"):settext("0000000");
+			StepsUnchosenMessageCommand=function(self)
+				if SCREENMAN:GetTopScreen():GetSelectionState() == 'ConfirmSteps' then
+					self:playcommand("Set");
+				end;
+			end;
 
-			local song, steps;
-			song = GAMESTATE:GetCurrentSong();
-			steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);	
+			SetCommand=function(self)
+				self:GetChild("scoreFrontMyBest"):settext("");
+				self:GetChild("scoreBackMyBest"):settext("0000000");
+
+				local song, steps;
+				song = GAMESTATE:GetCurrentSong();
+				steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);	
 
 				local scorelist;
 				if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel() then
@@ -1109,31 +800,27 @@ for p=-1,1,2 do
 						local iGrade = gradeTransformState(iScore);
 						local backScore = getZeroStringFromScore(iScore);
 
-					self:GetChild("scoreFrontMyBest"):settext(iScore);
-					self:GetChild("scoreBackMyBest"):settext(backScore);
+						self:GetChild("scoreFrontMyBest"):settext(iScore);
+						self:GetChild("scoreBackMyBest"):settext(backScore);
 
+					else
+						self:visible(false);
+					end;
 				else
 					self:visible(false);
 				end;
-			else
-				self:visible(false);
+
 			end;
 
-		end;
-
-	};
+		};
 
 
-	Def.ActorFrame{
-		OnCommand=function(self)
-			self:visible(false);
-		end;
-		
+
 		LoadActor( THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/Difficulty_BigBalls frame") )..{
 			OnCommand=function(self)
-				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(225*p):y(220):zoom(0.7):diffusealpha(0);				
+				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(225*p):y(BigBall_Y1):zoom(0.7):diffusealpha(0);				
 			end;
-			SongChosenMessageCommand=cmd(finishtweening;linear,0.125;y,220;diffusealpha,1);
+			SongChosenMessageCommand=cmd(finishtweening;linear,0.125;y,BigBall_Y1;diffusealpha,1);
 			SongUnchosenMessageCommand=cmd(finishtweening;diffusealpha,0);
 			
 			ChangeStepsMessageCommand=function(self, params)
@@ -1156,20 +843,22 @@ for p=-1,1,2 do
 					
 				end;
 			end;
+
 		};
 
 		LoadActor( THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/Difficulty_BigBalls glow spin") ) .. {
 			InitCommand=cmd(blend,'BlendMode_Add';diffusealpha,.15;spin);
 			OnCommand=function(self)
-				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(225*p):y(220):zoom(1.56):diffusealpha(0):rotationy(0);	
+				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(225*p):y(BigBall_Y1):zoom(1.56):diffusealpha(0):rotationy(0);	
 			end;
-			SongChosenMessageCommand=cmd(finishtweening;linear,0.125;y,220;diffusealpha,0.05);
+			SongChosenMessageCommand=cmd(finishtweening;linear,0.125;y,BigBall_Y1;diffusealpha,0.05);
 			SongUnchosenMessageCommand=cmd(finishtweening;diffusealpha,0);
 		};
+
 		
 		LoadActor( THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/FX-OverBallBackground") )..{
 			OnCommand=function(self)
-				self:visible(false):animate(false):x(225*p):y(220):zoom(.9):diffusealpha(0):blend('BlendMode_Add');
+				self:visible(false):animate(false):x(225*p):y(BigBall_Y1):zoom(.9):diffusealpha(0):blend('BlendMode_Add');
 			end;
 			SongUnchosenMessageCommand=cmd(finishtweening;diffusealpha,0);
 			
@@ -1191,7 +880,7 @@ for p=-1,1,2 do
 		
 		LoadActor( THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/FX-BallBackground") )..{
 			OnCommand=function(self)
-				self:visible(false):animate(false):x(225*p):y(220):zoom(.9):diffusealpha(0);
+				self:visible(false):animate(false):x(225*p):y(BigBall_Y1):zoom(.9):diffusealpha(0);
 			end;
 			SongUnchosenMessageCommand=cmd(finishtweening;diffusealpha,0);
 			
@@ -1215,7 +904,7 @@ for p=-1,1,2 do
 		
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/StepBall_Body"))..{
 			OnCommand=function(self)
-				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):setstate(0):diffusealpha(0):animate(false):x(900*p):y(220):zoom(.73);				
+				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):setstate(0):diffusealpha(0):animate(false):x(900*p):y(BigBall_Y1):zoom(.73);				
 			end;
 			SongChosenMessageCommand=cmd(stoptweening;diffusealpha,1;linear,0.125;x,225*p;playcommand,"Refresh");
 			SongUnchosenMessageCommand=cmd(stoptweening;linear,0.125;x,900*p;sleep,.1;diffusealpha,0);
@@ -1315,10 +1004,14 @@ for p=-1,1,2 do
 				end;
 			end;
 		};
+
+
+		
+		
 		
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DIFFLABELS"))..{
 			OnCommand=function(self)
-				self:setstate(0):animate(false):x(225*p):y(290):zoom(1);
+				self:setstate(0):animate(false):x(225*p):y(BigBall_Y2):zoom(1);
 			end;
 			SongChosenMessageCommand=cmd(finishtweening;diffusealpha,1;sleep,0.125;queuecommand,"Refresh");
 			RefreshStepMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
@@ -1358,7 +1051,7 @@ for p=-1,1,2 do
 		
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/CUSLABELS"))..{
 			OnCommand=function(self)
-				self:setstate(0):animate(false):x(225*p):y(290):zoom(1);
+				self:setstate(0):animate(false):x(225*p):y(BigBall_Y2):zoom(1);
 			end;
 			SongChosenMessageCommand=cmd(finishtweening;sleep,0.125;queuecommand,"Refresh");
 			RefreshStepMessageCommand=cmd(finishtweening;queuecommand,"Refresh");
@@ -1389,7 +1082,7 @@ for p=-1,1,2 do
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/SSM-FULL-QUESTTHINGS"))..{
 			OnCommand=function(self)
-				self:setstate(1):animate(false):y(-380):zoom(1.3):visible(false);				
+				self:setstate(1):animate(false):y(BigBall_Y3):zoom(1.3):visible(false);				
 			end;
 			SongChosenMessageCommand=cmd(finishtweening;sleep,0.125;queuecommand,"Refresh");
 			RefreshCommand=function(self)
@@ -1413,9 +1106,12 @@ for p=-1,1,2 do
 				end;
 			end;
 		};
+		
 
+		
+		
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/StepBall_Ready"))..{
-			OnCommand=cmd(visible,false;x,225*p;y,290;zoom,.7;glowshift;effectcolor1,color("1,1,1,0.25");effectcolor2,color("1,1,1,0");effectperiod,0.25);
+			OnCommand=cmd(visible,false;x,225*p;y,BigBall_Y2;zoom,.7;glowshift;effectcolor1,color("1,1,1,0.25");effectcolor2,color("1,1,1,0");effectperiod,0.25);
 			SongUnchosenMessageCommand=cmd(visible,false);
 			StepsChosenMessageCommand=function(self,params)
 				if params.Player == ARRAY[p] then
@@ -1428,10 +1124,10 @@ for p=-1,1,2 do
 				end;
 			end;
 		};
-
+		
 		LoadFont("Level")..{
 			OnCommand=function(self)
-				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(900*p):y(205):zoomx(.85):zoomy(.95);
+				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(900*p):y(BigBall_Y4):zoomx(.85):zoomy(.95);
 			end;
 			SongChosenMessageCommand=cmd(stoptweening;diffusealpha,1;linear,0.125;x,225*p;playcommand,"Refresh");
 			SongUnchosenMessageCommand=cmd(stoptweening;linear,0.125;x,900*p;sleep,.1;diffusealpha,0);
@@ -1468,7 +1164,7 @@ for p=-1,1,2 do
 
 		LoadFont("borderlevel")..{
 			OnCommand=function(self)
-				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(900*p):y(205):zoomx(.85):zoomy(.95);				
+				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):x(900*p):y(BigBall_Y4):zoomx(.85):zoomy(.95);				
 			end;
 			SongChosenMessageCommand=cmd(stoptweening;diffusealpha,1;linear,0.125;x,225*p;playcommand,"Refresh");
 			SongUnchosenMessageCommand=cmd(stoptweening;linear,0.125;x,900*p;diffusealpha,0);
@@ -1576,66 +1272,64 @@ for p=-1,1,2 do
 			end;
 		};
 
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/MusicWheel_Arrow"))..{
+			OnCommand=function(self)
+				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):rotationy(-180):animate(false):x(p == -1 and -335 or 115):y(ChartSelectArrows_Y):zoom(0);
+			end;
+			SongChosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,.6);
+			SongUnchosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,0);
+			ChangeStepsMessageCommand=function(self,params)
+				if params.Player == ARRAY[p] then
+					if params.Direction == 1 then
+						self:finishtweening():x(p == -1 and -335 or 115):sleep(0.25);
+					end;
+					if params.Direction == -1 then
+						self:finishtweening():x(p == -1 and -335 or 115):linear(0.125):x(p == -1 and -340 or 110):linear(0.125):x(p == -1 and -335 or 115);
+					end;
+				end;
+			end;
+			StepsUnchosenMessageCommand=function(self,params)
+				if params.Player == ARRAY[p] then
+					if params.Direction == 1 then
+						self:finishtweening():x(p == -1 and -335 or 115):sleep(0.25);
+					end;
+					if params.Direction == -1 then
+						self:finishtweening():x(p == -1 and -335 or 115):linear(0.125):x(p == -1 and -340 or 110):linear(0.125):x(p == -1 and -335 or 115);
+					end;
+				end;
+			end;
+		};
+
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/MusicWheel_Arrow"))..{
+			OnCommand=function(self)
+				self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):animate(false):x(p == -1 and -115 or 335):y(ChartSelectArrows_Y):zoom(0);
+			end;
+			SongChosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,.6);
+			SongUnchosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,0);
+			ChangeStepsMessageCommand=function(self,params)
+				if params.Player == ARRAY[p] then
+					if params.Direction == 1 then
+						self:finishtweening():x(p == -1 and -115 or 335):linear(0.125):x(p == -1 and -110 or 340):linear(0.125):x(p == -1 and -115 or 335);
+					end;
+					if params.Direction == -1 then
+						self:finishtweening():x(p == -1 and -115 or 335):sleep(0.25);
+					end;
+				end;
+			end;
+			StepsUnchosenMessageCommand=function(self,params)
+				if params.Player == ARRAY[p] then
+					if params.Direction == 1 then
+						self:finishtweening():x(p == -1 and -115 or 335):linear(0.125):x(p == -1 and -110 or 340):linear(0.125):x(p == -1 and -115 or 335);
+					end;
+					if params.Direction == -1 then
+						self:finishtweening():x(p == -1 and -115 or 335):sleep(0.25);
+					end;
+				end;
+			end;
+		};
+
 	};
 	
-	LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/MusicWheel_Arrow"))..{
-		OnCommand=function(self)
-			self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):rotationy(-180):animate(false):x(p == -1 and ChartSelectArrows_XLeftArrowP1 or ChartSelectArrows_XLeftArrowP2):y(ChartSelectArrows_Y):zoom(0);
-		end;
-		SongChosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,.6);
-		SongUnchosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,0);
-		ChangeStepsMessageCommand=function(self,params)
-			if params.Player == ARRAY[p] then
-				if params.Direction == 1 then
-					self:finishtweening():x(p == -1 and ChartSelectArrows_XLeftArrowP1 or ChartSelectArrows_XLeftArrowP2):sleep(0.25);
-				end;
-				if params.Direction == -1 then
-					self:finishtweening():x(p == -1 and ChartSelectArrows_XLeftArrowP1 or ChartSelectArrows_XLeftArrowP2):linear(0.125):x(p == -1 and (ChartSelectArrows_XLeftArrowP1-5) or (ChartSelectArrows_XLeftArrowP2-5)):linear(0.125):x(p == -1 and ChartSelectArrows_XLeftArrowP1 or ChartSelectArrows_XLeftArrowP2);
-				end;
-			end;
-		end;
-		StepsUnchosenMessageCommand=function(self,params)
-			if params.Player == ARRAY[p] then
-				if params.Direction == 1 then
-					self:finishtweening():x(p == -1 and ChartSelectArrows_XLeftArrowP1 or ChartSelectArrows_XLeftArrowP2):sleep(0.25);
-				end;
-				if params.Direction == -1 then
-					self:finishtweening():x(p == -1 and ChartSelectArrows_XLeftArrowP1 or ChartSelectArrows_XLeftArrowP2):linear(0.125):x(p == -1 and (ChartSelectArrows_XLeftArrowP1-5) or (ChartSelectArrows_XLeftArrowP2-5)):linear(0.125):x(p == -1 and ChartSelectArrows_XLeftArrowP1 or ChartSelectArrows_XLeftArrowP2);
-				end;
-			end;
-		end;
-	};
-
-	LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/MusicWheel_Arrow"))..{
-		OnCommand=function(self)
-			self:visible(GAMESTATE:IsHumanPlayer(ARRAY[p])):animate(false):x(p == -1 and ChartSelectArrows_XRightArrowP1 or ChartSelectArrows_XRightArrowP2):y(ChartSelectArrows_Y):zoom(0);
-		end;
-		SongChosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,.6);
-		SongUnchosenMessageCommand=cmd(finishtweening;linear,0.125;zoom,0);
-		ChangeStepsMessageCommand=function(self,params)
-			if params.Player == ARRAY[p] then
-				if params.Direction == 1 then
-					self:finishtweening():x(p == -1 and ChartSelectArrows_XRightArrowP1 or ChartSelectArrows_XRightArrowP2):linear(0.125):x(p == -1 and (ChartSelectArrows_XRightArrowP1+5) or (ChartSelectArrows_XRightArrowP2+5)):linear(0.125):x(p == -1 and ChartSelectArrows_XRightArrowP1 or ChartSelectArrows_XRightArrowP2);
-				end;
-				if params.Direction == -1 then
-					self:finishtweening():x(p == -1 and ChartSelectArrows_XRightArrowP1 or ChartSelectArrows_XRightArrowP2):sleep(0.25);
-				end;
-			end;
-		end;
-		StepsUnchosenMessageCommand=function(self,params)
-			if params.Player == ARRAY[p] then
-				if params.Direction == 1 then
-					self:finishtweening():x(p == -1 and ChartSelectArrows_XRightArrowP1 or ChartSelectArrows_XRightArrowP2):linear(0.125):x(p == -1 and (ChartSelectArrows_XRightArrowP1+5) or (ChartSelectArrows_XRightArrowP2+5)):linear(0.125):x(p == -1 and ChartSelectArrows_XRightArrowP1 or ChartSelectArrows_XRightArrowP2);
-				end;
-				if params.Direction == -1 then
-					self:finishtweening():x(p == -1 and ChartSelectArrows_XRightArrowP1 or ChartSelectArrows_XRightArrowP2):sleep(0.25);
-				end;
-			end;
-		end;
-	};		
-	
-};
-
 end;
 
 return t;
