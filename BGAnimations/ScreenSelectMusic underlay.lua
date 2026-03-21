@@ -107,7 +107,17 @@ t[#t+1] =  Def.ActorFrame{
 	--	LoadActor(THEME:GetPathG("","LOGO/logo2"))..{
 	--		InitCommand=cmd(zoom,.4;diffusealpha,1;y,-120;);
 	--	};
-
+		Def.Sprite {
+			Name="VideoBackground",
+			InitCommand=function(self)
+				self:x(0)
+			end,
+			OnCommand=function(self)
+				self:Load(THEME:GetPathG("","commonBackground/bbluesm.mp4"))
+				self:zoomto(SCREEN_WIDTH, SCREEN_HEIGHT)
+				self:play()
+			end,
+		};
 		Def.ActorFrame{	--control de childs
 			UpdateCommand=function(self)
 				local song = GAMESTATE:GetCurrentSong();
@@ -145,12 +155,10 @@ t[#t+1] =  Def.ActorFrame{
 					-- END PERFORMANCE MODE--
 
 					if PreviewPath["novideo"] then
-						self:GetChild("nBanner"):stoptweening():diffusealpha(1):Load(BannerPath):scaletoclipped(SCREEN_WIDTH-4-2,SCREEN_HEIGHT-4-2);
 						self:GetChild("Preview"):visible(false):LoadBackground(THEME:GetPathG("","blackdot"));
 					else
 						self:GetChild("Preview"):stoptweening():visible(true):LoadBackground(PreviewPath["path"]);
-						self:GetChild("Preview"):zoomto(SCREEN_WIDTH-4-2,SCREEN_HEIGHT-4-2):accelerate(0.4):diffusealpha(1);						
-						self:GetChild("nBanner"):stoptweening():diffusealpha(0);
+						self:GetChild("Preview"):zoomto(SCREEN_WIDTH,SCREEN_HEIGHT):accelerate(0.4):diffusealpha(1);
 					end;
 					self:diffusealpha(1);
 				end;
@@ -169,25 +177,12 @@ t[#t+1] =  Def.ActorFrame{
 				InitCommand=cmd(setsize,SCREEN_WIDTH,SCREEN_HEIGHT;xy,0,0;blend,Blend.Add;diffusealpha,1/3;);
 				OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
 			};
-			Def.Quad {		Name="bBack";	--marco interior, fondo de banner
-				InitCommand=cmd(zoomto,SCREEN_WIDTH-4,SCREEN_HEIGHT-4;diffuse,color("#000000FF"););
-				OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
-			};
-
 			Def.Sprite{		Name="Preview";	--video preview
-				InitCommand=cmd(setsize,SCREEN_WIDTH-4-2,SCREEN_HEIGHT-4-2;xy,0,0;);
+				InitCommand=cmd(setsize,SCREEN_WIDTH,SCREEN_HEIGHT;xy,0,0;);
 				OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
 			};
-
-			Def.Banner {	Name="nBanner";	--banner standard,
-				InitCommand=cmd(setsize,SCREEN_WIDTH-4-2,SCREEN_HEIGHT-4-2;xy,0,0;);
-				OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
-			};
-
-
-						
+			
 		};
-
 
 		Def.ActorFrame{	
 			--control de childs
@@ -197,47 +192,37 @@ t[#t+1] =  Def.ActorFrame{
 			ChannelChosenMessageCommand=cmd(stoptweening;queuecommand,"Visible");
 
 			channelEntryCommand=function(self)
-				self:GetChild("nBanner"):stoptweening():Load(THEME:GetPathG("", "_blank.png"));
+				--self:GetChild("nBanner"):stoptweening():Load(THEME:GetPathG("", "_blank.png"));
 			end;
 
 			UpdateCommand=function(self)
 				local song = GAMESTATE:GetCurrentSong();
 				if song then
 					local bannerNewPath = GetBannerSong(song);
-					if bannerNewPath["generic"] == 0 then
-						self:GetChild("nBanner"):stoptweening():LoadFromCachedBanner(bannerNewPath["bpath"]):scaletoclipped(SCREEN_WIDTH-4-2,SCREEN_HEIGHT-4-2):diffusealpha(1):sleep(1*(0.38)):linear(0.55):diffusealpha(0);						
-					end;	
 				end;
 			end;
 			InitCommand=cmd(playcommand,"Update");
 			CurrentSongChangedMessageCommand=function(self)
 				self:queuecommand("Update");
-			end;		
-			
-			Def.Banner {	Name="nBanner";	--banner standard,
-				InitCommand=cmd(setsize,SCREEN_WIDTH-4-2,SCREEN_HEIGHT-4-2;xy,0,0;);
-			};
-						
+			end;
 		};
 
 	};
+
 };
 
 
 t[#t+1] =  Def.ActorFrame{
 	InitCommand=cmd(Center;);
-	Def.Quad {
-		InitCommand=cmd(zoomto,SCREEN_WIDTH,SCREEN_CENTER_Y;y,SCREEN_CENTER_Y*.5;fadetop,.42;diffuse,color("#33333399"));
-		ChannelChosenMessageCommand=cmd(visible,true);
-		SelectChannelMessageCommand=cmd(visible,false);
-	};
 	LoadActor(THEME:GetPathG("","ScreenSelectMusic/bg/back3"))..{
-		InitCommand=cmd(zoomto,SCREEN_WIDTH,SCREEN_HEIGHT;fadetop,1;diffusealpha,0.8;);
+		Name="GrayGridThatEffectsTheVideoPreview";
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,SCREEN_HEIGHT;diffusealpha,0.8;);
 		ChannelChosenMessageCommand=cmd(linear,0.3;fadetop,1);
 		SelectChannelMessageCommand=cmd(fadetop,0);
 	};
 	Def.Quad {
-		InitCommand=cmd(zoomto,SCREEN_WIDTH,32;y,-SCREEN_CENTER_Y+16;fadebottom,.75;diffuse,color("#101010"));
+		Name="BottomMeckxArt";
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,56;y,SCREEN_CENTER_Y-28;diffuse,color("#101010ee"));
 	};
 };
 

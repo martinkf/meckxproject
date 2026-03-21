@@ -5,15 +5,15 @@
 -- PROFILE OVERLAY
 
 --ProfileBase_Y = 32 --original
-ProfileBase_Y = 32+546
+ProfileBase_Y = 32+546+24
 --Scorazones_Y = 65 --original
-Scorazones_Y = 65+546
+Scorazones_Y = 65+546+24-42
 --ProfileEditorText_Y = SCREEN_CENTER_Y-268 --original
-ProfileEditorText_Y = SCREEN_CENTER_Y-268+546+83
+ProfileEditorText_Y = SCREEN_CENTER_Y-268+546+88
 --ChangeProfile_Y = SCREEN_CENTER_Y-320 --original
-ChangeProfile_Y = SCREEN_CENTER_Y-320+546+83
+ChangeProfile_Y = SCREEN_CENTER_Y-320+546+83+26
 --AvatarPic_Y = 32 --original
-AvatarPic_Y = 32+546
+AvatarPic_Y = 32+546+24
 
 -- PLAYER MOD ICONS
 
@@ -26,8 +26,12 @@ PlayerModIcons_Y = SCREEN_CENTER_Y-376+338
 
 -- FUNCTION KEYS HELPER INFORMATION
 
---FunctionKeysSearch_Y = SCREEN_CENTER_Y+347 --original
-FunctionKeysSearch_Y = SCREEN_CENTER_Y-350
+--FunctionKeysSearch_X = SCREEN_CENTER_X+400 --original
+FunctionKeysSearch_X = SCREEN_CENTER_X+400-350
+--FunctionKeysPerformance_X = SCREEN_CENTER_X+190 --original
+FunctionKeysPerformance_X = SCREEN_CENTER_X+190-350
+--FunctionKeys_Y = SCREEN_CENTER_Y+347 --original
+FunctionKeys_Y = SCREEN_CENTER_Y+326
 
 -- SONG INFORMATION STRIP
 

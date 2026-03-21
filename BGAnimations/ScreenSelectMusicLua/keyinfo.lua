@@ -1,20 +1,6 @@
 local t = Def.ActorFrame {}
 local isAspectRatio1610On=isAspectRatio1610();
 
-t[#t+1] = LoadActor( THEME:GetPathG("","ScreenSelectMusic/bottom_keys") )..{
-		InitCommand=function(self)
-			self:zoom(0.6);
-			self:xy(SCREEN_CENTER_X,SCREEN_CENTER_Y+347);
-			self:fadetop(0.8);
-
-			if isAspectRatio1610On then
-				self:xy(SCREEN_CENTER_X,SCREEN_CENTER_Y-420);
-			end;
-
-		end;
-}
-
-
 --#######
 --PROFILE
 --P1
@@ -160,14 +146,14 @@ t[#t+1] =  Def.ActorFrame
 }
 
 --######
-local yBaseForInfoKeys=FunctionKeysSearch_Y;
+local yBaseForInfoKeys=FunctionKeys_Y;
 local yBaseForInfoKeys1610=SCREEN_CENTER_Y+387;
 
 --f11 SEARCH
 t[#t+1] =  Def.ActorFrame
 {
 	OnCommand=function(self)
-		self:x(SCREEN_CENTER_X+400);
+		self:x(FunctionKeysSearch_X);
 		self:y(yBaseForInfoKeys);
 
 		if isAspectRatio1610On then
@@ -205,7 +191,7 @@ t[#t+1] =  Def.ActorFrame
 t[#t+1] =  Def.ActorFrame
 {
 	OnCommand=function(self)
-		self:x(SCREEN_CENTER_X+190);
+		self:x(FunctionKeysPerformance_X);
 		self:y(yBaseForInfoKeys);
 
 		if isAspectRatio1610On then
