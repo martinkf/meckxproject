@@ -2006,6 +2006,20 @@ t[#t+1] = LoadActor("ScreenSelectMusicLua/keyinfo")..{
 		end;			
 };
 
+t[#t+1] = LoadActor("ScreenSelectMusicLua/parts")..{
+		OnCommand=cmd(visible,true);
+		FinalizedMessageCommand=function(self)
+			self:stoptweening();
+			self:linear(0.15);
+			self:diffusealpha(0);
+		end;	
+		OffCommand=function(self)
+			self:stoptweening();
+			self:linear(0.15);
+			self:diffusealpha(0);
+		end;				
+};
+
 --HEADER BASIC MODE
 t[#t+1] = LoadActor(THEME:GetPathG("","ScreenSelectMusic/BASICHEADER"))..{
 		InitCommand=function(self)
