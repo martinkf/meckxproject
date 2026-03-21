@@ -1263,54 +1263,7 @@ end;
 
 
 
-if GAMESTATE:IsHumanPlayer(PLAYER_1) then
-	t[#t+1] = getChartInfoBox(PLAYER_1)..{
-		SaniNetMainMenuMessageCommand=function(self,params)
-			if params.Action == 1 then
-				self:visible(false);
-			else
-				self:visible(true);
-			end;
-		end;
 
-		FinalizedMessageCommand=function(self)
-			self:stoptweening();
-			self:linear(0.15);
-			self:diffusealpha(0);
-		end;		
-
-		OffCommand=function(self)
-			self:stoptweening();
-			self:linear(0.15);
-			self:diffusealpha(0);
-		end;
-
-	};
-end;
-if GAMESTATE:IsHumanPlayer(PLAYER_2) then
-	t[#t+1] = getChartInfoBox(PLAYER_2)..{
-
-		SaniNetMainMenuMessageCommand=function(self,params)
-			if params.Action == 1 then
-				self:visible(false);
-			else
-				self:visible(true);
-			end;
-		end;
-
-		FinalizedMessageCommand=function(self)
-			self:stoptweening();
-			self:linear(0.15);
-			self:diffusealpha(0);
-		end;		
-
-		OffCommand=function(self)
-			self:stoptweening();
-			self:linear(0.15);
-			self:diffusealpha(0);
-		end;
-	};
-end;
 
 --**********************************
 --*** 7 - FULL INTERFACE	   ***
