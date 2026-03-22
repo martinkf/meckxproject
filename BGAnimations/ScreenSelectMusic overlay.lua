@@ -598,7 +598,7 @@ t[#t+1] =  Def.ActorFrame{
 		Def.Quad {
 			InitCommand=function(self)
 				self:x(0)
-				self:y(-43)
+				self:y(-38)
 				self:valign(0)
 				self:setsize(SCREEN_WIDTH-110,108)
 				self:diffuse(0,0,0,0.7)
@@ -689,6 +689,52 @@ t[#t+1] =  Def.ActorFrame{
 			end;
 		};
 	};
+};
+
+--BORDER WHEEL SONG SELECTED
+t[#t+1] =  Def.ActorFrame
+{
+	SelectChannelMessageCommand=function(self)
+	--	bPickingChannel = true;
+		self:visible(false);		
+	end;
+	ChannelChosenMessageCommand=function(self)
+	--	bPickingChannel = false;
+		self:visible(true);
+	end;
+	
+	InitCommand=cmd(y,THEME:GetMetric("ScreenSelectMusic", "MusicWheelY"));
+	Def.Quad{
+		InitCommand=cmd(xy,SCREEN_CENTER_X,-82;rainbow;effectperiod,4;setsize,256,1;faderight,.1;fadeleft,.1;);	--blend,"BlendMode_Add"
+		CurrentSongChangedMessageCommand=cmd(stoptweening;diffusealpha,0;sleep,.25;linear,.3;diffusealpha,1;);
+		SongChosenMessageCommand=cmd(stoptweening;linear,0.1;diffusealpha,0);
+		SongUnchosenMessageCommand=cmd(stoptweening;sleep,.25;linear,0.3;diffusealpha,1);		
+		OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+		FinalizedMessageCommand=function(self)
+			self:stoptweening();
+			self:linear(0.15);
+			self:diffusealpha(0);
+		end;			
+	};
+	Def.Quad{
+		InitCommand=cmd(xy,SCREEN_CENTER_X,82;rainbow;effectperiod,4;setsize,256,1;faderight,.1;fadeleft,.1;);	--blend,"BlendMode_Add"
+		CurrentSongChangedMessageCommand=cmd(stoptweening;diffusealpha,0;sleep,.25;linear,.3;diffusealpha,1;);
+		SongChosenMessageCommand=cmd(stoptweening;linear,0.1;diffusealpha,0);
+		SongUnchosenMessageCommand=cmd(stoptweening;sleep,.25;linear,0.3;diffusealpha,1);		
+		OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+		FinalizedMessageCommand=function(self)
+			self:stoptweening();
+			self:linear(0.15);
+			self:diffusealpha(0);
+		end;			
+	};	
+};
+
+--FAVORITE INDICATOR
+t[#t+1] =  Def.ActorFrame{
+	InitCommand=cmd(xy,SCREEN_CENTER_X,SCREEN_CENTER_Y*1.19);
+	SelectChannelMessageCommand=cmd(finishtweening;decelerate,0.1;diffusealpha,0);
+	ChannelChosenMessageCommand=cmd(stoptweening;diffusealpha,0;sleep,0.1;linear,0.3;diffusealpha,1);	
 
 	Def.Sound {
 	    Name = "favActivateSound";
@@ -731,10 +777,12 @@ t[#t+1] =  Def.ActorFrame{
 		end;
 
 		SongChosenMessageCommand=function(self)
-			self:stoptweening():linear(0.25):y(FavoriteIcon_YSongChosen);
+			--self:stoptweening():linear(0.25):y(FavoriteIcon_YSongChosen);
+			self:visible(false);
 		end;
 		SongUnchosenMessageCommand=function(self)
-			self:stoptweening():linear(0.125):y(FavoriteIcon_Y);
+			--self:stoptweening():linear(0.125):y(FavoriteIcon_Y);
+			self:visible(true);
 		end;
 
 		OffCommand=function(self)
@@ -748,7 +796,7 @@ t[#t+1] =  Def.ActorFrame{
 	LoadActor(THEME:GetPathG("", "ScreenSelectMusic/favorite"))..{
 		name="favoriteP1";
 		InitCommand = function(self)
-			self:zoom(0.8):xy(-150, FavoriteIcon_Y):visible(GAMESTATE:IsPlayerEnabled(PLAYER_1)):diffusealpha(0);
+			self:zoom(0.8):xy(-70, FavoriteIcon_Y):visible(GAMESTATE:IsPlayerEnabled(PLAYER_1)):diffusealpha(0);
 		end;
 		CurrentSongChangedMessageCommand = function(self) 
 			p1StatusFavSelectMode = false;
@@ -765,12 +813,14 @@ t[#t+1] =  Def.ActorFrame{
 		end;
 		SongUnchosenMessageCommand = function(self) 
 			p1StatusFavSelectMode = false;
-			self:stoptweening():linear(0.125):y(FavoriteIcon_Y):queuecommand("UpdateFavorite");
+			--self:stoptweening():linear(0.125):y(FavoriteIcon_Y):queuecommand("UpdateFavorite");
+			self:stoptweening():visible(true):queuecommand("UpdateFavorite");
 		end;
 
 	   	SongChosenMessageCommand = function(self) 
 			p1StatusFavSelectMode = true;
-			self:stoptweening():linear(0.25):y(FavoriteIcon_YSongChosen):queuecommand("UpdateFavorite");
+			--self:stoptweening():linear(0.25):y(FavoriteIcon_YSongChosen):queuecommand("UpdateFavorite");
+			self:stoptweening():visible(false):queuecommand("UpdateFavorite");
 	   	end;
 		
 		SelectChannelMessageCommand = function(self) 
@@ -809,7 +859,7 @@ t[#t+1] =  Def.ActorFrame{
 	LoadActor(THEME:GetPathG("", "ScreenSelectMusic/favorite"))..{
 		name="favoriteP2";
 		InitCommand = function(self)
-			self:zoom(0.8):xy(150, FavoriteIcon_Y):visible(GAMESTATE:IsPlayerEnabled(PLAYER_2)):diffusealpha(0);
+			self:zoom(0.8):xy(70, FavoriteIcon_Y):visible(GAMESTATE:IsPlayerEnabled(PLAYER_2)):diffusealpha(0);
 		end;
 		CurrentSongChangedMessageCommand = function(self) 
 			self:stoptweening():queuecommand("UpdateFavorite") 
@@ -817,12 +867,14 @@ t[#t+1] =  Def.ActorFrame{
 
 		SongUnchosenMessageCommand = function(self) 
 			p2StatusFavSelectMode = false;
-			self:stoptweening():linear(0.125):y(FavoriteIcon_Y):queuecommand("UpdateFavorite");
+			--self:stoptweening():linear(0.125):y(FavoriteIcon_Y):queuecommand("UpdateFavorite");
+			self:stoptweening():visible(true):queuecommand("UpdateFavorite");
 		end;
 
 		SongChosenMessageCommand = function(self) 
 			p2StatusFavSelectMode = true;
-			self:stoptweening():linear(0.25):y(FavoriteIcon_YSongChosen):queuecommand("UpdateFavorite");
+			--self:stoptweening():linear(0.25):y(FavoriteIcon_YSongChosen):queuecommand("UpdateFavorite");
+			self:stoptweening():visible(false):queuecommand("UpdateFavorite");
 		end;
 
 		SelectChannelMessageCommand = function(self) 
@@ -898,46 +950,6 @@ t[#t+1] =  Def.ActorFrame{
 		};
 
 	};
-};
-
-
---BORDER WHEEL SONG SELECTED
-t[#t+1] =  Def.ActorFrame
-{
-	SelectChannelMessageCommand=function(self)
-	--	bPickingChannel = true;
-		self:visible(false);		
-	end;
-	ChannelChosenMessageCommand=function(self)
-	--	bPickingChannel = false;
-		self:visible(true);
-	end;
-	
-	InitCommand=cmd(y,THEME:GetMetric("ScreenSelectMusic", "MusicWheelY"));
-	Def.Quad{
-		InitCommand=cmd(xy,SCREEN_CENTER_X,-82;rainbow;effectperiod,4;setsize,256,1;faderight,.1;fadeleft,.1;);	--blend,"BlendMode_Add"
-		CurrentSongChangedMessageCommand=cmd(stoptweening;diffusealpha,0;sleep,.25;linear,.3;diffusealpha,1;);
-		SongChosenMessageCommand=cmd(stoptweening;linear,0.1;diffusealpha,0);
-		SongUnchosenMessageCommand=cmd(stoptweening;sleep,.25;linear,0.3;diffusealpha,1);		
-		OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
-		FinalizedMessageCommand=function(self)
-			self:stoptweening();
-			self:linear(0.15);
-			self:diffusealpha(0);
-		end;			
-	};
-	Def.Quad{
-		InitCommand=cmd(xy,SCREEN_CENTER_X,82;rainbow;effectperiod,4;setsize,256,1;faderight,.1;fadeleft,.1;);	--blend,"BlendMode_Add"
-		CurrentSongChangedMessageCommand=cmd(stoptweening;diffusealpha,0;sleep,.25;linear,.3;diffusealpha,1;);
-		SongChosenMessageCommand=cmd(stoptweening;linear,0.1;diffusealpha,0);
-		SongUnchosenMessageCommand=cmd(stoptweening;sleep,.25;linear,0.3;diffusealpha,1);		
-		OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
-		FinalizedMessageCommand=function(self)
-			self:stoptweening();
-			self:linear(0.15);
-			self:diffusealpha(0);
-		end;			
-	};	
 };
 
 --**********************************************

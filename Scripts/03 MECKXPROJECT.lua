@@ -27,49 +27,49 @@ Player2ModIcons_X = SCREEN_CENTER_X+604
 --PlayerModIcons_Y = SCREEN_CENTER_Y-257 --original
 PlayerModIcons_Y = SCREEN_CENTER_Y-376+338-338-54
 
--- FAVORITE SONG ICON
-
---FavoriteIcon_Y = -40 --original
-FavoriteIcon_Y = -355
-
---FavoriteIcon_YSongChosen = -40 --original
-FavoriteIcon_YSongChosen = -355
-
 -- SONG INFORMATION STRIP
 
 --SongInfoStrip_Y = 0 --original
-SongInfoStrip_Y = -320
+SongInfoStrip_Y = -308
 
 --SongInfoStrip_YSongChosen = 0 --original
-SongInfoStrip_YSongChosen = -320
+SongInfoStrip_YSongChosen = SongInfoStrip_Y
 
 SongInfoStrip_Zoom = 1
-SongInfoStrip_ZoomSongChosen = 1
+SongInfoStrip_ZoomSongChosen = SongInfoStrip_Zoom
 
 -- SONG INDEX COUNTER
 
 --SongIndexCounter_Y = 106 --original
-SongIndexCounter_Y = -257
+SongIndexCounter_Y = -211
+
+-- FAVORITE SONG ICON
+
+--FavoriteIcon_Y = -40 --original
+FavoriteIcon_Y = -38
+
+--FavoriteIcon_YSongChosen = -40 --original
+FavoriteIcon_YSongChosen = FavoriteIcon_Y
 
 -- MUSIC WHEEL
 
 -- Y position is done through metrics.ini ([ScreenSelectMusic] > MusicWheelY)
 -- original is: SCREEN_CENTER_Y*1.68
--- modified is: SCREEN_CENTER_Y-84
+-- modified is: SCREEN_CENTER_Y-52
 
 -- YELLOW ARROW TO THE LEFT OF THE MUSIC WHEEL
 
 --YellowArrows_Y = SCREEN_CENTER_Y*1.66; --original
-YellowArrows_YLeftArrow = SCREEN_CENTER_Y-144
-YellowArrows_YRightArrow = SCREEN_CENTER_Y-144-5
+YellowArrows_YLeftArrow = SCREEN_CENTER_Y-100
+YellowArrows_YRightArrow = SCREEN_CENTER_Y-100-5
 
 -- DIFFICULTY LIST
 
 --DifficultyListOrbs_Y = SCREEN_CENTER_Y+124; --original
-DifficultyListOrbs_Y = SCREEN_CENTER_Y+46
+DifficultyListOrbs_Y = SCREEN_CENTER_Y+90
 
 --DifficultyListOrbs_YSongChosen = SCREEN_CENTER_Y+128; --original
-DifficultyListOrbs_YSongChosen = SCREEN_CENTER_Y-80
+DifficultyListOrbs_YSongChosen = SCREEN_CENTER_Y-110
 
 --DifficultyListOrbs_SongChosenTransition1 = 0.065 --original
 DifficultyListOrbs_SongChosenTransition1 = 0.25

@@ -221,12 +221,24 @@ t[#t+1] =  Def.ActorFrame{
 		ChannelChosenMessageCommand=cmd(linear,0.3;fadetop,1);
 		SelectChannelMessageCommand=cmd(fadetop,0);
 	};
-	Def.Quad {
+	--Def.Quad {
+		-- maybe use this to cover the entirety of the profile banners?
+		--Name="TopMeckxArt";
+		--InitCommand=function(self)
+			--self:y(-SCREEN_CENTER_Y+28)
+			--self:zoomto(SCREEN_WIDTH,57)
+			--self:diffuse(0,0,0,0.9);
+		--end;
+	--};
+	Def.Quad {	
 		Name="TopMeckxArt";
 		InitCommand=function(self)
-			self:y(-SCREEN_CENTER_Y+28)
-			self:zoomto(SCREEN_WIDTH,57)
+			self:y(-SCREEN_CENTER_Y+1)
+			self:valign(0)
+			self:zoomto(SCREEN_WIDTH-1120,48)
 			self:diffuse(0,0,0,0.9);
+			self:fadeleft(0.3)
+			self:faderight(0.3)
 		end;
 	};
 	Def.Quad {
