@@ -92,11 +92,11 @@ FunctionKeys_Y = SCREEN_CENTER_Y+348
 -- CHART DETAIL LABELS
 
 --DifficultyDetails_Y = -70 --original
-DifficultyDetails_Y = -98
+DifficultyDetails_Y = 100
 --DifficultyDetails_XPlayer1 = -568 --original
-DifficultyDetails_XPlayer1 = -480
+DifficultyDetails_XPlayer1 = -170
 --DifficultyDetails_XPlayer2 = 556 --original
-DifficultyDetails_XPlayer2 = 480
+DifficultyDetails_XPlayer2 = 170
 
 -- RECORDS GRID (MY BEST AND MACHINE BEST)
 --RecordsGrid_Y1 = 175 --original: MY BEST (Grade letter)
@@ -144,11 +144,90 @@ LoadingDifficultyDetails_XPlayer2 = 340
 
 
 -- -- -- 02 - FUNCTIONS
+function GetColor_POI(inputString)
+	local colorMap = {
+		-- others
+		Black = color("#000000"),
+		Invisible  = Color.Invisible,
+
+		-- IDK or Placeholder charts
+		IDK = color("#FFFF00"),
+		Placeholder = color("#888888"),
+
+		-- chart stepstype
+		Single = color("#ff8811"),
+		Halfdouble = color("#11eeee"),
+		Double = color("#119922"),
+		Double_P = color("#ffff00"),
+
+		-- song origins
+		["The 1st DF"] = color("#ff00ff"),
+		["The 2nd DF"] = color("#1144ff"),
+		["O.B.G The 3rd"] = color("#33bb00"),
+		["O.B.G Season Evo."] = color("#ffff00"),
+		["Perfect"] = color("#ff9900"),
+		["Extra"] = color("#ff0000"),
+		["Premiere"] = color("#ff00ff"),
+		["Rebirth"] = color("#1144ff"),
+		["Premiere 3"] = color("#33bb00"),
+		["Prex 3"] = color("#ffff00"),
+		["Exceed"] = color("#ff9900"),
+		["Exceed S.E"] = color("#ff9900"),
+		["Exceed 2"] = color("#ff0000"),
+		["Zero"] = color("#ff00ff"),
+		["NX"] = color("#1144ff"),
+		["Pro"] = color("#33bb00"),
+		["Pro Encore"] = color("#33bb00"),
+		["NX2"] = color("#ffff00"),
+		["NX Absolute"] = color("#ff9900"),
+		["Fiesta"] = color("#ff9900"),
+		["Fiesta EX"] = color("#ff0000"),
+		["Fiesta 2"] = color("#ff00ff"),
+		["Prime"] = color("#1144ff"),
+		["Prime 2"] = color("#33bb00"),
+		["XX"] = color("#ffff00"),
+		["M"] = color("#ff9900"),
+		["Phoenix"] = color("#ff0000"),
+		["Pro 2"] = color("#888888"),
+		["Infinity"] = color("#aaaaaa"),
+
+		-- song genres
+		ORIGINAL = color("#1144ff"),
+		KPOP = color("#ffff00"),
+		WORLDMUSIC = color("#11eeee"),
+		JMUSIC = color("#ff0000"),
+		XROSS = color("#33bb00"),
+
+		-- song tags
+		ARCADE = color("#ffffff"),
+		ANOTHER = color("#ff0000"),
+		SHORTCUT = color("#ffff00"),
+		REMIX = color("#1144ff"),
+		FULLSONG = color("#33bb00"),
+
+		-- song tags for quads
+		ARCADEQUAD = color("#ffffff00"),
+		ANOTHERQUAD = color("#ee0000bb"),
+		SHORTCUTQUAD = color("#eeee00bb"),
+		REMIXQUAD = color("#0033eebb"),
+		FULLSONGQUAD = color("#22aa00bb"),
+
+		-- grades
+		GOLD = color("#ffcc33"),
+		SILVER = color("#aaaaaa"),
+		BRONZE = color("#dd7733"),
+		PASSED = color("#3399ff"),
+		FAILED = color("0,0,0,0.4"),
+		NOT_PLAYED = color("0,0,0,0.2"),
+	}
+
+	return colorMap[inputString] or colorMap["Black"]
+
+end
+
 -- inputs:
 -- 1) a chart object
--- 2) a string detailing what you want, from this list:
--- "Chart Original Name", "Chart Origin",
--- "Chart Author", "Chart Level"
+-- 2) a string detailing what you want, from the options below
 -- returns:
 -- check below
 function Meckx_FetchFromChart(input_chart, fetch_details)
@@ -181,6 +260,16 @@ function Meckx_FetchFromChart(input_chart, fetch_details)
 
 		if input_chart:GetMeter() == 99 then output = "??"
 		else output = string.format("%02d", input_chart:GetMeter()) end
+
+	elseif fetch_details == "Chart Type" then
+		-- returns a string such as "Single", "Halfdouble", "Double", "Double_P"
+
+		output = ToEnumShortString(ToEnumShortString(input_chart:GetStepsType()))
+
+	elseif fetch_details == "Color based on Chart Type" then
+		-- returns a color object, such to use inside a self:diffuse(x)
+
+		output = GetColor_POI(ToEnumShortString(ToEnumShortString(input_chart:GetStepsType())))
 
 	end
 

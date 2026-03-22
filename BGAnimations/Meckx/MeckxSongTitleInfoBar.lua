@@ -22,7 +22,6 @@ return function(params)
 			self:visible(true)
 		end;
 		CurrentSongChangedMessageCommand=function(self)
-			--self:finishtweening():queuecommand("Updateinfo"):diffusealpha(0):sleep(0.02):queuecommand("showInfo");
 			self:playcommand("UpdateInfo")
 		end;
 		UpdateInfoCommand=function(self)
@@ -181,5 +180,5 @@ return function(params)
 	};
 
 	return t
-	
+
 end

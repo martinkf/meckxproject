@@ -54,7 +54,7 @@ t[#t+1] = Def.ActorFrame {
 	};
 };
 
-t[#t+1] =  LoadActor("Meckx/MeckxSongTitleInfoBar.lua")( { YPosition = 136 } );
+t[#t+1] = LoadActor("Meckx/MeckxSongTitleInfoBar.lua")( { YPosition = 136 } );
 
 t[#t+1] = Def.ActorFrame {
 	Def.Quad {
@@ -115,6 +115,8 @@ t[#t+1] = Def.ActorFrame {
         end
     };
 };
+
+--t[#t+1] = LoadActor("/Meckx/MeckxChartDetailsInfoBar.lua")( { YPosition = -100, Player = -1 } );
 
 t[#t+1] = Def.ActorFrame {
 	Name="chartDetailsInformation";
