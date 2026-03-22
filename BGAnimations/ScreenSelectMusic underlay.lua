@@ -237,8 +237,8 @@ t[#t+1] =  Def.ActorFrame{
 			self:valign(0)
 			self:zoomto(SCREEN_WIDTH-1120,48)
 			self:diffuse(0,0,0,0.9);
-			self:fadeleft(0.3)
-			self:faderight(0.3)
+			self:fadeleft(0.2)
+			self:faderight(0.2)
 		end;
 	};
 	Def.Quad {

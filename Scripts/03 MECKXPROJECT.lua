@@ -27,16 +27,7 @@ Player2ModIcons_X = SCREEN_CENTER_X+604
 --PlayerModIcons_Y = SCREEN_CENTER_Y-257 --original
 PlayerModIcons_Y = SCREEN_CENTER_Y-376+338-338-54
 
--- SONG INFORMATION STRIP
-
---SongInfoStrip_Y = 0 --original
-SongInfoStrip_Y = -308
-
---SongInfoStrip_YSongChosen = 0 --original
-SongInfoStrip_YSongChosen = SongInfoStrip_Y
-
-SongInfoStrip_Zoom = 1
-SongInfoStrip_ZoomSongChosen = SongInfoStrip_Zoom
+-- MECKX SONG TITLE INFO BAR: MeckxSongTitleInfoBar.lua
 
 -- SONG INDEX COUNTER
 
@@ -146,8 +137,8 @@ ChartSelectArrows_Y = 225-80
 -- CHART DETAIL LABELS
 
 LoadingDifficultyDetails_YAnchor = -150
-LoadingDifficultyDetails_XPlayer1 = -400
-LoadingDifficultyDetails_XPlayer2 = 400
+LoadingDifficultyDetails_XPlayer1 = -340
+LoadingDifficultyDetails_XPlayer2 = 340
 
 
 

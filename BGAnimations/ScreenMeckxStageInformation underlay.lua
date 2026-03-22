@@ -1,39 +1,126 @@
 local t = Def.ActorFrame {
 	-- automatically goes to next screen after 1 second
     OnCommand=function(self)
-        self:sleep(1):queuecommand("Next")
+        self:sleep(4):queuecommand("Next")
     end,
 
     NextCommand=function(self)
         SCREENMAN:GetTopScreen():StartTransitioningScreen("SM_GoToNextScreen")
-    end
+    end,
 }
 
 t[#t+1] = Def.ActorFrame {
 	Def.Sprite {
-		Name="songBackgroundImage";
+		Name="VideoBackground",
+		InitCommand=function(self)
+			self:x(SCREEN_CENTER_X)
+			self:y(SCREEN_CENTER_Y)
+		end,
+		OnCommand=function(self)
+			self:Load(THEME:GetPathG("","commonBackground/bbluesm.mp4"))
+			self:zoomto(SCREEN_WIDTH, SCREEN_HEIGHT)
+			self:play()
+		end,
+	};
+};
+
+t[#t+1] = Def.ActorFrame {
+	InitCommand=function(self)
+		self:x(SCREEN_CENTER_X)
+		self:y(1)
+	end;
+
+	Def.Quad {
+		Name="BeReadyQuad";
+		InitCommand=function(self)
+			self:valign(0)
+			self:setsize(670,48)
+			self:diffuse(0,0,0,0.9)
+			self:fadeleft(0.2)
+			self:faderight(0.2)
+		end;
+	};
+
+	LoadFont("_TitleXolonium")..{
+		Name="BeReadyText";
+		Text="BE READY FOR...";
+		InitCommand=function(self)
+			self:y(22)
+			self:valign(0.5)
+			self:zoom(1.5)
+			self:diffuse(1,0,0,1)
+			self:maxwidth(960)
+		end;
+	};
+};
+
+t[#t+1] =  LoadActor("Meckx/MeckxSongTitleInfoBar.lua")( { YPosition = 136 } );
+
+t[#t+1] = Def.ActorFrame {
+	Def.Quad {
+		Name="BottomMeckxArt";
+		InitCommand=function(self)
+			self:x(SCREEN_CENTER_X)
+			self:y(SCREEN_BOTTOM-12)
+			self:zoomto(SCREEN_WIDTH,24)
+			self:diffuse(0,0,0,0.9)
+		end;
+	};
+};
+
+t[#t+1] = Def.ActorFrame {
+	InitCommand=function(self)
+		self:y(SCREEN_CENTER_Y-38)
+		self:finishtweening():diffusealpha(0):sleep(0.25):linear(0.25):diffusealpha(1)
+	end;
+
+	Def.Quad {
+		Name="SongImageBackgroundBox";
+		InitCommand=function(self)
+			self:x(SCREEN_CENTER_X)
+			self:zoomto(438,252)
+			self:diffuse(0,0,0,0.8)
+		end;
+	};
+
+	Def.Sprite {
+		Name="SongImageDuplicateFor43";
         OnCommand=function(self)
             local song = GAMESTATE:GetCurrentSong()
             if song then
                 local bg = song:GetBackgroundPath()
                 if bg then
-                    self:Load(bg);
-                    self:scaletocover(0,0,SCREEN_WIDTH/3,SCREEN_HEIGHT/3);
-					self:x(SCREEN_CENTER_X);
-					self:y(SCREEN_CENTER_Y-100);
+                    self:Load(bg)
+					self:x(SCREEN_CENTER_X)
+					self:zoomto(426,240)
+					self:diffuse(0.3,0.3,0.3,1)
                 end
             end
         end
-    }
+    };
+
+	Def.Sprite {
+		Name="SongImage";
+        OnCommand=function(self)
+            local song = GAMESTATE:GetCurrentSong()
+            if song then
+                local bg = song:GetBackgroundPath()
+                if bg then
+                    self:Load(bg)
+					self:x(SCREEN_CENTER_X)
+					local targetH = 240
+					self:zoom( targetH / self:GetHeight() )
+                end
+            end
+        end
+    };
 };
 
 t[#t+1] = Def.ActorFrame {
 	Name="chartDetailsInformation";
-	OnCommand=function(self)
-		self:visible(true);
-		self:diffusealpha(1);
+	InitCommand=function(self)
 		self:x(SCREEN_CENTER_X);
-		self:y(SCREEN_CENTER_Y);
+		self:y(SCREEN_CENTER_Y+290);
 
 		if GAMESTATE:IsSideJoined(PLAYER_1) then
 			local CurrentStepP1 = GAMESTATE:GetCurrentSteps(PLAYER_1);
@@ -82,6 +169,8 @@ t[#t+1] = Def.ActorFrame {
 			local chartLevelPlayer2 = Meckx_FetchFromChart(CurrentStepP2, "Chart Level")
 			self:GetChild("chartLevelPlayer2"):settext("Lvl. "..chartLevelPlayer2);
 		end;
+
+		self:finishtweening():diffusealpha(0):sleep(0.25):linear(0.25):diffusealpha(1)
 
 	end;
 
