@@ -89,7 +89,7 @@ return function(params)
 				self:x(0)
 				self:y(0)
 				self:valign(0.5)
-				self:setsize(SCREEN_WIDTH-110,108)
+				self:setsize(1200,108)
 				self:diffuse(0,0,0,0.7)
 				self:fadeleft(0.2)
 				self:faderight(0.2)
@@ -103,7 +103,7 @@ return function(params)
 				self:x(0)
 				self:y(-25)
 				self:zoom(1.5)
-				self:maxwidth(960)
+				self:maxwidth(680)
 			end;
 		};
 
@@ -115,7 +115,9 @@ return function(params)
 				self:y(upperInfoY)
 				self:halign(1)
 				self:zoom(0.5)
-				self:diffuse(color("#FFE7C9"))
+				--self:diffuse(color("#FFE7C9"))
+				self:diffuse(color("#c9c9C9"))
+				self:maxwidth(960)
 			end;
 		};
 
@@ -127,6 +129,7 @@ return function(params)
 				self:y(upperInfoY)
 				self:halign(0.5)
 				self:zoom(0.5)
+				self:diffuse(color("#c9c9C9"))
 			end;
 		};
 
@@ -138,7 +141,9 @@ return function(params)
 				self:y(upperInfoY)
 				self:halign(0)
 				self:zoom(0.5)
-				self:diffuse(color("#C9FFF3"))
+				--self:diffuse(color("#C9FFF3"))
+				self:diffuse(color("#c9c9C9"))
+				self:maxwidth(960)
 			end;
 		};
 
@@ -150,7 +155,9 @@ return function(params)
 				self:y(lowerInfoY)
 				self:halign(1)
 				self:zoom(0.5)
-				self:diffuse(color("#C9FFC9"))
+				--self:diffuse(color("#C9FFC9"))
+				self:diffuse(color("#c9c9C9"))
+				self:maxwidth(960)
 			end;
 		};
 
@@ -162,6 +169,7 @@ return function(params)
 				self:y(lowerInfoY)
 				self:halign(0.5)
 				self:zoom(0.5)
+				self:diffuse(color("#c9c9C9"))
 			end;
 		};
 
@@ -173,7 +181,9 @@ return function(params)
 				self:y(lowerInfoY)
 				self:halign(0)
 				self:zoom(0.5)
-				self:diffuse(color("#FFC9EA"))
+				--self:diffuse(color("#FFC9EA"))
+				self:diffuse(color("#c9c9C9"))
+				self:maxwidth(960)
 			end;
 		};
 

@@ -774,28 +774,6 @@ t[#t+1] =  Def.ActorFrame{
 			InitCommand=cmd(zoom,.7;xy,-37,SongIndexCounter_Y;horizalign,left;maxwidth,160/.8;strokecolor,color("0,0,0,1") );
 		};
 
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/SM-BACKTITLE"))..{
-			Name="baseChannel";
-			InitCommand=cmd(xy,-360,130;zoomy,0.3;zoomx,0.6;diffusealpha,0.95;fadeleft,0.3;faderight,0.3;visible,FloatingLabels_Visibility);
-		};
-
-		LoadFont("xolonium")..{
-			Name="Channel";
-			Text="ALL TUNES";
-			InitCommand=cmd(zoom,.8;xy,-360,128;horizalign,center;maxwidth,180/.8;strokecolor,color("0,0,0,1");visible,FloatingLabels_Visibility);
-		};
-
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/SM-BACKTITLE"))..{
-			Name="baseCategory";
-			InitCommand=cmd(xy,360,130;zoomy,0.3;zoomx,0.6;diffusealpha,0.95;fadeleft,0.3;faderight,0.3;visible,FloatingLabels_Visibility);
-		};
-
-		LoadFont("xolonium")..{
-			Name="Category";
-			Text="ALL TUNES";
-			InitCommand=cmd(zoom,.8;xy,360,128;horizalign,center;maxwidth,180/.8;strokecolor,color("0,0,0,1");visible,FloatingLabels_Visibility);
-		};
-
 	};
 };
 

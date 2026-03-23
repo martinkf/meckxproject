@@ -40,7 +40,7 @@ t[#t+1] = LoadActor("01_difficulty_detail")..{
 	OnCommand=function(self)
 		self:y(SCREEN_CENTER_Y+70);
 		self:x(SCREEN_CENTER_X);
-		self:zoom(0.8);
+		self:zoom(1);
 	end;
 
 };

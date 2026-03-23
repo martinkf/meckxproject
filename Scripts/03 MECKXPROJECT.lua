@@ -60,7 +60,7 @@ YellowArrows_YRightArrow = SCREEN_CENTER_Y-100-5
 DifficultyListOrbs_Y = SCREEN_CENTER_Y+90
 
 --DifficultyListOrbs_YSongChosen = SCREEN_CENTER_Y+128; --original
-DifficultyListOrbs_YSongChosen = SCREEN_CENTER_Y-110
+DifficultyListOrbs_YSongChosen = SCREEN_CENTER_Y+40
 
 --DifficultyListOrbs_SongChosenTransition1 = 0.065 --original
 DifficultyListOrbs_SongChosenTransition1 = 0.25
@@ -73,11 +73,6 @@ DifficultyListBackArtAssets_ZoomY = 0.75
 DifficultyListBackArtAssets_YSongChosen = DifficultyListOrbs_YSongChosen
 DifficultyListBackArtAssets_ZoomYSongChosen = 1.25
 
--- ORIGINAL THEME FLOATING CATEGORY AND CHANNEL LABELS
-
---FloatingLabels_Visibility = true --original
-FloatingLabels_Visibility = false
-
 -- FUNCTION KEYS HELPER INFORMATION
 
 --FunctionKeysSearch_X = SCREEN_CENTER_X+400 --original
@@ -88,15 +83,6 @@ FunctionKeysPerformance_X = SCREEN_CENTER_X+190+108
 FunctionKeys_Y = SCREEN_CENTER_Y+348
 
 -- -- SCREEN SELECT MUSIC - SONG CHOSEN (CHART DETAILS)
-
--- CHART DETAIL LABELS
-
---DifficultyDetails_Y = -70 --original
-DifficultyDetails_Y = 100
---DifficultyDetails_XPlayer1 = -568 --original
-DifficultyDetails_XPlayer1 = -170
---DifficultyDetails_XPlayer2 = 556 --original
-DifficultyDetails_XPlayer2 = 170
 
 -- RECORDS GRID (MY BEST AND MACHINE BEST)
 --RecordsGrid_Y1 = 175 --original: MY BEST (Grade letter)
@@ -116,30 +102,6 @@ RecordsGrid_Y7 = 252-52
 RecordsGrid_Y8 = (SCREEN_CENTER_Y+90)-52
 RecordsGrid_Y9 = (SCREEN_CENTER_Y-140)-52
 RecordsGrid_YA = (SCREEN_CENTER_Y+125)-52
-
--- BIG UGLY ASS BALL
---BigBall_Y1 = 220 --original
-BigBall_Y1 = 220-80
---BigBall_Y2 = 290 --original
-BigBall_Y2 = 290-80
---BigBall_Y3 = -380 --original
-BigBall_Y3 = -380-80
---BigBall_Y4 = 205 --original
-BigBall_Y4 = 205-80
-
--- WHITE ARROWS
-
---ChartSelectArrows_Y = 225 --original
-ChartSelectArrows_Y = 225-80
-
--- -- SCREEN MECKX STAGE INFORMATION
-
--- CHART DETAIL LABELS
-
-LoadingDifficultyDetails_YAnchor = -150
-LoadingDifficultyDetails_XPlayer1 = -340
-LoadingDifficultyDetails_XPlayer2 = 340
-
 
 
 
