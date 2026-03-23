@@ -536,7 +536,7 @@ local favMessage;
 
 local langMessageFav = PREFSMAN:GetPreference('Language').."_favorite_message";
 
-t[#t+1] =  LoadActor("Meckx/MeckxSongTitleInfoBar.lua")( { YPosition = 136 } );
+t[#t+1] = LoadActor("Meckx/MeckxSongTitleInfoBar.lua")( { YPosition = 136 } );
 
 --BORDER WHEEL SONG SELECTED
 t[#t+1] =  Def.ActorFrame
