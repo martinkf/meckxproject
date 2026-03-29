@@ -44,7 +44,7 @@ t[#t+1] =  Def.ActorFrame
 	Def.ActorFrame{
 
 		OnCommand=function(self)
-			self:x(SCREEN_CENTER_X-198);
+			self:x(SCREEN_CENTER_X-198-50-7);
 			self:y(ProfileEditorText_Y);
 			self:zoom(0.9);
 
@@ -113,7 +113,7 @@ t[#t+1] =  Def.ActorFrame
 		--OnCommand=cmd(x,SCREEN_CENTER_X+187;y,SCREEN_CENTER_Y-268;zoom,0.9);
 
 		OnCommand=function(self)
-			self:x(SCREEN_CENTER_X+198+290);
+			self:x(SCREEN_CENTER_X+198+290+57+8);
 			self:y(ProfileEditorText_Y);
 			self:zoom(0.9);
 

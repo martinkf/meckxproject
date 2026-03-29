@@ -87,7 +87,7 @@ return function(params)
 						self:Load(bg)
 						self:x(SCREEN_CENTER_X)
 						self:zoomto(426,240)
-						self:diffuse(0.3,0.3,0.3,1)
+						self:diffuse(0.15,0.15,0.15,1)
 					end
 				end
 			end

@@ -4,6 +4,8 @@
 
 -- PROFILE OVERLAY
 
+ProfileOverlayP1_Y = -50
+ProfileOverlayP2_Y = 57
 --ProfileBase_Y = 32 --original
 ProfileBase_Y = 32+570-570-7
 --Scorazones_Y = 65 --original
@@ -121,6 +123,10 @@ function GetColor_POI(inputString)
 		Halfdouble = color("#11eeee"),
 		Double = color("#119922"),
 		Double_P = color("#ffff00"),
+		SingleSoft = color("#FFE7C9"),
+		HalfdoubleSoft = color("#C9FFFF"),
+		DoubleSoft = color("#C9FFD4"),
+		Double_PSoft = color("#FFFAC9"),
 
 		-- song origins
 		["The 1st DF"] = color("#ff00ff"),
@@ -188,6 +194,47 @@ function GetColor_POI(inputString)
 end
 
 -- inputs:
+-- 1) a song object
+-- 2) a string detailing what you want, from the options below
+-- returns:
+-- check below
+function Meckx_FetchFromSong(input_song, fetch_details)
+
+	local output = ""
+
+	if fetch_details == "Song Formatted Category" then
+		-- returns a string such as "K-Pop" instead of "KPOP"
+
+		local matchingMap = {
+			ORIGINAL = "PIU Originals",
+			KPOP = "K-Pop",
+			WORLDMUSIC = "World Music",
+			JMUSIC = "J-Music",
+			XROSS = "Xross",
+		}
+		local songUnformattedCategory = input_song:GetCategory()
+		output = matchingMap[songUnformattedCategory] or "IDONTKNOWMAN"
+
+	elseif fetch_details == "Song Formatted Category" then
+		-- returns a string such as "K-Pop" instead of "KPOP"
+
+		local matchingMap = {
+			ORIGINAL = "PIU Originals",
+			KPOP = "K-Pop",
+			WORLDMUSIC = "World Music",
+			JMUSIC = "J-Music",
+			XROSS = "Xross",
+		}
+		local songUnformattedCategory = input_song:GetCategory()
+		output = matchingMap[songUnformattedCategory] or "IDONTKNOWMAN"
+
+	end
+
+	return output
+
+end
+
+-- inputs:
 -- 1) a chart object
 -- 2) a string detailing what you want, from the options below
 -- returns:
@@ -232,6 +279,11 @@ function Meckx_FetchFromChart(input_chart, fetch_details)
 		-- returns a color object, such to use inside a self:diffuse(x)
 
 		output = GetColor_POI(ToEnumShortString(ToEnumShortString(input_chart:GetStepsType())))
+
+	elseif fetch_details == "Color based on Chart Type Soft" then
+		-- returns a color object, such to use inside a self:diffuse(x)
+
+		output = GetColor_POI(ToEnumShortString(ToEnumShortString(input_chart:GetStepsType())).."Soft")
 
 	end
 
@@ -341,3 +393,41 @@ end
 --				&
 --				MISS+BAD+GOOD > 9
 --				COLOR OF MISS (RED)
+--
+-- THE ABOVE IS IDIOTIC AND IMBECILISTIC.
+-- PERCENT + COMMENTARY + DECLARATION OF NOTES
+--
+-- 100.00%
+-- 092	PG		PERFECT --as in PERFECT GAME --BLUE
+-- 000			GREAT
+-- 000			GOOD
+-- 000			BAD
+-- 000			MISS
+--
+-- 99.00%
+-- 091			PERFECT
+-- 001	FC		GREAT	--as in FULL COMBO	--GREEN
+-- 000			GOOD
+-- 000			BAD
+-- 000			MISS
+--
+-- 99.00%
+-- 090			PERFECT
+-- 001			GREAT
+-- 002	PFC		GOOD	--as in PSEUDO FULL COMBO	--ORANGE
+-- 000			BAD
+-- 000			MISS
+--
+-- 99.00%
+-- 087			PERFECT
+-- 004			GREAT
+-- 000			GOOD
+-- 000			BAD
+-- 001	SDM		MISS	--as in SINGLE DIGIT MISSES	--RED
+--
+-- 99.00%
+-- 079			PERFECT
+-- 004			GREAT
+-- 000			GOOD
+-- 000			BAD
+-- 009	SDM		MISS	--as in SINGLE DIGIT MISSES	--RED

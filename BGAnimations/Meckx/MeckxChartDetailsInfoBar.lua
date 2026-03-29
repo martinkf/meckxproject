@@ -8,7 +8,8 @@ return function(params)
 	local relevantPlayer = (p == -1) and PLAYER_1 or PLAYER_2
 
 	-- levers
-	local upperInfoY = 19; -- Y alignment of the upper info bar part
+	local upperInfoY = -39; -- Y alignment of the upper info bar part
+	local mainTextY = -4; -- Y aligment of the big chart title part
 	local lowerInfoY = 39; -- Y alignment of the lower info bar part
 	local arrowDistance = 280 -- distance from the arrows to the center of the infobar
 	local arrowStrength = 10 -- amount of pixels the arrow move when pressed
@@ -54,6 +55,8 @@ return function(params)
 
 			local chartMainNameColor
 			chartMainNameColor = Meckx_FetchFromChart(thisChart, "Color based on Chart Type")
+			local chartColorSoft
+			chartColorSoft = Meckx_FetchFromChart(thisChart, "Color based on Chart Type Soft")
 
 			self:GetChild("ChartMainName"):settext(chartMainNameText);
 			self:GetChild("ChartMainName"):diffuse(chartMainNameColor);
@@ -62,18 +65,25 @@ return function(params)
 			local chartAuthorText
 			chartAuthorText = Meckx_FetchFromChart(thisChart, "Chart Author")
 			self:GetChild("ChartAuthor"):settext(chartAuthorText);
+			self:GetChild("ChartAuthor"):diffuse(chartColorSoft);
 
-			-- UPDATING CHART ORIGIN
+			-- UPDATING CHART ORIGIN AND ORIGINAL NAME
 			local chartOriginText
 			chartOriginText = Meckx_FetchFromChart(thisChart, "Chart Origin")
-			self:GetChild("ChartOrigin"):settext("Chart debut in "..chartOriginText);
-
-			-- UPDATING CHART ORIGINAL NAME
-			local chartOriginalNameText
-			chartOriginalNameText = Meckx_FetchFromChart(thisChart, "Chart Original Name")
-			self:GetChild("ChartOriginalName"):settext("Originally called \""..chartOriginalNameText.."\"");
-
-
+			
+			local chartOriginalNameTextUnformatted
+			local chartOriginalNameTextFormatted = ""
+			chartOriginalNameTextUnformatted = Meckx_FetchFromChart(thisChart, "Chart Original Name")
+			if chartOriginalNameTextUnformatted == chartMainNameText or
+				chartOriginalNameTextUnformatted == "CO-OP 2P"
+			then
+				self:GetChild("LowerDot"):settext(chartOriginText);
+			else
+				--chartOriginalNameTextFormatted = "Originally called \""..chartOriginalNameTextUnformatted.."\""
+				chartOriginalNameTextFormatted = " • \""..chartOriginalNameTextUnformatted.."\""
+				self:GetChild("LowerDot"):settext(chartOriginText..chartOriginalNameTextFormatted);
+			end
+			self:GetChild("LowerDot"):diffuse(chartColorSoft);
 
 			-- UPDATING YOUR MOTHER
 			
@@ -103,7 +113,7 @@ return function(params)
 			Text="Testing test";
 			InitCommand=function(self)
 				self:x(0)
-				self:y(-25)
+				self:y(mainTextY)
 				self:zoom(1.5)
 				self:maxwidth(340)
 			end;
@@ -117,24 +127,24 @@ return function(params)
 				self:y(upperInfoY)
 				self:halign(0.5)
 				self:zoom(0.5)
-				self:diffuse(color("#FFE7C9"))
+				--self:diffuse(color("#FFE7C9"))
 				self:maxwidth(980)
 			end;
 		};
 
-		LoadFont("_TitleXolonium")..{
-			Name="ChartOrigin";
-			Text="ChartOrigin Test";
-			InitCommand=function(self)
-				self:x(-12)
-				self:y(lowerInfoY)
-				self:halign(1)
-				self:zoom(0.5)
+		--LoadFont("_TitleXolonium")..{
+			--Name="ChartOrigin";
+			--Text="ChartOrigin Test";
+			--InitCommand=function(self)
+				--self:x(-12)
+				--self:y(lowerInfoY)
+				--self:halign(1)
+				--self:zoom(0.5)
 				--self:diffuse(color("#C9FFC9"))
-				self:diffuse(color("#FFE7C9"))
-				self:maxwidth(490)
-			end;
-		};
+				--self:diffuse(color("#FFE7C9"))
+				--self:maxwidth(490)
+			--end;
+		--};
 
 		LoadFont("_TitleXolonium")..{
 			Name="LowerDot";
@@ -144,23 +154,23 @@ return function(params)
 				self:y(lowerInfoY)
 				self:halign(0.5)
 				self:zoom(0.5)
-				self:diffuse(color("#FFE7C9"))
+				--self:diffuse(color("#FFE7C9"))
 			end;
 		};
 		
-		LoadFont("_TitleXolonium")..{
-			Name="ChartOriginalName";
-			Text="ChartOriginalName Test";
-			InitCommand=function(self)
-				self:x(12)
-				self:y(lowerInfoY)
-				self:halign(0)
-				self:zoom(0.5)
+		--LoadFont("_TitleXolonium")..{
+			--Name="ChartOriginalName";
+			--Text="ChartOriginalName Test";
+			--InitCommand=function(self)
+				--self:x(12)
+				--self:y(lowerInfoY)
+				--self:halign(0)
+				--self:zoom(0.5)
 				--self:diffuse(color("#FFC9EA"))
-				self:diffuse(color("#FFE7C9"))
-				self:maxwidth(490)
-			end;
-		};
+				--self:diffuse(color("#FFE7C9"))
+				--self:maxwidth(490)
+			--end;
+		--};
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/MusicWheel_Arrow"))..{
 			Name="LeftArrow";

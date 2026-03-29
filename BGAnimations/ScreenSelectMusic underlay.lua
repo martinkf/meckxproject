@@ -235,8 +235,8 @@ t[#t+1] =  Def.ActorFrame{
 		InitCommand=function(self)
 			self:y(-SCREEN_CENTER_Y+1)
 			self:valign(0)
-			self:zoomto(SCREEN_WIDTH-1120,48)
-			self:diffuse(0,0,0,0.9);
+			self:zoomto(SCREEN_WIDTH-820,48)
+			self:diffuse(0,0,0,0.75);
 			self:fadeleft(0.2)
 			self:faderight(0.2)
 		end;
@@ -246,7 +246,7 @@ t[#t+1] =  Def.ActorFrame{
 		InitCommand=function(self)
 			self:y(SCREEN_CENTER_Y-12)
 			self:zoomto(SCREEN_WIDTH,24)
-			self:diffuse(0,0,0,0.9);
+			self:diffuse(0,0,0,0.75);
 		end;
 	};
 };

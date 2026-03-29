@@ -3,7 +3,8 @@ return function(params)
 	-- params
 	local entireY = params.YPosition -- Y positioning of the entire module
 	-- levers
-	local upperInfoY = 19; -- Y alignment of the upper info bar part
+	local upperInfoY = -39; -- Y alignment of the upper info bar part
+	local songTitleY = -4; -- Y aligment of the big song title part
 	local lowerInfoY = 39; -- Y alignment of the lower info bar part
 
 	-- drawing
@@ -28,30 +29,25 @@ return function(params)
 			local currentSong = GAMESTATE:GetCurrentSong()
 			local isRandomChannel = GAMESTATE:GetRandomChannel() or GAMESTATE:GetRandomTrainChannel() or GAMESTATE:GetSurvivalChannel()
 
+			local songtitle = currentSong:GetDisplayMainTitle();
 			local songartist = "???"
 			local bpmActual = "BPM ???"
 			local durationSong = "??:??"
-			local songOrigin = GAMESTATE:GetCurrentSong():GetOrigin();
+			local songOrigin = currentSong:GetOrigin();
+			local songCategoryUnformatted = currentSong:GetCategory();
+			local songCategoryFormatted = Meckx_FetchFromSong(currentSong,"Song Formatted Category");
 			
-			-- UPDATING SONG TITLE
-			if isRandomChannel or (currentSong and currentSong:GetOrigin() == "RANDOMXX") then
+			-- LOGIC
+			if isRandomChannel or (currentSong and songOrigin == "RANDOMXX") then
 				if GAMESTATE:GetSurvivalChannel() and currentSong then
-					local songtitle = GAMESTATE:GetCurrentSong():GetDisplayMainTitle();
-					self:GetChild("SongTitle"):settext(songtitle);
+					--donothing
 				else
-					self:GetChild("SongTitle"):settext("?????");
+					songtitle = "?????";
 				end;
-			elseif currentSong then
-				local songtitle = GAMESTATE:GetCurrentSong():GetDisplayMainTitle();
-					self:GetChild("SongTitle"):settext(songtitle );
-					
+			elseif currentSong then					
 				--get real information about a train
-
-
 				bpmActual = "BPM " .. ProcessBPM(GAMESTATE:GetCurrentSong():GetCustomBPM());
 				songartist = GAMESTATE:GetCurrentSong():GetDisplayArtist();
-				--songcategory = GAMESTATE:GetCurrentSong():GetCategory();
-				songcategory = CHGetCategory(0)
 				local MusicLength = GAMESTATE:GetCurrentSong():MusicLengthSeconds() or 0;
 				durationSong = MusicLength > 0 and SecondsToMMSS(MusicLength) or "";
 
@@ -62,20 +58,30 @@ return function(params)
 					durationSong = dataTrain.duration > 0 and SecondsToMMSS(dataTrain.duration) or "";
 				end;
 			else
-				self:GetChild("SongTitle"):settext("?????");
+				songtitle = "?????";
 			end;
 
+			-- UPDATING SONG TITLE
+			self:GetChild("SongTitle"):settext(songtitle);
+
 			-- UPDATING SONG ARTIST
-			self:GetChild("SongArtist"):settext(songartist);
+			--self:GetChild("SongArtist"):settext(songartist);
 
 			-- UPDATING SONG BPM
-			self:GetChild("SongBPM"):settext(bpmActual);
+			--self:GetChild("SongBPM"):settext(bpmActual);
 
 			-- UPDATING SONG CATEGORY
-			self:GetChild("SongCategory"):settext(songcategory);
+			--self:GetChild("SongCategory"):settext(songCategoryUnformatted);
 
 			-- UPDATING SONG ORIGIN
-			self:GetChild("SongOrigin"):settext(songOrigin);
+			--self:GetChild("SongOrigin"):settext(songOrigin);
+
+			-- UPDATING SONG CATEGORY + SONG ARTIST
+			self:GetChild("UpperDot"):settext(songCategoryFormatted.." • "..songartist);
+			self:GetChild("UpperDot"):diffuse(GetColor_POI(songCategoryUnformatted))
+			-- UPDATING SONG ORIGIN + SONG BPM
+			self:GetChild("LowerDot"):settext(songOrigin.." • "..bpmActual);
+			self:GetChild("LowerDot"):diffuse(GetColor_POI(songOrigin))
 
 			-- START ANIMATION
 			self:playcommand("StartShowAnimation")
@@ -101,25 +107,25 @@ return function(params)
 			Text="SongName Test";
 			InitCommand=function(self)
 				self:x(0)
-				self:y(-25)
+				self:y(songTitleY)
 				self:zoom(1.5)
 				self:maxwidth(680)
 			end;
 		};
 
-		LoadFont("_TitleXolonium")..{
-			Name="SongArtist";
-			Text="SongArtist Test";
-			InitCommand=function(self)
-				self:x(-12)
-				self:y(upperInfoY)
-				self:halign(1)
-				self:zoom(0.5)
+		--LoadFont("_TitleXolonium")..{
+			--Name="SongArtist";
+			--Text="SongArtist Test";
+			--InitCommand=function(self)
+				--self:x(-12)
+				--self:y(upperInfoY)
+				--self:halign(1)
+				--self:zoom(0.5)
 				--self:diffuse(color("#FFE7C9"))
-				self:diffuse(color("#c9c9C9"))
-				self:maxwidth(960)
-			end;
-		};
+				--self:diffuse(color("#c9c9C9"))
+				--self:maxwidth(960)
+			--end;
+		--};
 
 		LoadFont("_TitleXolonium")..{
 			Name="UpperDot";
@@ -133,33 +139,33 @@ return function(params)
 			end;
 		};
 
-		LoadFont("_TitleXolonium")..{
-			Name="SongBPM";
-			Text="BPM 0";
-			InitCommand=function(self)
-				self:x(12)
-				self:y(upperInfoY)
-				self:halign(0)
-				self:zoom(0.5)
+		--LoadFont("_TitleXolonium")..{
+			--Name="SongBPM";
+			--Text="BPM 0";
+			--InitCommand=function(self)
+				--self:x(12)
+				--self:y(upperInfoY)
+				--self:halign(0)
+				--self:zoom(0.5)
 				--self:diffuse(color("#C9FFF3"))
-				self:diffuse(color("#c9c9C9"))
-				self:maxwidth(960)
-			end;
-		};
+				--self:diffuse(color("#c9c9C9"))
+				--self:maxwidth(960)
+			--end;
+		--};
 
-		LoadFont("_TitleXolonium")..{
-			Name="SongCategory";
-			Text="SongCategory Test";
-			InitCommand=function(self)
-				self:x(-12)
-				self:y(lowerInfoY)
-				self:halign(1)
-				self:zoom(0.5)
+		--LoadFont("_TitleXolonium")..{
+			--Name="SongCategory";
+			--Text="SongCategory Test";
+			--InitCommand=function(self)
+				--self:x(-12)
+				--self:y(lowerInfoY)
+				--self:halign(1)
+				--self:zoom(0.5)
 				--self:diffuse(color("#C9FFC9"))
-				self:diffuse(color("#c9c9C9"))
-				self:maxwidth(960)
-			end;
-		};
+				--self:diffuse(color("#c9c9C9"))
+				--self:maxwidth(960)
+			--end;
+		--};
 
 		LoadFont("_TitleXolonium")..{
 			Name="LowerDot";
@@ -173,19 +179,19 @@ return function(params)
 			end;
 		};
 
-		LoadFont("_TitleXolonium")..{
-			Name="SongOrigin";
-			Text="SongOrigin Test";
-			InitCommand=function(self)
-				self:x(12)
-				self:y(lowerInfoY)
-				self:halign(0)
-				self:zoom(0.5)
+		--LoadFont("_TitleXolonium")..{
+			--Name="SongOrigin";
+			--Text="SongOrigin Test";
+			--InitCommand=function(self)
+				--self:x(12)
+				--self:y(lowerInfoY)
+				--self:halign(0)
+				--self:zoom(0.5)
 				--self:diffuse(color("#FFC9EA"))
-				self:diffuse(color("#c9c9C9"))
-				self:maxwidth(960)
-			end;
-		};
+				--self:diffuse(color("#c9c9C9"))
+				--self:maxwidth(960)
+			--end;
+		--};
 
 	};
 

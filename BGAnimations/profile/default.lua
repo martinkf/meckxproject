@@ -9,8 +9,8 @@ function GetUsb()
 
 	local yPosFix = ProfileBase_Y;
 	
-	local fixp1pf=20; 
-	local fixp2pf=-20;
+	local fixp1pf=20+ProfileOverlayP1_Y;
+	local fixp2pf=-20+ProfileOverlayP2_Y;
 
 	
 	local t = Def.ActorFrame{};
