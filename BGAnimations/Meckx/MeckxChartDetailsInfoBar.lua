@@ -39,10 +39,31 @@ return function(params)
 		end;
 
 		UpdateInfoCommand=function(self)
+			
 			-- LOCAL VARIABLES
 			local thisChart = GAMESTATE:GetCurrentSteps(relevantPlayer);
 			local thisChartType = Meckx_FetchFromChart(thisChart, "Chart Type")
 			local thisChartLevel = Meckx_FetchFromChart(thisChart, "Chart Level")
+
+			-- LOGIC FOR VISIBILITY			
+			local isNotASong = Meckx_IsThisASong(GAMESTATE:GetCurrentSong())
+			
+			--adaptations
+			if isNotASong then --this means you're hovering over a musicwheel item that's not really a song
+				self:GetChild("EntireBG"):visible(false);
+				self:GetChild("ChartMainName"):visible(false);
+				self:GetChild("ChartAuthor"):visible(false);
+				self:GetChild("LowerDot"):visible(false);
+				self:GetChild("LeftArrow"):visible(false);
+				self:GetChild("RightArrow"):visible(false);
+			else
+				self:GetChild("EntireBG"):visible(true);
+				self:GetChild("ChartMainName"):visible(true);
+				self:GetChild("ChartAuthor"):visible(true);
+				self:GetChild("LowerDot"):visible(true);
+				self:GetChild("LeftArrow"):visible(true);
+				self:GetChild("RightArrow"):visible(true);
+			end
 
 			-- UPDATING CHART MAIN NAME
 			local chartMainNameText
@@ -71,7 +92,7 @@ return function(params)
 			local chartOriginText
 			chartOriginText = Meckx_FetchFromChart(thisChart, "Chart Origin")
 			
-			local chartOriginalNameTextUnformatted
+			local chartOriginalNameTextUnformatted = ""
 			local chartOriginalNameTextFormatted = ""
 			chartOriginalNameTextUnformatted = Meckx_FetchFromChart(thisChart, "Chart Original Name")
 			if chartOriginalNameTextUnformatted == chartMainNameText or
@@ -79,13 +100,10 @@ return function(params)
 			then
 				self:GetChild("LowerDot"):settext(chartOriginText);
 			else
-				--chartOriginalNameTextFormatted = "Originally called \""..chartOriginalNameTextUnformatted.."\""
 				chartOriginalNameTextFormatted = " • \""..chartOriginalNameTextUnformatted.."\""
 				self:GetChild("LowerDot"):settext(chartOriginText..chartOriginalNameTextFormatted);
 			end
 			self:GetChild("LowerDot"):diffuse(chartColorSoft);
-
-			-- UPDATING YOUR MOTHER
 			
 		end;
 		StartShowAnimationCommand=function(self)
@@ -97,6 +115,7 @@ return function(params)
 		end;
 
 		Def.Quad {
+			Name="EntireBG";
 			InitCommand=function(self)
 				self:x(0)
 				self:y(0)
@@ -132,20 +151,6 @@ return function(params)
 			end;
 		};
 
-		--LoadFont("_TitleXolonium")..{
-			--Name="ChartOrigin";
-			--Text="ChartOrigin Test";
-			--InitCommand=function(self)
-				--self:x(-12)
-				--self:y(lowerInfoY)
-				--self:halign(1)
-				--self:zoom(0.5)
-				--self:diffuse(color("#C9FFC9"))
-				--self:diffuse(color("#FFE7C9"))
-				--self:maxwidth(490)
-			--end;
-		--};
-
 		LoadFont("_TitleXolonium")..{
 			Name="LowerDot";
 			Text="•";
@@ -157,20 +162,6 @@ return function(params)
 				--self:diffuse(color("#FFE7C9"))
 			end;
 		};
-		
-		--LoadFont("_TitleXolonium")..{
-			--Name="ChartOriginalName";
-			--Text="ChartOriginalName Test";
-			--InitCommand=function(self)
-				--self:x(12)
-				--self:y(lowerInfoY)
-				--self:halign(0)
-				--self:zoom(0.5)
-				--self:diffuse(color("#FFC9EA"))
-				--self:diffuse(color("#FFE7C9"))
-				--self:maxwidth(490)
-			--end;
-		--};
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/MusicWheel_Arrow"))..{
 			Name="LeftArrow";

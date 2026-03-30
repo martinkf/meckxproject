@@ -291,6 +291,40 @@ function Meckx_FetchFromChart(input_chart, fetch_details)
 
 end
 
+-- inputs:
+-- 1) a song object
+-- returns:
+-- a boolean value - "true" if it's a regular song, "false" if it's the musicwheel item of a non-song item (such as a random song or survival mode)
+function Meckx_IsThisASong(input_song)
+
+	local output
+
+	local songTitle = input_song:GetDisplayMainTitle();
+	if songTitle == "SURVIVAL SINGLE" or
+		songTitle == "SURVIVAL HALF-DOUBLE" or
+		songTitle == "SURVIVAL DOUBLE" or
+		songTitle == "RANDOM TRAIN SINGLE 13-14" or
+		songTitle == "RANDOM TRAIN SINGLE 15-16" or
+		songTitle == "RANDOM TRAIN SINGLE 17-18" or
+		songTitle == "RANDOM TRAIN SINGLE 19-20" or
+		songTitle == "RANDOM TRAIN SINGLE 21-22" or
+		songTitle == "RANDOM TRAIN DOUBLE 13-15" or
+		songTitle == "RANDOM TRAIN DOUBLE 16-17" or
+		songTitle == "RANDOM TRAIN DOUBLE 18-19" or
+		songTitle == "RANDOM TRAIN DOUBLE 20-21" or
+		songTitle == "RANDOM TRAIN DOUBLE 22-23" or
+		songTitle == "RANDOM TRAIN DOUBLE 24 OVER" or
+		songTitle == "???" then
+		output = true
+	else
+		output = false
+	end
+
+	return output
+
+end
+
+
 -- BRAINSTORMING
 --
 -- AFTER PROFILE SELECT, SCREENSELECTGAMEMODE

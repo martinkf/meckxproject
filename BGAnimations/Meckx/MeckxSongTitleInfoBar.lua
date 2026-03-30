@@ -26,61 +26,67 @@ return function(params)
 			self:playcommand("UpdateInfo")
 		end;
 		UpdateInfoCommand=function(self)
-			local currentSong = GAMESTATE:GetCurrentSong()
-			local isRandomChannel = GAMESTATE:GetRandomChannel() or GAMESTATE:GetRandomTrainChannel() or GAMESTATE:GetSurvivalChannel()
+			-- LOGIC
 
-			local songtitle = currentSong:GetDisplayMainTitle();
-			local songartist = "???"
-			local bpmActual = "BPM ???"
-			local durationSong = "??:??"
+			--preliminary references
+			local currentSong = GAMESTATE:GetCurrentSong();
+			local songTitle = currentSong:GetDisplayMainTitle();
+			local songArtist = currentSong:GetDisplayArtist();
+			local songDisplayBpm = "BPM " .. ProcessBPM(currentSong:GetCustomBPM());
 			local songOrigin = currentSong:GetOrigin();
 			local songCategoryUnformatted = currentSong:GetCategory();
 			local songCategoryFormatted = Meckx_FetchFromSong(currentSong,"Song Formatted Category");
+
+			--local isRandomChannel = GAMESTATE:GetRandomChannel() or GAMESTATE:GetRandomTrainChannel() or GAMESTATE:GetSurvivalChannel();
+			-- changing this so new StageInformation screen for Survival can display song info
+			local isNotASong = Meckx_IsThisASong(currentSong)
 			
-			-- LOGIC
-			if isRandomChannel or (currentSong and songOrigin == "RANDOMXX") then
-				if GAMESTATE:GetSurvivalChannel() and currentSong then
-					--donothing
-				else
-					songtitle = "?????";
-				end;
-			elseif currentSong then					
-				--get real information about a train
-				bpmActual = "BPM " .. ProcessBPM(GAMESTATE:GetCurrentSong():GetCustomBPM());
-				songartist = GAMESTATE:GetCurrentSong():GetDisplayArtist();
-				local MusicLength = GAMESTATE:GetCurrentSong():MusicLengthSeconds() or 0;
-				durationSong = MusicLength > 0 and SecondsToMMSS(MusicLength) or "";
-
-				if GAMESTATE:GetMusicTrainChannel() or GAMESTATE:GetProgressiveChannel() then
-					local dataTrain = getTrainProgresiveInfoLess();
-					bpmActual = "BPM " .. ProcessBPM(dataTrain.bpm);
-					songartist = "V.A";
-					durationSong = dataTrain.duration > 0 and SecondsToMMSS(dataTrain.duration) or "";
-				end;
+			--adaptations
+			if isNotASong then --this means you're hovering over a musicwheel item that's not really a song
+				self:GetChild("EntireBG"):visible(false);
+				self:GetChild("SongTitle"):visible(false);
+				self:GetChild("UpperDot"):visible(false);
+				self:GetChild("LowerDot"):visible(false);
 			else
-				songtitle = "?????";
-			end;
+				self:GetChild("EntireBG"):visible(true);
+				self:GetChild("SongTitle"):visible(true);
+				self:GetChild("UpperDot"):visible(true);
+				self:GetChild("LowerDot"):visible(true);
+			end
 
-			-- UPDATING SONG TITLE
-			self:GetChild("SongTitle"):settext(songtitle);
 
-			-- UPDATING SONG ARTIST
-			--self:GetChild("SongArtist"):settext(songartist);
+			--old logic for reference
+			--if isRandomChannel or (currentSong and songOrigin == "RANDOMXX") then
+				--if GAMESTATE:GetSurvivalChannel() and currentSong then
+					--donothing
+				--else
+					--songtitle = "?????";
+				--end;
+			--elseif currentSong then
+				--get real information about a train
+				--bpmActual = "BPM " .. ProcessBPM(GAMESTATE:GetCurrentSong():GetCustomBPM());
+				--songartist = GAMESTATE:GetCurrentSong():GetDisplayArtist();
 
-			-- UPDATING SONG BPM
-			--self:GetChild("SongBPM"):settext(bpmActual);
+				--if GAMESTATE:GetMusicTrainChannel() or GAMESTATE:GetProgressiveChannel() then
+					--local dataTrain = getTrainProgresiveInfoLess();
+					--bpmActual = "BPM " .. ProcessBPM(dataTrain.bpm);
+					--songartist = "V.A";
+					--durationSong = dataTrain.duration > 0 and SecondsToMMSS(dataTrain.duration) or "";
+				--end;
+			--else
+				--songtitle = "?????";
+			--end;
 
-			-- UPDATING SONG CATEGORY
-			--self:GetChild("SongCategory"):settext(songCategoryUnformatted);
+			--new logic
 
-			-- UPDATING SONG ORIGIN
-			--self:GetChild("SongOrigin"):settext(songOrigin);
+			-- UPDATING SONG TITLE			
+			self:GetChild("SongTitle"):settext(songTitle);
 
 			-- UPDATING SONG CATEGORY + SONG ARTIST
-			self:GetChild("UpperDot"):settext(songCategoryFormatted.." • "..songartist);
+			self:GetChild("UpperDot"):settext(songCategoryFormatted.." • "..songArtist);
 			self:GetChild("UpperDot"):diffuse(GetColor_POI(songCategoryUnformatted))
 			-- UPDATING SONG ORIGIN + SONG BPM
-			self:GetChild("LowerDot"):settext(songOrigin.." • "..bpmActual);
+			self:GetChild("LowerDot"):settext(songOrigin.." • "..songDisplayBpm);
 			self:GetChild("LowerDot"):diffuse(GetColor_POI(songOrigin))
 
 			-- START ANIMATION
@@ -91,6 +97,7 @@ return function(params)
 		end;
 
 		Def.Quad {
+			Name="EntireBG";
 			InitCommand=function(self)
 				self:x(0)
 				self:y(0)
@@ -113,20 +120,6 @@ return function(params)
 			end;
 		};
 
-		--LoadFont("_TitleXolonium")..{
-			--Name="SongArtist";
-			--Text="SongArtist Test";
-			--InitCommand=function(self)
-				--self:x(-12)
-				--self:y(upperInfoY)
-				--self:halign(1)
-				--self:zoom(0.5)
-				--self:diffuse(color("#FFE7C9"))
-				--self:diffuse(color("#c9c9C9"))
-				--self:maxwidth(960)
-			--end;
-		--};
-
 		LoadFont("_TitleXolonium")..{
 			Name="UpperDot";
 			Text="•";
@@ -139,34 +132,6 @@ return function(params)
 			end;
 		};
 
-		--LoadFont("_TitleXolonium")..{
-			--Name="SongBPM";
-			--Text="BPM 0";
-			--InitCommand=function(self)
-				--self:x(12)
-				--self:y(upperInfoY)
-				--self:halign(0)
-				--self:zoom(0.5)
-				--self:diffuse(color("#C9FFF3"))
-				--self:diffuse(color("#c9c9C9"))
-				--self:maxwidth(960)
-			--end;
-		--};
-
-		--LoadFont("_TitleXolonium")..{
-			--Name="SongCategory";
-			--Text="SongCategory Test";
-			--InitCommand=function(self)
-				--self:x(-12)
-				--self:y(lowerInfoY)
-				--self:halign(1)
-				--self:zoom(0.5)
-				--self:diffuse(color("#C9FFC9"))
-				--self:diffuse(color("#c9c9C9"))
-				--self:maxwidth(960)
-			--end;
-		--};
-
 		LoadFont("_TitleXolonium")..{
 			Name="LowerDot";
 			Text="•";
@@ -178,20 +143,6 @@ return function(params)
 				self:diffuse(color("#c9c9C9"))
 			end;
 		};
-
-		--LoadFont("_TitleXolonium")..{
-			--Name="SongOrigin";
-			--Text="SongOrigin Test";
-			--InitCommand=function(self)
-				--self:x(12)
-				--self:y(lowerInfoY)
-				--self:halign(0)
-				--self:zoom(0.5)
-				--self:diffuse(color("#FFC9EA"))
-				--self:diffuse(color("#c9c9C9"))
-				--self:maxwidth(960)
-			--end;
-		--};
 
 	};
 

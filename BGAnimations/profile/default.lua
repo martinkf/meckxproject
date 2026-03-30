@@ -406,7 +406,7 @@ function GetUsb()
 							if GAMESTATE:GetCurrentSong() ~= nil then
 								local heart = GAMESTATE:GetCurrentSong():GetHearts();						
 								if h > GAMESTATE:GetNumStagesLeft(ARRAY[p]) and h <= GAMESTATE:GetNumStagesLeft(ARRAY[p]) + params.Hearts then	
-									self:y(65):zoom(1):linear(0.5):zoom(0.85):y(65):diffusealpha(1);
+									self:y(Scorazones_Y):zoom(1):linear(0.5):zoom(0.85):y(Scorazones_Y):diffusealpha(1);
 								end;
 							end;
 						end;
