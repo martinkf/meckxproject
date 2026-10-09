@@ -87,6 +87,12 @@ end
 
 local t = Def.ActorFrame { };
 
+t[#t+1] =  Def.ActorFrame{ -- general grey background video
+	InitCommand=cmd(Center;);
+	LoadActor( THEME:GetPathG("","commonBackground/bbluetogreysm") )..{
+		InitCommand=cmd(setsize,SCREEN_WIDTH,SCREEN_HEIGHT;xy,0,0;);
+	};
+};
 t[#t+1] =  Def.ActorFrame{
 	InitCommand=cmd(Center);
 	VisibleCommand=cmd(visible,true);
@@ -103,9 +109,6 @@ t[#t+1] =  Def.ActorFrame{
 	Def.ActorFrame{		--Banner & PrevVid
 		OnCommand=cmd(diffusealpha,0;accelerate,.15;diffusealpha,1;);
 		OffCommand=cmd(stoptweening;sleep,.1;accelerate,.25;diffusealpha,0;);
-	--	LoadActor(THEME:GetPathG("","LOGO/logo2"))..{
-	--		InitCommand=cmd(zoom,.4;diffusealpha,1;y,-120;);
-	--	};
 
 		Def.ActorFrame{	--control de childs
 			UpdateCommand=function(self)
@@ -114,9 +117,6 @@ t[#t+1] =  Def.ActorFrame{
 
 					local PreviewPath 	= GetPreviewVidOnly(song);
 					local BannerPath 	= GetSongBannerPath(song);
-					--self:accelerate(0.1*(0.6)):diffusealpha(1);		
-
-					self:GetChild("gBanner"):stoptweening():Load(BannerPath):scaletoclipped(SCREEN_WIDTH,SCREEN_HEIGHT);
 					
 					-- PERFORMANCE MODE--
 					local performanceType = getPerformanceModeType();
@@ -126,93 +126,51 @@ t[#t+1] =  Def.ActorFrame{
 					-- END PERFORMANCE MODE--
 
 					if PreviewPath["novideo"] then
-						self:GetChild("nBanner"):stoptweening():diffusealpha(1):Load(BannerPath):scaletoclipped(SCREEN_WIDTH-4-2,SCREEN_HEIGHT-4-2);
+						self:GetChild("nBanner"):stoptweening():diffusealpha(1):Load(BannerPath):scaletoclipped(SCREEN_WIDTH,SCREEN_HEIGHT);
 						self:GetChild("Preview"):visible(false):LoadBackground(THEME:GetPathG("","blackdot"));
 					else
 						self:GetChild("Preview"):stoptweening():visible(true):LoadBackground(PreviewPath["path"]);
-						self:GetChild("Preview"):zoomto(SCREEN_WIDTH-4-2,SCREEN_HEIGHT-4-2):accelerate(0.4):diffusealpha(1);						
+						self:GetChild("Preview"):zoomto(SCREEN_WIDTH,SCREEN_HEIGHT):diffusealpha(0):linear(1):diffusealpha(1);
 						self:GetChild("nBanner"):stoptweening():diffusealpha(0);
 					end;
 
 					self:diffusealpha(1);
 				end;
 			end;
-			--InitCommand=cmd(playcommand,"Update");
-			InitCommand=function(self)
-				self:sleep(1);
-				self:queuecommand("Update");
-			end;
-
-			CurrentSongChangedMessageCommand=function(self)
-				self:stoptweening():diffusealpha(0):sleep(0.38):queuecommand("Update");
-			end;
-
-			OffCommand=function(self)
-				self:stoptweening();
-				self:linear(0.15);
-				self:diffusealpha(0);
-			end;
-
 			
-			Def.Quad {		Name="Glow";	--cuadro gris
-				InitCommand=cmd(zoomto,SCREEN_WIDTH,SCREEN_HEIGHT;diffuse,color("#333333FF"););
-				OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
-			};
-			Def.Banner {	Name="gBanner";	--banner glow, da efecto al segundo marco
-				InitCommand=cmd(setsize,SCREEN_WIDTH,SCREEN_HEIGHT;xy,0,0;blend,Blend.Add;diffusealpha,1/3;);
-				OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
-			};
-			Def.Quad {		Name="bBack";	--marco interior, fondo de banner
-				InitCommand=cmd(zoomto,SCREEN_WIDTH-4,SCREEN_HEIGHT-4;diffuse,color("#000000FF"););
-				OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
-			};
-
-			Def.Sprite{		Name="Preview";	--video preview
-				InitCommand=cmd(setsize,SCREEN_WIDTH-4-2,SCREEN_HEIGHT-4-2;xy,0,0;);
-				OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
-			};
-
-			Def.Banner {	Name="nBanner";	--banner standard,
-				InitCommand=cmd(setsize,SCREEN_WIDTH-4-2,SCREEN_HEIGHT-4-2;xy,0,0;);
-				OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
-			};						
-		};
-
-
-		Def.ActorFrame{	
-			--control de childs
-			HideCommand=cmd(visible,false);
-			SelectChannelMessageCommand=cmd(queuecommand,"channelEntry");				
-			VisibleCommand=cmd(visible,true);
-			ChannelChosenMessageCommand=cmd(stoptweening;queuecommand,"Visible");
-
-			channelEntryCommand=function(self)
-				self:GetChild("nBanner"):stoptweening():Load(THEME:GetPathG("", "_blank.png"));
-			end;
-
-			UpdateCommand=function(self)
-				local song = GAMESTATE:GetCurrentSong();
-				if song then
-					local bannerNewPath = GetBannerSong(song);
-					if bannerNewPath["generic"] == 0 then
-						self:GetChild("nBanner"):stoptweening():LoadFromCachedBanner(bannerNewPath["bpath"]):scaletoclipped(SCREEN_WIDTH-4-2,SCREEN_HEIGHT-4-2):diffusealpha(1):sleep(1*(0.38)):linear(0.55):diffusealpha(0);						
-					end;	
+			InitCommand=function(self)
+				local performanceType = getPerformanceModeType();
+				if performanceType >= 2 then
+					self:stoptweening():queuecommand("Update");
+				else
+					self:stoptweening():diffusealpha(0):sleep(0.38):queuecommand("Update");
 				end;
 			end;
-			InitCommand=cmd(playcommand,"Update");
+
 			CurrentSongChangedMessageCommand=function(self)
-				self:queuecommand("Update");
-			end;		
-			
-			Def.Banner {	Name="nBanner";	--banner standard,
-				InitCommand=cmd(setsize,SCREEN_WIDTH-4-2,SCREEN_HEIGHT-4-2;xy,0,0;);
-			};
-			
+				local performanceType = getPerformanceModeType();
+				if performanceType >= 2 then
+					self:stoptweening():queuecommand("Update");
+				else
+					self:stoptweening():diffusealpha(0):sleep(0.38):queuecommand("Update");
+				end;
+			end;
+
 			OffCommand=function(self)
 				self:stoptweening();
 				self:linear(0.15);
 				self:diffusealpha(0);
-			end;		
+			end;
+
+			Def.Sprite{		Name="Preview";	--video preview
+				InitCommand=cmd(setsize,SCREEN_WIDTH,SCREEN_HEIGHT;xy,0,0;);
+				OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
+			};
+
+			Def.Banner {	Name="nBanner";	--banner standard,
+				InitCommand=cmd(setsize,SCREEN_WIDTH,SCREEN_HEIGHT;xy,0,0;);
+				OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
+			};
 		};
 	};
 };
