@@ -339,9 +339,10 @@ t[#t+1] = createTriangleBack1(25,-35,"#ff005a",true,true)..{
 
 local numParticles = 70  -- Cambia este valor para más o menos partículas
 
-local performanceStatus = checkPerformanceModeState();
-if performanceStatus then
-	numParticles = 20;
+--local performanceStatus = checkPerformanceModeState();
+
+if getPerformanceModeType() > 0 then
+	numParticles = 15;
 end;
 
 local screenW = SCREEN_WIDTH

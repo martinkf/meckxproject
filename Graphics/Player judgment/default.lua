@@ -51,8 +51,6 @@ if skinHasLua ~= "-" then
 		luafilepath = "/Themes/"..activeTheme.."/Graphics/Player judgment/skins/"..skinSelected.."/"..skinHasLua;
 	end;				
 	return LoadActor(luafilepath){ name=skinSelected,zoom= zoomSkinSelected}
-else
-	--Trace("#PLAYER JUDGMENT ::: NO TIENE LUA, CONTINUA DEFAULT");
 end;
 
 

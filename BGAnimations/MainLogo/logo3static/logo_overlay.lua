@@ -66,7 +66,7 @@ t[#t+1] = LoadActor( THEME:GetPathG("","LOGO/nlogo3/nlogo_bw.png") )..{
 t[#t+1] = LoadFont("xolonium 20px")..{
 	InitCommand=function(self)
 		self:x(14);
-		self:y(SCREEN_TOP + 110);
+		self:y(SCREEN_TOP + 40);
         local vsyncEnabled = PREFSMAN:GetPreference("Vsync");
         local vsyncState = vsyncEnabled and "ON" or "OFF";
         local visualDelay = PREFSMAN:GetPreference("VisualDelaySeconds");
@@ -91,12 +91,12 @@ t[#t+1] = LoadFont("xolonium 20px")..{
 			tipoRes = "4K "
 		end;		
 
-		self:vertspacing(5);
+		self:vertspacing(2);
 		--self:settext("PIUMOD - V"..vActual.."\nREV-01112024-00-ARKA\nVSYNC: "..vsyncState.."\n"..tipoRes..gwidth.." X "..gheight.."\nVISUAL DELAY: "..visualDelayTruncated);
 		self:settext(vActual.."\nVSYNC: "..vsyncState.."\n"..tipoRes..gwidth.." X "..gheight);
 		--self:skewx(-.12);
 		self:horizalign("HorizAlign_Left");
-		self:zoom(.65);
+		self:zoom(.55);
 		self:shadowlength(0.8)  -- Define la longitud de la sombra
         self:shadowcolor(color("0,0,0,1"))  -- Color negro para la sombra
 	end;

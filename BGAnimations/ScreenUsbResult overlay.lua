@@ -498,7 +498,6 @@ function getSongPlayedBanners()
 
 		    	--basicModeLevelStateAndColor
 				if GAMESTATE:GetGameMode() == 'Basic' then
-					Trace("# ESTOY EN BASIC #");
 					local stateColorBasic = basicModeLevelStateAndColor(stepdataP1[1]:GetMeter(),stepdataP1[1]:GetStepsType());
 					lvPlayer1 = stepdataP1[1]:GetMeter();
 			    	stateModoP1 = stateColorBasic["state"];
@@ -524,7 +523,6 @@ function getSongPlayedBanners()
 		    	--we need to get the step data :o
 		    	local stepdataP2 = player2StageStats:GetPlayedSteps();
 				if GAMESTATE:GetGameMode() == 'Basic' then
-					Trace("# ESTOY EN BASIC #");
 					local stateColorBasic = basicModeLevelStateAndColor(stepdataP2[1]:GetMeter(),stepdataP2[1]:GetStepsType());
 					lvPlayer2 = stepdataP2[1]:GetMeter();
 			    	stateModoP2 = stateColorBasic["state"];

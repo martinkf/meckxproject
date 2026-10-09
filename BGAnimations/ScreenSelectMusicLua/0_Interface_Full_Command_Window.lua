@@ -32,8 +32,18 @@ local notelist = GetNoteSkinList();
 local notelistPrimaryNum = GetPrimaryNoteSkinNum();
 local tmpNoteSkin={"",""};
 
+--############################--
+--			Skins Mods 	 	  --
+--############################--
 local judgeSkinList = GetJudgSkinList(); -- las carpetas vienen con i_/e_ donde i_=en el theme - e_= en la raiz del juego
 local lifebarSkinList = getLifeBarSkinList(); -- las carpetas vienen con i_/e_ donde i_=en el theme - e_= en la raiz del juego
+
+--############################--
+--		    Companions 	 	  --
+--############################--
+local companionList = getCompanionsInstalled();
+local companionsInstalled = #companionList;
+
 
 local function FindFileWithPattern(directory, pattern)
     -- Obtener todos los archivos del directorio
@@ -68,10 +78,10 @@ end
 
 local lifebarSpriteObject = {};
 local judgmentSpriteObject = {};
+local companionSpriteObject = {};
 function getIndexModSelectedFromModList(list,actualSelection)
 	for i = 1, #list do
 		
-		--Trace("#list "..i..":"..list[i].command);
 		if list[i].command == actualSelection then
 			return i;
 		end;
@@ -103,7 +113,7 @@ function getSkinJudgmentPreview(player)
 	local skinComboLabel = getSkinJudgmentTemplateNew("combo",skinSelectedProfileProc,skinExterno);
 	local skinComboNumber = getSkinJudgmentTemplateNew("comboNumber",skinSelectedProfileProc,skinExterno);
 	local skinIcon = getSkinJudgmentTemplateNew("icon",skinSelectedProfileProc,skinExterno);
-	local skinSelected = {skinJudgText,skinComboLabel,skinComboNumber,skinIcon};
+	local skinSelected = {skinJudgText,skinComboLabel,skinComboNumber,skinIcon,skinExterno,skinSelectedProfileProc};
 	return skinSelected;
 end;
 
@@ -149,7 +159,7 @@ function getSkinJudgmentPreviewBySkinName(skinPlayer)
 	local skinJudgText = getSkinJudgmentTemplateNew("judgments",skinSelectedProfileProc,skinExterno);
 	local skinComboLabel = getSkinJudgmentTemplateNew("combo",skinSelectedProfileProc,skinExterno);
 	local skinComboNumber = getSkinJudgmentTemplateNew("comboNumber",skinSelectedProfileProc,skinExterno);
-	local skinSelected = {skinJudgText,skinComboLabel,skinComboNumber};
+	local skinSelected = {skinJudgText,skinComboLabel,skinComboNumber,skinExterno,skinSelectedProfileProc};
 	return skinSelected;
 end;
 
@@ -546,9 +556,21 @@ function getActorPreviewOptionSelected(player,typeActor)
 			end;
 
 			checkOptSelectedPreviewCommand=function(self,params)
+				if GAMESTATE:IsHumanPlayer(player) == false then return; end;
 				local STATE = GAMESTATE:GetPlayerState(player);
-				local failSetting = STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting();
+				local extra_mode = getCustomOptionValuePlayer(player,"lifebar_extra_mode");
 
+				self:GetChild("opt_breakon"):visible(true);
+				self:GetChild("opt_suddendeath"):visible(true);
+				self:GetChild("opt_5missmax"):visible(true);
+				self:GetChild("opt_pfcmode"):visible(true);
+				self:GetChild("opt_fcmode"):visible(true);
+				self:GetChild("opt_efcmode"):visible(true);
+
+				if extra_mode ~= nil and extra_mode ~= "none" then
+					self:GetChild("opt_"..extra_mode):visible(false);
+				end;
+				--[[
 				local isBreakOn = false;
 				if failSetting == "FailType_Immediate" then
 					isBreakOn = true;
@@ -559,9 +581,10 @@ function getActorPreviewOptionSelected(player,typeActor)
 				else
 					self:GetChild("opt_breakon"):visible(false);
 				end;
+				]]
 			end;
 
-			LoadActor(THEME:GetPathG( "","CommandWindow/previewResume/minBase"))..{
+			LoadActor(THEME:GetPathG( "","CommandWindow/previewResume/bigBase"))..{
 				OnCommand=function(self)
 					self:zoom(0.52);
 					self:y(-30);
@@ -579,7 +602,7 @@ function getActorPreviewOptionSelected(player,typeActor)
 
 			LoadActor(THEME:GetPathG( "","CommandWindow/previewResume/lifebarSettings"))..{
 				OnCommand=function(self)
-					self:zoom(0.27);
+					self:zoom(0.3);
 					self:y(-31);
 				end;
 				CWOpenMessageCommand=function(self,params)
@@ -588,7 +611,7 @@ function getActorPreviewOptionSelected(player,typeActor)
 					end;
 				end;
 				FullModeMessageCommand=function(self)
-					self:zoom(0.27);
+					self:zoom(0.3);
 					self:y(-32);
 				end;
 			};
@@ -596,9 +619,45 @@ function getActorPreviewOptionSelected(player,typeActor)
 		    Def.Quad {
 		    	Name="opt_breakon";
 		        InitCommand = function(self)
-		            self:zoomto(32, 23):diffuse(0, 0, 0, 0.6):x(0):y(-32);
+		            self:zoomto(36, 24):diffuse(0, 0, 0, 0.6):x(-97):y(-31);
 		        end;
 		    };
+
+		    Def.Quad {
+		    	Name="opt_suddendeath";
+		        InitCommand = function(self)
+ 					self:zoomto(36, 24):diffuse(0, 0, 0, 0.6):x(-58):y(-31);
+		        end;
+		    };
+
+		    Def.Quad {
+		    	Name="opt_5missmax";
+		        InitCommand = function(self)
+ 					self:zoomto(36, 24):diffuse(0, 0, 0, 0.6):x(-19):y(-31);
+		        end;
+		    };
+
+		    Def.Quad {
+		    	Name="opt_pfcmode";
+		        InitCommand = function(self)
+ 					self:zoomto(36, 24):diffuse(0, 0, 0, 0.6):x(20):y(-31);
+		        end;
+		    };
+
+		    Def.Quad {
+		    	Name="opt_fcmode";
+		        InitCommand = function(self)
+ 					self:zoomto(36, 24):diffuse(0, 0, 0, 0.6):x(59):y(-31);
+		        end;
+		    };
+
+		    Def.Quad {
+		    	Name="opt_efcmode";
+		        InitCommand = function(self)
+ 					self:zoomto(36, 24):diffuse(0, 0, 0, 0.6):x(98):y(-31);
+		        end;
+		    };
+
 		};
 
 
@@ -654,6 +713,13 @@ function getActorPreviewOptionSelected(player,typeActor)
 				local songTimeUi = getCustomOptionValuePlayer(player,"gameplay_song_time_ui");
 				local stepLvUi = getCustomOptionValuePlayer(player,"gameplay_lv_ui");
 				local timingbar = getCustomOptionValuePlayer(player,"gameplay_timingbar");
+				local topTimeBar = getCustomOptionValuePlayer(player,"gameplay_topTimerBar");
+
+				if topTimeBar == nil or topTimeBar == false then
+					self:GetChild("opt_musicdurationtopbar"):visible(true);
+				else
+					self:GetChild("opt_musicdurationtopbar"):visible(false);
+				end;
 
 				if fastslowUi == nil or fastslowUi == false then
 					self:GetChild("opt_timing"):visible(true);
@@ -708,7 +774,7 @@ function getActorPreviewOptionSelected(player,typeActor)
 			LoadActor(THEME:GetPathG( "","CommandWindow/previewResume/bigBase"))..{
 				OnCommand=function(self)
 					self:zoom(0.52);
-					self:zoomx(0.636);
+					self:zoomx(0.65);
 					self:y(-30);
 				end;
 				CWOpenMessageCommand=function(self,params)
@@ -724,7 +790,7 @@ function getActorPreviewOptionSelected(player,typeActor)
 
 			LoadActor(THEME:GetPathG( "","CommandWindow/previewResume/gamePlayIcons"))..{
 				OnCommand=function(self)
-					self:zoom(0.27);
+					self:zoom(0.26);
 					self:y(-30);
 				end;
 				CWOpenMessageCommand=function(self,params)
@@ -741,53 +807,135 @@ function getActorPreviewOptionSelected(player,typeActor)
 		    Def.Quad {
 		    	Name="opt_timing";
 		        InitCommand = function(self)
-		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(-121):y(-30);
+		            self:zoomto(32, 20):diffuse(0, 0, 0, 0.6):x(-135):y(-30);
 		        end;
 		    };
 		    Def.Quad {
 		    	Name="opt_breaktiming";
 		        InitCommand = function(self)
-		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(-86):y(-30);
+		            self:zoomto(32, 20):diffuse(0, 0, 0, 0.6):x(-102):y(-30);
 		        end;
 		    };
 		    Def.Quad {
 		    	Name="opt_score";
 		        InitCommand = function(self)
-		            self:zoomto(32.5, 21):diffuse(0, 0, 0, 0.6):x(-52):y(-30);
+		            self:zoomto(32.5, 20):diffuse(0, 0, 0, 0.6):x(-68):y(-30);
 		        end;
 		    };
 		    Def.Quad {
 		    	Name="opt_scorepercent";
 		        InitCommand = function(self)
-		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(-17):y(-30);
+		            self:zoomto(32, 20):diffuse(0, 0, 0, 0.6):x(-34):y(-30);
 		        end;
 		    };
 		    Def.Quad {
 		    	Name="opt_judgdata";
 		        InitCommand = function(self)
-		            self:zoomto(32.5, 21):diffuse(0, 0, 0, 0.6):x(18):y(-30);
+		            self:zoomto(32, 20):diffuse(0, 0, 0, 0.6):x(0):y(-30);
 		        end;
 		    };
 		    Def.Quad {
 		    	Name="opt_musicduration";
 		        InitCommand = function(self)
-		            self:zoomto(32.5, 21):diffuse(0, 0, 0, 0.6):x(52):y(-30);
+		            self:zoomto(32, 20):diffuse(0, 0, 0, 0.6):x(34):y(-30);
 		        end;
 		    };
 		    Def.Quad {
 		    	Name="opt_steplv";
 		        InitCommand = function(self)
-		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(86):y(-30);
+		            self:zoomto(32, 20):diffuse(0, 0, 0, 0.6):x(68):y(-30);
 		        end;
 		    };
 
 		    Def.Quad {
 		    	Name="opt_timingbar";
 		        InitCommand = function(self)
-		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(121):y(-30);
+		            self:zoomto(32, 20):diffuse(0, 0, 0, 0.6):x(102):y(-30);
+		        end;
+		    };
+
+		    Def.Quad {
+		    	Name="opt_musicdurationtopbar";
+		        InitCommand = function(self)
+		            self:zoomto(32, 20):diffuse(0, 0, 0, 0.6):x(135):y(-30);
 		        end;
 		    };
 		};
+	end;
+
+	if typeActor == "companion" then
+
+		if companionsInstalled == 0 then
+			return;
+		end;
+
+		--judgeskin
+		return Def.ActorFrame{
+
+			OnCommand=function(self)
+				self:zoomx(0);				
+			end;
+
+			CheckPreviewSelectedMessageCommand=function(self, params)
+				if params.Player == player then
+					if params.Title == "companion" then
+						self:queuecommand("LoadCompanionPreview");
+					else
+						self:linear(0.05);
+						self:zoomx(0);
+					end;
+				end;
+			end;
+
+			CloseCheckPreviewSelectedMessageCommand=function(self, params)
+				if params.Player == player then
+					self:queuecommand("closePreviewProc");
+				end;
+			end;
+
+			closePreviewProcCommand=function(self)
+				self:linear(0.025);
+				self:zoomx(0);
+			end;
+
+			CommandWindowModCancelMessageCommand=function(self,params)
+				local companionIcon = getCompanionIconData(player);
+				self:GetChild("iconCompanion"):Load(companionIcon);			
+			end;
+
+			LoadCompanionPreviewCommand=function(self,params)
+				local companionIcon = getCompanionIconData(player);
+				self:GetChild("iconCompanion"):Load(companionIcon);
+				self:zoomx(0);
+				self:linear(speedLoad);
+				self:zoomx(1);
+			end;
+
+			LoadActor(THEME:GetPathG( "","CommandWindow/previewResume/minBase"))..{
+				OnCommand=function(self)
+					self:zoom(0.52);
+					self:y(-30);
+				end;
+				CWOpenMessageCommand=function(self,params)
+					if params.Player == player then
+						self:sleep(0.0625):glow(1,1,1,0.5):linear(0.0625):glow(1,1,1,0):diffusealpha(0.95);
+					end;
+				end;
+				FullModeMessageCommand=function(self)
+					self:zoom(0.52);
+					self:y(-30);
+				end;
+			};
+
+			Def.Sprite{
+					Name="iconCompanion";
+				    InitCommand=function(self)
+				    		self:y(-31);	
+				    		self:scaletoclipped(44,34);
+				    end;
+			};
+		};
+			
 	end;
 
 	--speed
@@ -837,15 +985,35 @@ function getActorPreviewOptionSelected(player,typeActor)
 					local STATE = GAMESTATE:GetPlayerState(player);
 					local velPlayer = STATE:GetPlayerOptions('ModsLevel_Preferred' ):XMod();
 					local avPlayer = STATE:GetPlayerOptions('ModsLevel_Preferred' ):MMod();
+					local cvPlayer = STATE:GetPlayerOptions('ModsLevel_Preferred' ):CMod();
 					local esExpand = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Expand(); -- 1 / 0
 				    local esAccel = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Accel(); -- 1 / 0
 					local esDecel = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Decel(); -- 1 / 0
 				  	local esRandomVel = STATE:GetPlayerOptions('ModsLevel_Preferred' ):RandomVel(); -- true / false
 
-				  	if avPlayer == nil then
-						self:GetChild("opt_av"):visible(true);
+
+				  	if avPlayer == nil and cvPlayer == nil then
+				  		if avPlayer == nil then
+							self:GetChild("opt_av"):visible(true);
+						end;
+
+						if cvPlayer == nil then
+							self:GetChild("opt_cv"):visible(true);
+						end;
 					else
-						self:GetChild("opt_av"):visible(false);
+
+				  		if avPlayer == nil then
+							self:GetChild("opt_av"):visible(true);
+						else
+							self:GetChild("opt_av"):visible(false);
+						end;
+
+						if cvPlayer == nil then
+							self:GetChild("opt_cv"):visible(true);
+						else
+							self:GetChild("opt_cv"):visible(false);
+						end;
+
 						self:GetChild("opt_x1"):visible(true);
 						self:GetChild("opt_x2"):visible(true);
 						self:GetChild("opt_x3"):visible(true);
@@ -858,11 +1026,14 @@ function getActorPreviewOptionSelected(player,typeActor)
 						self:GetChild("opt_rv"):visible(true);
 						self:GetChild("opt_ac"):visible(true);
 						self:GetChild("opt_dc"):visible(true);
-
 						return;
 					end;
 
-					local noX = string.gsub(GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Preferred' ):XMod(),"x","");
+					local noX = "0";
+					if GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Preferred' ):XMod() then
+						noX = string.gsub(GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Preferred' ):XMod(),"x","");
+					end;
+
 					self:GetChild("opt_x025"):visible(true);
 					self:GetChild("opt_x05"):visible(true);
 
@@ -1000,7 +1171,7 @@ function getActorPreviewOptionSelected(player,typeActor)
 
 
 
-			LoadActor(THEME:GetPathG( "","CommandWindow/previewResume/speedIcons_02"))..{
+			LoadActor(THEME:GetPathG( "","CommandWindow/previewResume/speedIcons_03"))..{
 				OnCommand=function(self)
 					self:zoom(0.2);
 					self:y(-20);
@@ -1069,33 +1240,44 @@ function getActorPreviewOptionSelected(player,typeActor)
 			Def.Quad {
 		    	Name="opt_ew";
 		        InitCommand = function(self)
-		            self:zoomto(24, 16):diffuse(0, 0, 0, 0.6):x(-51):y(-20);
+		            self:zoomto(24, 16):diffuse(0, 0, 0, 0.6):x(-61):y(-20);
 		        end;
 		    };
 			Def.Quad {
 		    	Name="opt_rv";
 		        InitCommand = function(self)
-		            self:zoomto(24, 16):diffuse(0, 0, 0, 0.6):x(-26):y(-20);
-		        end;
-		    };
-			Def.Quad {
-		    	Name="opt_av";
-		        InitCommand = function(self)
-		            self:zoomto(24, 16):diffuse(0, 0, 0, 0.6):x(0):y(-20);
+		            self:zoomto(24, 16):diffuse(0, 0, 0, 0.6):x(-37):y(-20);
 		        end;
 		    };
 			Def.Quad {
 		    	Name="opt_ac";
 		        InitCommand = function(self)
-		            self:zoomto(24, 16):diffuse(0, 0, 0, 0.6):x(26):y(-20);
+		            self:zoomto(24, 16):diffuse(0, 0, 0, 0.6):x(-12):y(-20);
 		        end;
 		    };
+
+
 			Def.Quad {
 		    	Name="opt_dc";
 		        InitCommand = function(self)
-		            self:zoomto(24, 16):diffuse(0, 0, 0, 0.6):x(51):y(-20);
+		            self:zoomto(24, 16):diffuse(0, 0, 0, 0.6):x(12):y(-20);
 		        end;
 		    };
+
+			Def.Quad {
+		    	Name="opt_av";
+		        InitCommand = function(self)
+		            self:zoomto(24, 16):diffuse(0, 0, 0, 0.6):x(37):y(-20);
+		        end;
+		    };
+
+			Def.Quad {
+		    	Name="opt_cv";
+		        InitCommand = function(self)
+		            self:zoomto(24, 16):diffuse(0, 0, 0, 0.6):x(61):y(-20);
+		        end;
+		    };
+
 		};
 
 	end;
@@ -1156,6 +1338,7 @@ function getActorPreviewOptionSelected(player,typeActor)
 					self:GetChild("opt_fl"):visible(true);
 					self:GetChild("opt_rskin"):visible(true);
 					self:GetChild("opt_mi"):visible(true);
+					self:GetChild("opt_footguide"):visible(true);
 				end;
 			end;
 
@@ -1172,6 +1355,7 @@ function getActorPreviewOptionSelected(player,typeActor)
 				local esMini = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Mini();
 				local esFreedom = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Dark();
 				local esrandomnote = STATE:GetPlayerOptions('ModsLevel_Preferred' ):RandomNote();
+				local footguide = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Guide();
 
 				if bgaoff then
 					self:GetChild("opt_bgaoff"):visible(false);
@@ -1232,6 +1416,13 @@ function getActorPreviewOptionSelected(player,typeActor)
 				else
 					self:GetChild("opt_mi"):visible(true);
 				end;
+
+				if footguide then
+					self:GetChild("opt_footguide"):visible(false);
+				else
+					self:GetChild("opt_footguide"):visible(true);
+				end;
+
 
 			end;
 
@@ -1325,6 +1516,12 @@ function getActorPreviewOptionSelected(player,typeActor)
 		    };
 			Def.Quad {
 		    	Name="opt_mi";
+		        InitCommand = function(self)
+		            self:zoomto(28, 19):diffuse(0, 0, 0, 0.6):x(136):y(-30);
+		        end;
+		    };
+			Def.Quad {
+		    	Name="opt_footguide";
 		        InitCommand = function(self)
 		            self:zoomto(28, 19):diffuse(0, 0, 0, 0.6):x(136):y(-30);
 		        end;
@@ -1496,7 +1693,7 @@ function getActorPreviewOptionSelected(player,typeActor)
 				local esDropMode = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Drop();
 				local esRiseOrSink = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Rise();
 				local esSnake = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Snake();
-				local esZigZag = STATE:GetPlayerOptions('ModsLevel_Preferred' ):ZigZag();
+				local esZigZag = STATE:GetPlayerOptions('ModsLevel_Preferred' ):PIUZigZag();
 
 				if esXmode == 1 then
 					self:GetChild("opt_x"):visible(false);
@@ -1707,15 +1904,15 @@ function getActorPreviewOptionSelected(player,typeActor)
 				end;
 
 				if esBackwards then
-					self:GetChild("opt_ss"):visible(false);
-				else
-					self:GetChild("opt_ss"):visible(true);
-				end;
-
-				if esMirror then
 					self:GetChild("opt_m"):visible(false);
 				else
 					self:GetChild("opt_m"):visible(true);
+				end;
+
+				if esMirror then
+					self:GetChild("opt_ss"):visible(false);
+				else
+					self:GetChild("opt_ss"):visible(true);
 				end;
 			end;
 
@@ -1756,7 +1953,7 @@ function getActorPreviewOptionSelected(player,typeActor)
 			Def.Quad {
 		    	Name="opt_ss";
 		        InitCommand = function(self)
-		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(-35):y(-30);
+		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(35):y(-30);
 		        end;
 		    };
 
@@ -1770,7 +1967,7 @@ function getActorPreviewOptionSelected(player,typeActor)
 			Def.Quad {
 		    	Name="opt_m";
 		        InitCommand = function(self)
-		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(35):y(-30);
+		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(-35):y(-30);
 		        end;
 		    };
 
@@ -1839,8 +2036,15 @@ function getActorPreviewOptionSelected(player,typeActor)
 				local esVj = STATE:GetPlayerOptions('ModsLevel_Preferred' ):VeryHardJudgement();
 				local esXj = STATE:GetPlayerOptions('ModsLevel_Preferred' ):ExtraJudgement();
 				local esUj = STATE:GetPlayerOptions('ModsLevel_Preferred' ):UltraHardJudgement();
-				
+				local esEj = STATE:GetPlayerOptions('ModsLevel_Preferred' ):EasyJudgement();
 
+
+				if esEj then -- idk?
+					self:GetChild("opt_ej"):visible(false);
+				else
+					self:GetChild("opt_ej"):visible(true);
+				end;
+				
 				if esJr then
 					self:GetChild("opt_jr"):visible(false);
 				else
@@ -1906,40 +2110,52 @@ function getActorPreviewOptionSelected(player,typeActor)
 				end;
 			};
 
+
+			
 			Def.Quad {
 		    	Name="opt_jr";
 		        InitCommand = function(self)
-		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(-69):y(-30);
+		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(-86):y(-30);
 		        end;
 		    };
 
+			Def.Quad { 
+		    	Name="opt_ej";
+		        InitCommand = function(self)
+		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(-51):y(-30);
+		        end;
+		    };		    
+
 			Def.Quad {
 		    	Name="opt_hj";
-		        InitCommand = function(self)
-		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(-35):y(-30);
+		        InitCommand = function(self)-- -51
+		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(-17):y(-30);
 		        end;
 		    };
 
 			Def.Quad {
 		    	Name="opt_vj";
-		        InitCommand = function(self)
-		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(0):y(-30);
+		        InitCommand = function(self)-- -17
+		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(17):y(-30);
 		        end;
 		    };
 
 			Def.Quad {
 		    	Name="opt_xj";
-		        InitCommand = function(self)
-		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(35):y(-30);
+		        InitCommand = function(self)--17
+		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(52):y(-30);
 		        end;
 		    };
 
 			Def.Quad {
 		    	Name="opt_uj";
-		        InitCommand = function(self)
-		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(69):y(-30);
+		        InitCommand = function(self)--52
+		            self:zoomto(32, 21):diffuse(0, 0, 0, 0.6):x(86):y(-30);
 		        end;
 		    };
+
+
+
 
 		};
 	end;
@@ -2456,6 +2672,110 @@ function getActorPreviewOptionSelected(player,typeActor)
 		};
 	end;
 
+	if typeActor == "cv" then
+
+		return Def.ActorFrame{
+
+			OnCommand=function(self)
+				self:zoomx(0);				
+			end;
+
+			CheckPreviewSelectedMessageCommand=function(self, params)
+				if params.Player == player then
+					if params.Title == "cv" then
+						self:queuecommand("LoadCvPreview");
+					else
+						self:linear(0.05);
+						self:zoomx(0);
+					end;
+				end;
+			end;
+
+			LoadCvPreviewCommand=function(self,params)
+				self:zoomx(0);
+				self:linear(speedLoad);
+				self:zoomx(1);
+				self:queuecommand("checkCvPreview");
+			end;
+
+
+			CloseCheckPreviewSelectedMessageCommand=function(self, params)
+				if params.Player == player then
+					self:queuecommand("closePreviewProc");
+				end;
+			end;
+
+			closePreviewProcCommand=function(self)
+				self:linear(0.025);
+				self:zoomx(0);
+			end;
+
+			CommandWindowModCancelMessageCommand=function(self,params)
+				if params.Player == player then
+					self:queuecommand("checkCvPreview");
+				end;
+			end;
+
+			checkCvPreviewCommand=function(self,params)
+				local cvPlayer = GetCV(player);
+				if cvPlayer ~= "" then
+					self:GetChild("cvPreview"):settext(cvPlayer);
+					self:GetChild("cv_obj"):visible(false);
+				else
+					self:GetChild("cvPreview"):settext("");
+					self:GetChild("cv_obj"):visible(true);
+				end;
+
+			end;
+
+			LoadActor(THEME:GetPathG( "","CommandWindow/previewResume/minBase"))..{
+				OnCommand=function(self)
+					self:zoom(0.52);
+					self:y(-30);
+				end;
+				CWOpenMessageCommand=function(self,params)
+					if params.Player == player then
+						self:sleep(0.0625):glow(1,1,1,0.5):linear(0.0625):glow(1,1,1,0):diffusealpha(0.95);
+					end;
+				end;
+				FullModeMessageCommand=function(self)
+					self:zoom(0.52);
+					self:y(-30);
+				end;
+			};
+
+			LoadActor(THEME:GetPathG( "","CommandWindow/previewResume/CVicon"))..{
+				OnCommand=function(self)
+					self:zoom(0.35);
+					self:y(-30);
+				end;
+				CWOpenMessageCommand=function(self,params)
+					if params.Player == player then
+						self:sleep(0.0625):glow(1,1,1,0.5):linear(0.0625):glow(1,1,1,0):diffusealpha(0.95);
+					end;
+				end;
+				FullModeMessageCommand=function(self)
+					self:zoom(0.35);
+					self:y(-30);
+				end;
+			};
+ 
+
+ 	 		LoadFont("interphase/InterNumber numbers").. {
+ 	 			Name="cvPreview";
+				InitCommand=cmd(y,-34;horizalign,center;settext,"100";zoom,0.3);
+			};
+
+			Def.Quad {
+		    	Name="cv_obj";
+		        InitCommand = function(self)
+		            self:zoomto(40, 28):diffuse(0, 0, 0, 0.6):x(0):y(-30);
+		        end;
+		    };
+
+		};
+	end;
+
 
 end;
 
@@ -2572,8 +2892,8 @@ function GetPreview(player)
 
 			loadBackgroundSongCwCommand=function(self)
 				--if in performance mode, we don't show anything.
-				local performanceStatus = checkPerformanceModeState();
-				if performanceStatus then
+				local performanceStatus = getPerformanceModeType();
+				if performanceStatus > 0 then
 					self:queuecommand("noBackground");
 					return;
 				end;
@@ -2801,8 +3121,11 @@ function GetPreview(player)
 				local esDropMode = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Drop();
 				if esDropMode then
 					self:y(yStartReceptor+88);
+					self:rotationx(180);
+
 				else
 					self:y(yStartReceptor);
+					self:rotationx(0);
 				end;			
 
 				--Mini
@@ -2865,20 +3188,30 @@ function GetPreview(player)
 			local isFlash = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Flash();	
 			local isXmode = STATE:GetPlayerOptions('ModsLevel_Preferred'):Xmode();
 			local isNxMode = STATE:GetPlayerOptions('ModsLevel_Preferred'):NXMode();
-			local isSIMode = STATE:GetPlayerOptions('ModsLevel_Preferred'):Drop();
+			local isDropMode = STATE:GetPlayerOptions('ModsLevel_Preferred'):Drop();
 			local isRIMode = STATE:GetPlayerOptions('ModsLevel_Preferred'):Rise();
 			local isMini = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Mini();	
 			
 			if isMini > 0 then
 				self:zoom(zoomOnMini+0.35);
 				self:y(23);
-
 			end;	
+
 			if isMini == 0 then
 				self:zoom(1);
 				self:y(0);
 			end;
 			
+			if isDropMode then
+				self:rotationx(180);
+				self:y(246);
+
+				if isMini > 0 then
+					self:y(222);
+				end;
+			else
+				self:rotationx(0);
+			end;
 
 
 			-- we read the chart and we display the chart.
@@ -3048,6 +3381,7 @@ function GetPreview(player)
 							end;
 						end;
 
+
 			};
 
 
@@ -3058,253 +3392,31 @@ function GetPreview(player)
 
 	af[#af+1] = chartActor;
 
-
-
-
---[[
-
-    --buscamos el chart por fila
-	for i=1, #defaultChartShow do
-		--buscamos la flechas por col
-		for x=1,5 do
-			local archivoNote="";
-			local rotazionNote = 0;
-			local addxNote = 0;	
-			local distPerArrow = 22;		
-
-			if x == 1 then
-				archivoNote = "DownLeft Tap Note";
-				rotazionNote = 0;
-				addxNote = posXBaseChart[1];
-			end;
-
-			if x == 2 then
-				archivoNote = "UpLeft Tap Note";
-				rotazionNote = 0;
-				addxNote = posXBaseChart[2];					
-			end;
-
-			if x == 3 then
-				archivoNote = "Center Tap Note";
-				rotazionNote = 0;
-				addxNote = posXBaseChart[3];					
-			end;	
-
-			if x == 4 then
-				archivoNote = "UpLeft Tap Note";
-				rotazionNote = 180;
-				addxNote = posXBaseChart[4];
-			end;	
-
-			if x == 5 then
-				archivoNote = "DownLeft Tap Note";
-				rotazionNote = 180;
-				addxNote = posXBaseChart[5];
-			end;
-
-			if defaultChartShow[i][x] == 1 then
-
-			     af[#af+1] = Def.Sprite{
-					    InitCommand=function(self)
-					    		local STATE = GAMESTATE:GetPlayerState(player);
-					    		local noteSkinSelected = STATE:GetPlayerOptions('ModsLevel_Preferred' ):NoteSkin();
-								local nomArchivoFull = FindFileWithPattern("NoteSkins/pump/".. noteSkinSelected.."/",archivoNote);
-
-					    		self:Load(nomArchivoFull);
-					            --self:pause();
-					            self:zoomto(32, 32);
-					            self:rotationy(rotazionNote);
-					            self:addy(yStartChart+((i-1)*distPerArrow));
-					            self:x(xPosNoteFieldPrevBase+addxNote);
-
-					            self:queuecommand("CheckCambio");
-					    end;
-
-						OnCommand=function(self,params)
-							self:queuecommand("CheckCambio");
-						end;
-
-						CodeModMessageCommand=function(self,params)
-							if params.Player == player then
-					    		local STATE = GAMESTATE:GetPlayerState(player);
-					    		local noteSkinSelected = STATE:GetPlayerOptions('ModsLevel_Preferred' ):NoteSkin();
-								local nomArchivoFull = FindFileWithPattern("NoteSkins/pump/".. noteSkinSelected.."/",archivoNote);
-								self:Load(nomArchivoFull);
-							end;
-						end;
-
-					    --Aca hay que evaluar las opciones para aplicarlas al menu.
-					    --si hay que mover las flechas o cosas
-						CommandWindowSelectModMessageCommand=function(self,params)
-							self:queuecommand("CheckCambio");
-						end;
-
-						--Comprobaciones de MODS para el preview
-						CheckCambioCommand = function(self)
-							local STATE = GAMESTATE:GetPlayerState(player);
-							self:fadetop(0);
-							self:fadebottom(0);
-							self:diffusealpha(1);
-
-							--MIRROR
-							local esMirror = STATE:GetPlayerOptions('ModsLevel_Preferred'):Mirror();
-							if esMirror then
-								if rotazionNote == 180 then
-					            	self:rotationy(0);
-					        	else
-					        		self:rotationy(180);
-					        	end;
-
-					        	if i == 1 then					        		
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[5]);
-					        	end;
-					        	if i == 2 then
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[1]);
-					        	end;
-					        	if i == 3 then
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[3]);
-					        	end;
-					        	if i == 4 then
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[2]);
-					        	end;
-					        	if i == 5 then
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[4]);
-					        	end;
-					        	if i == 6 then
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[3]);
-					        	end;
-					        	if i == 7 then
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[5]);
-					        	end;
-					        	if i == 8 then
-					        		self:x(xPosNoteFieldPrevBase+posXBaseChart[1]);
-					        	end;	
-
-							else
-								self:rotationy(rotazionNote);
-							end;
-
-							--VANISH
-							local esVanish = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Vanish();							
-							if esVanish == 1 then
-
-								if i < 4 then
-									self:diffusealpha(0);
-								end;
-
-								if i == 4 then
-									self:fadetop(0.7);
-								end;
-
-								if i > 4 then
-									self:diffusealpha(1);
-								end;								
-							end;
-
-							--APPEAR
-							local esAppear = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Appear();							
-							if esAppear == 1 then
-
-								if i == 4 then
-									self:fadebottom(0.7);
-								end;
-
-								if i > 4 then
-									self:diffusealpha(0);
-								end;
-							end;
-
-							--NONSTEP
-							local esNonstep = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Nonstep();							
-							if esNonstep == 1 then
-								self:diffusealpha(0);
-							end;	
-
-							--FLASH
-							local esFlash = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Flash();							
-							if esFlash == 1 then
-								self:diffuseshift();
-								self:effectcolor1(Color.White)
-								self:effectcolor2(color("0,0,0,0"))
-								self:effectperiod(1);
-							end;	
-							if esFlash == 0 then
-								self:stopeffect();
-							end;
-
-	
-
-							--La segunda tanda de mods para el preview.
-							local esXmode = STATE:GetPlayerOptions('ModsLevel_Preferred'):Xmode();
-							if esXmode > 0 then
-								--modificamos como se ven las flechas :o
-								self:x((xPosNoteFieldPrevBase+addxNote)-((i-1)*10));
-							end;			
-							if esXmode == 0 then
-								self:x(xPosNoteFieldPrevBase+addxNote);
-							end;	
-
-							local esNxMode = STATE:GetPlayerOptions('ModsLevel_Preferred'):NXMode();
-							if esNxMode then
-								--esto esta raro tengo que acostar las flechas y el receptor D:
-								self:rotationx(60);
-							else
-								self:rotationx(0);
-							end;			
-
-							local numSiMod = STATE:GetPlayerOptions('ModsLevel_Preferred'):Rise();
-							if numSiMod < 0 then
-									self:x((xPosNoteFieldPrevBase+addxNote)+((i-1)*1.5));
-									self:zoom(0.5 + (i/50));
-							end;
-
-							local numSiMod = STATE:GetPlayerOptions('ModsLevel_Preferred'):Rise();
-							if numSiMod > 0 then
-									self:x((xPosNoteFieldPrevBase+addxNote)+((i-1)*0.5));
-									self:zoom(0.5 - (i/50));
-							end;							
-
-							
-							local esMini = STATE:GetPlayerOptions('ModsLevel_Preferred' ):Mini();							
-							if esMini > 0 then
-								self:zoom(zoomOnMini);
-								self:x(posXBaseChartMini[x]);
-
-							end;	
-							if esMini == 0 then
-								self:zoom(0.5);
-								self:x(posXBaseChart[x]);
-							end;
-							
-
-						end;
-
-						CheckNoteSkinMessageCommand = function(self,params)
-							if params.Player == player then
-					    		local STATE = GAMESTATE:GetPlayerState(player);
-					    		local noteSkinSelected = STATE:GetPlayerOptions('ModsLevel_Preferred' ):NoteSkin();
-								local nomArchivoFull = FindFileWithPattern("NoteSkins/pump/".. noteSkinSelected.."/",archivoNote);
-								self:Load(nomArchivoFull);
-							end;
-						end;
-
-
-				};
-			    --yStartChart = yStartChart + 20;
-			end;
-		end;	
-
-	end;
-
-]]
-
-
-
 	--Agregamos los items de información.
     af[#af+1] = Def.ActorFrame{ 	
 		Def.Sprite{
 				Name="heart_ui";
 			    InitCommand=function(self)
+		    		local schemePlayerSelected = getSkinSelectedInfoSchemePath(player);
+	    			if schemePlayerSelected["default"] == false then
+		    			local havePreview = checkPreviewImgSkinSelectedInfoScheme(schemePlayerSelected["pathLua"],"BreakIcon",player);
+		    			if havePreview["valid"] then
+		    				self:Load(havePreview["path"]);	
+				    		self:zoom(0.56);
+				    		self:y(yInfoPanel+2);
+				    		self:x(xInfoPanel-110);	
+				    		self:visible(false);
+		    			else
+				    		self:Load(THEME:GetPathG("","ScreenGamePlay_ui/info/heart 2x1"));
+				    		self:pause();
+				    		self:setstate(1);
+				    		self:zoom(0.16);
+				    		self:y(yInfoPanel-59);
+				    		self:x(xInfoPanel-36);
+				    		self:visible(false);
+
+		    			end;
+	    			else
 			    		self:Load(THEME:GetPathG("","ScreenGamePlay_ui/info/heart 2x1"));
 			    		self:pause();
 			    		self:setstate(1);
@@ -3312,6 +3424,8 @@ function GetPreview(player)
 			    		self:y(yInfoPanel-59);
 			    		self:x(xInfoPanel-36);
 			    		self:visible(false);
+	    			end;
+
 			    end;
 		};
 
@@ -3327,33 +3441,93 @@ function GetPreview(player)
 	    Def.Sprite{
 	    	Name="judgedata_ui";
 		    InitCommand=function(self)
-		    		self:Load(THEME:GetPathG("","ScreenGamePlay_ui/info/judg_b"));
-		    		self:zoom(0.36);
-		    		self:y(yInfoPanel-27);
-		    		self:x(xInfoPanel);
-		    		self:visible(false);
+
+		    		--here we check if we have a mod active.
+		    		local schemePlayerSelected = getSkinSelectedInfoSchemePath(player);
+		    		if schemePlayerSelected["default"] == false then
+		    			local havePreview = checkPreviewImgSkinSelectedInfoScheme(schemePlayerSelected["pathLua"],"Judgment",player);
+		    			if havePreview["valid"] then
+		    				self:Load(havePreview["path"]);	
+		    			else
+		    				self:Load(THEME:GetPathG("","_blank"));	
+		    			end;
+
+			    		self:zoom(0.56);
+
+			    		self:y(yInfoPanel+2);
+			    		if player == PLAYER_1 then
+			    			self:y(yInfoPanel-2);
+			    		end;
+
+			    		self:x(xInfoPanel-110);	
+
+			    		self:visible(false);
+		    		else
+		    			self:Load(THEME:GetPathG("","ScreenGamePlay_ui/info/judg_b"));
+			    		self:zoom(0.36);
+			    		self:y(yInfoPanel-27);
+			    		self:x(xInfoPanel);
+			    		self:visible(false);
+		    		end;
 		    end;
 		};	
 
 	    Def.Sprite{
 	    	Name="scoredata_ui";
 		    InitCommand=function(self)
+
+		    	local schemePlayerSelected = getSkinSelectedInfoSchemePath(player);
+		    	if schemePlayerSelected["default"] == false then
+	    			local havePreview = checkPreviewImgSkinSelectedInfoScheme(schemePlayerSelected["pathLua"],"Score",player);
+	    			if havePreview["valid"] then
+	    				self:Load(havePreview["path"]);	
+	    			else
+	    				self:Load(THEME:GetPathG("","_blank"));	
+	    			end;
+		    		self:zoom(0.56);
+
+		    		self:y(yInfoPanel+2);
+
+		    		self:x(xInfoPanel-110);
+		    		self:visible(false);
+		    	else
 		    		self:Load(THEME:GetPathG("","ScreenGamePlay_ui/info/scoredata"));
 		    		self:zoom(0.36);
 		    		self:y(yInfoPanel+23.5);
 		    		self:x(xInfoPanel);
 		    		self:visible(false);
+		    	end;
+
+
 		    end;
 		};	
 
 	    Def.Sprite{
 	    	Name="fastslow_ui";
 		    InitCommand=function(self)
+		    	local schemePlayerSelected = getSkinSelectedInfoSchemePath(player);
+		    	if schemePlayerSelected["default"] == false then
+	    			local havePreview = checkPreviewImgSkinSelectedInfoScheme(schemePlayerSelected["pathLua"],"Timing",player);
+	    			if havePreview["valid"] then
+	    				self:Load(havePreview["path"]);	
+	    			else
+	    				self:Load(THEME:GetPathG("","_blank"));	
+	    			end;
+		    		self:zoom(0.56);
+
+		    		self:y(yInfoPanel+2);
+
+		    		self:x(xInfoPanel-110);
+		    		self:visible(false);
+		    	else
 		    		self:Load(THEME:GetPathG("","ScreenGamePlay_ui/info/fastslowdata"));
 		    		self:zoom(0.36);
 		    		self:y(yInfoPanel+52);
 		    		self:x(xInfoPanel);
 		    		self:visible(false);
+		    	end;
+
+
 		    end;
 		};
 
@@ -3379,6 +3553,31 @@ function GetPreview(player)
 			    end;
 		};
 
+		Def.ActorFrame{
+			Name="topbarsongduration_ui";
+			OnCommand=function(self)
+	    		self:y(yInfoPanel-67);
+	    		self:x(xInfoPanel-238);	
+				self:visible(false);
+			end;
+		    Def.Quad{
+		      InitCommand=function(self)
+		        	self:zoomto(20, 1):diffuse(1,1,1,1);
+		      end
+		    };
+		    Def.Sprite{
+		    	Name="tipTopBarDuration";
+			    InitCommand=function(self)
+			    		self:Load(THEME:GetPathG("","ScreenGamePlay/song position tip"));
+			    		self:zoom(0.35);
+			    		self:x(10);			    		
+			    end;
+			};		
+
+
+
+		};
+
 
 		OnCommand=function(self)
 			self:queuecommand("ProcInfo");
@@ -3398,10 +3597,28 @@ function GetPreview(player)
 			local STATE = GAMESTATE:GetPlayerState(player);
 			if player == PLAYER_1 then
 				-- playerAfix="infop1";	
-				this.heart_ui:x((xInfoPanel*-1)+36);	
-				this.fastslow_ui:x((xInfoPanel*-1));
-				this.judgedata_ui:x((xInfoPanel*-1));
-				this.scoredata_ui:x((xInfoPanel*-1));
+
+	    		local schemePlayerSelected = getSkinSelectedInfoSchemePath(player);
+	    		if schemePlayerSelected["default"] == false then
+
+	    			local havePreview = checkPreviewImgSkinSelectedInfoScheme(schemePlayerSelected["pathLua"],"BreakIcon",player);
+	    			if havePreview["valid"] == false then
+	    				this.heart_ui:x((xInfoPanel*-1)+36);
+	    			else
+	    				this.heart_ui:x(( (xInfoPanel-110)*-1));
+	    			end;
+					
+					this.fastslow_ui:x(((xInfoPanel-110)*-1));
+					this.judgedata_ui:x(( (xInfoPanel-110)*-1));
+					this.scoredata_ui:x(( (xInfoPanel-110)*-1));
+	    		else
+					this.heart_ui:x((xInfoPanel*-1)+36);	
+					this.fastslow_ui:x((xInfoPanel*-1));
+					this.judgedata_ui:x((xInfoPanel*-1));
+					this.scoredata_ui:x((xInfoPanel*-1));	    			
+	    		end;
+
+
 
 
 			end;
@@ -3417,6 +3634,7 @@ function GetPreview(player)
 			local songTimeUi = getCustomOptionValuePlayer(player,"gameplay_song_time_ui");
 			local stepLvUi = getCustomOptionValuePlayer(player,"gameplay_lv_ui");
 			local timingBarUi = getCustomOptionValuePlayer(player,"gameplay_timingbar");
+			local topbarTimerSong = getCustomOptionValuePlayer(player,"gameplay_topTimerBar");
 
 			if fastslowUi ~= nil then
 				if fastslowUi then
@@ -3468,6 +3686,14 @@ function GetPreview(player)
 				end;
 			end;
 
+			if topbarTimerSong ~= nil or topbarTimerSong ~= nil then
+				if topbarTimerSong then
+					this.topbarsongduration_ui:visible(true);
+				else
+					this.topbarsongduration_ui:visible(false);
+				end;
+			end;
+
 		end;
     };	
 
@@ -3510,35 +3736,175 @@ function GetPreview(player)
 	--Agregamos el preview del judgment
 	af[#af+1] = Def.ActorFrame{ 
 
-		Def.Sprite{
-				Name="judg_text";
-			    InitCommand=function(self)
-			    		local skinActual = getSkinJudgmentPreview(player);
 
-			    		self:Load(skinActual[1]);
-			    		self:pause();
-			    		self:setstate(1);
-			    		self:zoom(0.26);
-			    		self:y(3);
-			    		--self:y(yInfoPanel-10);
-			    		--self:x(xInfoPanel-110);
-			    		self:visible(false);
-			    end;
-		};
-		
-		Def.Sprite{
-				Name="judg_combo_text";
-			    InitCommand=function(self)
-			    		local skinActual = getSkinJudgmentPreview(player);
-			    		self:Load(skinActual[2]);
-			    		self:zoom(0.26);
-			    		self:y(15);
-			    		--self:x(xInfoPanel-110);
-			    		self:visible(false);
-			    end;
+		Def.ActorFrame{
+			Name="BoxJudg";
+			Def.Sprite{
+					Name="judg_text";
+				    InitCommand=function(self)
+				    		local skinActual = getSkinJudgmentPreview(player);
+
+				    		self:Load(skinActual[1]);
+				    		self:pause();
+				    		self:setstate(1);
+				    		self:zoom(0.26);
+				    		self:y(3);
+				    		--self:y(yInfoPanel-10);
+				    		--self:x(xInfoPanel-110);
+				    		self:visible(false);
+				    end;
+			};
+			
+			Def.Sprite{
+					Name="judg_combo_text";
+				    InitCommand=function(self)
+				    		local skinActual = getSkinJudgmentPreview(player);
+				    		self:Load(skinActual[2]);
+				    		self:zoom(0.26);
+				    		self:y(15);
+				    		--self:x(xInfoPanel-110);
+				    		self:visible(false);
+				    end;
+			};
 		};
 
-		
+
+
+
+		Def.ActorFrame{
+			Name="ModInfo";
+			OnCommand=function(self)
+				self:zoom(1.6);
+				self:y(-90);
+				self:x(-15);
+				self:visible(false);
+			end;
+
+			LoadFont("_myriad pro").. 
+			{
+				InitCommand=cmd(y,30;zoom,0.25;);
+				FullModeMessageCommand=cmd(playcommand,"Init");
+				OnCommand=function(self)
+			        self:wrapwidthpixels(380)  -- Limita el ancho en píxeles donde el texto se ajustará automáticamente.
+			        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+			        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+			        self:y(85);	
+			        self:x(-68);
+			        self:settext("Name:");
+				end;
+			};
+
+
+			LoadFont("_myriad pro").. 
+			{
+				Name="skinName";
+				InitCommand=cmd(y,30;zoom,0.25;);
+				FullModeMessageCommand=cmd(playcommand,"Init");
+				OnCommand=function(self)
+			        self:wrapwidthpixels(380)  -- Limita el ancho en píxeles donde el texto se ajustará automáticamente.
+			        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+			        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+			        self:horizalign(left);
+			        self:y(85);	
+			        self:x(-59);
+			        self:settext("");
+				end;
+			};
+
+
+			LoadFont("_myriad pro").. 
+			{
+				InitCommand=cmd(y,30;zoom,0.25;);
+				FullModeMessageCommand=cmd(playcommand,"Init");
+				OnCommand=function(self)
+			        self:wrapwidthpixels(380)  -- Limita el ancho en píxeles donde el texto se ajustará automáticamente.
+			        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+			        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+			        self:y(92);	
+			        self:x(-66.5);
+			        self:settext("Author:");
+				end;
+			};
+
+			LoadFont("_myriad pro").. 
+			{
+				Name="skinAuthor";
+				InitCommand=cmd(y,30;zoom,0.25;);
+				FullModeMessageCommand=cmd(playcommand,"Init");
+				OnCommand=function(self)
+			        self:wrapwidthpixels(380)  -- Limita el ancho en píxeles donde el texto se ajustará automáticamente.
+			        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+			        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+			        self:horizalign(left);
+			        self:y(92);	
+			        self:x(-56);
+			        self:settext("");
+				end;
+			};
+
+			LoadFont("_myriad pro").. 
+			{
+				InitCommand=cmd(y,30;zoom,0.25;);
+				FullModeMessageCommand=cmd(playcommand,"Init");
+				OnCommand=function(self)
+			        self:wrapwidthpixels(380)  -- Limita el ancho en píxeles donde el texto se ajustará automáticamente.
+			        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+			        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+			        self:y(99);	
+			        self:x(-62);
+			        self:settext("Description:");
+				end;
+			};
+
+			LoadFont("_myriad pro").. 
+			{
+				Name="skinDesc";
+				InitCommand=cmd(y,30;zoom,0.25;);
+				FullModeMessageCommand=cmd(playcommand,"Init");
+				OnCommand=function(self)
+			        --self:wrapwidthpixels(380)
+			        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+			        self:maxwidth(430);
+			        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+			        self:horizalign(left);
+			        self:y(99);	
+			        self:x(-47);
+			        self:settext("");
+				end;
+			};
+
+			LoadFont("_myriad pro").. 
+			{
+				InitCommand=cmd(y,30;zoom,0.25;);
+				FullModeMessageCommand=cmd(playcommand,"Init");
+				OnCommand=function(self)
+			        self:wrapwidthpixels(380)  -- Limita el ancho en píxeles donde el texto se ajustará automáticamente.
+			        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+			        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+			        self:y(99);	
+			        self:x(72);
+			        self:settext("Version:");
+				end;
+			};
+
+			LoadFont("_myriad pro").. 
+			{
+				Name="skinVer";
+				InitCommand=cmd(y,30;zoom,0.25;);
+				FullModeMessageCommand=cmd(playcommand,"Init");
+				OnCommand=function(self)
+			        self:wrapwidthpixels(380)  -- Limita el ancho en píxeles donde el texto se ajustará automáticamente.
+			        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+			        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+			        self:horizalign(left);
+			        self:y(99);	
+			        self:x(82);
+			        self:settext("");
+				end;
+			};
+
+		};
+
 
 		OnCommand=function(self)
 			self:y(yInfoPanel-5);
@@ -3548,7 +3914,7 @@ function GetPreview(player)
 		end;
 
 		ProcCheckCommand=function(self,params)
-
+			
 			local passedSkinNameParameter = "-";
 			if params.judgskincw then
 				passedSkinNameParameter = params.judgskincw;
@@ -3557,10 +3923,16 @@ function GetPreview(player)
 			local this = self:GetChildren();
 
 			local skinActual = "";
+			local isExternal = false;
+			local pathSkinExt = "";
 			if passedSkinNameParameter == "-" then
 				skinActual = getSkinJudgmentPreview(player);
+				isExternal = skinActual[5];
+				pathSkinExt = skinActual[6];
 			else
 				skinActual = getSkinJudgmentPreviewBySkinName(passedSkinNameParameter);
+				isExternal = skinActual[4];
+				pathSkinExt = skinActual[5];
 			end;
 
 			local zoomPlayer = getCustomOptionValuePlayer(player,"judgmentZoom");
@@ -3570,22 +3942,56 @@ function GetPreview(player)
 			end;
 			local zoomSetPlayer = getZoomSkinJudgCwPlayer(zoomPlayer,1);			
 
+			--[[
 			this.judg_text:Load(skinActual[1]);
 			this.judg_combo_text:Load(skinActual[2]);
-
 			self:zoom(zoomSetPlayer);
 			if zoomSetPlayer < 1 then
 
 			end;
-
 			this.judg_text:visible(true);
 			this.judg_combo_text:visible(true);
+			]]
+
+			this.BoxJudg:GetChild("judg_text"):Load(skinActual[1]);
+			this.BoxJudg:GetChild("judg_combo_text"):Load(skinActual[2]);
+			this.BoxJudg:GetChild("judg_text"):visible(true);
+			this.BoxJudg:GetChild("judg_combo_text"):visible(true);
+			this.BoxJudg:zoom(zoomSetPlayer);
+
+
+
+
+			--if it's external we try to load the mod_info.
+			this.ModInfo:diffusealpha(0);
+			if isExternal then				
+				local existModInfo = FindFileWithPatternOnDirectory(GetJudgSkinExternalPath()..pathSkinExt.."/","mod_info.lua");
+				if existModInfo ~= nil and existModInfo ~= "-" and existModInfo ~= "" then
+					local modInfoData = getModInfo(GetJudgSkinExternalPath()..pathSkinExt.."/");
+					this.ModInfo:GetChild("skinName"):settext(modInfoData["Name"]);
+					this.ModInfo:GetChild("skinAuthor"):settext(modInfoData["Author"]);
+					this.ModInfo:GetChild("skinDesc"):settext(modInfoData["Description"]);
+					this.ModInfo:GetChild("skinVer"):settext(modInfoData["Version"]);
+					this.ModInfo:diffusealpha(1);
+
+					local data = getEnvPlayer(player,"playercwmenu");
+					if data == "judgeskin" then
+						this.ModInfo:visible(true);
+					else
+						this.ModInfo:visible(false);
+					end;
+
+				end;
+
+			end;
+
 		end;
 
 		CommandWindowModCancelMessageCommand=function(self,params)
-			if params.Player == player then
+			if params.Player == player then				
 				local judgSkinPlayer = getCustomOptionValuePlayer(player,"judgmentSkin");
 				self:playcommand("ProcCheck",{judgskincw = judgSkinPlayer});
+				self:GetChild("ModInfo"):visible(false);				
 			end;
 		end;
 
@@ -3678,6 +4084,143 @@ function GetPreview(player)
 		    	end;
 			};
 
+
+			Def.ActorFrame{
+				Name="ModInfo";
+				OnCommand=function(self)
+					self:zoom(0.9);
+					self:y(10);
+					self:x(-7);
+					self:visible(false);
+				end;
+
+				LoadFont("_myriad pro").. 
+				{
+					InitCommand=cmd(y,30;zoom,0.25;);
+					FullModeMessageCommand=cmd(playcommand,"Init");
+					OnCommand=function(self)
+				        self:wrapwidthpixels(380)  -- Limita el ancho en píxeles donde el texto se ajustará automáticamente.
+				        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+				        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+				        self:y(85);	
+				        self:x(-68);
+				        self:settext("Name:");
+					end;
+				};
+
+
+				LoadFont("_myriad pro").. 
+				{
+					Name="skinName";
+					InitCommand=cmd(y,30;zoom,0.25;);
+					FullModeMessageCommand=cmd(playcommand,"Init");
+					OnCommand=function(self)
+				        self:wrapwidthpixels(380)  -- Limita el ancho en píxeles donde el texto se ajustará automáticamente.
+				        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+				        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+				        self:horizalign(left);
+				        self:y(85);	
+				        self:x(-59);
+				        self:settext("");
+					end;
+				};
+
+
+				LoadFont("_myriad pro").. 
+				{
+					InitCommand=cmd(y,30;zoom,0.25;);
+					FullModeMessageCommand=cmd(playcommand,"Init");
+					OnCommand=function(self)
+				        self:wrapwidthpixels(380)  -- Limita el ancho en píxeles donde el texto se ajustará automáticamente.
+				        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+				        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+				        self:y(92);	
+				        self:x(-66.5);
+				        self:settext("Author:");
+					end;
+				};
+
+				LoadFont("_myriad pro").. 
+				{
+					Name="skinAuthor";
+					InitCommand=cmd(y,30;zoom,0.25;);
+					FullModeMessageCommand=cmd(playcommand,"Init");
+					OnCommand=function(self)
+				        self:wrapwidthpixels(380)  -- Limita el ancho en píxeles donde el texto se ajustará automáticamente.
+				        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+				        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+				        self:horizalign(left);
+				        self:y(92);	
+				        self:x(-56);
+				        self:settext("");
+					end;
+				};
+
+				LoadFont("_myriad pro").. 
+				{
+					InitCommand=cmd(y,30;zoom,0.25;);
+					FullModeMessageCommand=cmd(playcommand,"Init");
+					OnCommand=function(self)
+				        self:wrapwidthpixels(380)  -- Limita el ancho en píxeles donde el texto se ajustará automáticamente.
+				        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+				        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+				        self:y(99);	
+				        self:x(-62);
+				        self:settext("Description:");
+					end;
+				};
+
+				LoadFont("_myriad pro").. 
+				{
+					Name="skinDesc";
+					InitCommand=cmd(y,30;zoom,0.25;);
+					FullModeMessageCommand=cmd(playcommand,"Init");
+					OnCommand=function(self)
+				        --self:wrapwidthpixels(380)
+				        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+				        self:maxwidth(430);
+				        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+				        self:horizalign(left);
+				        self:y(99);	
+				        self:x(-47);
+				        self:settext("");
+					end;
+				};
+
+				LoadFont("_myriad pro").. 
+				{
+					InitCommand=cmd(y,30;zoom,0.25;);
+					FullModeMessageCommand=cmd(playcommand,"Init");
+					OnCommand=function(self)
+				        self:wrapwidthpixels(380)  -- Limita el ancho en píxeles donde el texto se ajustará automáticamente.
+				        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+				        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+				        self:y(99);	
+				        self:x(72);
+				        self:settext("Version:");
+					end;
+				};
+
+				LoadFont("_myriad pro").. 
+				{
+					Name="skinVer";
+					InitCommand=cmd(y,30;zoom,0.25;);
+					FullModeMessageCommand=cmd(playcommand,"Init");
+					OnCommand=function(self)
+				        self:wrapwidthpixels(380)  -- Limita el ancho en píxeles donde el texto se ajustará automáticamente.
+				        self:maxheight(100)        -- Establece el máximo espacio vertical que puede ocupar el texto.
+				        self:vertspacing(-2)       -- Ajusta el espacio entre líneas (opcional).
+				        self:horizalign(left);
+				        self:y(99);	
+				        self:x(82);
+				        self:settext("");
+					end;
+				};
+
+			};
+
+		
+
 		InitCommand=function(self)
 			lifebarSpriteObject[player] = self;
 			self:queuecommand("ReloadLifebarSkin");
@@ -3699,8 +4242,6 @@ function GetPreview(player)
 		end;
 
 		ReloadLifebarSkinCommand=function(self,params)
-
-
 			local pasedSkinNameParameter = "-";
 			if params.lifebarskincw then
 				pasedSkinNameParameter = params.lifebarskincw;
@@ -3723,6 +4264,7 @@ function GetPreview(player)
 			local lifebarSkinData = getLifebarSkinDataParsed(lifeBarSkinPlayer);		
 			local this = self:GetChildren();
 
+			this.ModInfo:diffusealpha(0);
 			if lifebarSkinData["isExternal"] then
 				local lifebarSkinExternalPath = GetLifebarSkinExternalPath();
 				pathSkin = lifebarSkinExternalPath..lifebarSkinData["name"].."/";	
@@ -3732,6 +4274,19 @@ function GetPreview(player)
 				if existeSkinLua ~= "-" then
 					esSkinLua = true;
 				end;
+
+
+				-- we check if this have modinfo
+				local existModInfo = FindFileWithPatternOnDirectory(pathSkin,"mod_info.lua");
+				if existModInfo ~= nil and existModInfo ~= "-" and existModInfo ~= "" then
+					local modInfoData = getModInfo(pathSkin);
+					this.ModInfo:GetChild("skinName"):settext(modInfoData["Name"]);
+					this.ModInfo:GetChild("skinAuthor"):settext(modInfoData["Author"]);
+					this.ModInfo:GetChild("skinDesc"):settext(modInfoData["Description"]);
+					this.ModInfo:GetChild("skinVer"):settext(modInfoData["Version"]);
+					this.ModInfo:diffusealpha(1);
+				end;
+
 
 				if esSkinLua then
 					this.backTextureLifebar:diffusealpha(1);
@@ -3747,7 +4302,6 @@ function GetPreview(player)
 						this.backTextureLifebar:Load(THEME:GetPathG("","ScreenGamePlay_ui/lifebar/nopreview"));
 						this.backTextureLifebar:pause();
 					end;
-
 				else
 					this.backTextureLifebar:diffusealpha(1);
 					this.midTextureLifebar:diffusealpha(1);
@@ -3831,6 +4385,7 @@ function GetPreview(player)
 				self:diffusealpha(1);
 				self:zoom(1);
 				self:y(0);
+				self:GetChild("ModInfo"):visible(false);
 			end;
 		end;
 
@@ -3845,6 +4400,7 @@ function GetPreview(player)
 					if data == "lifebarskin" then
 						self:zoom(1.8);
 						self:y(3);
+						self:GetChild("ModInfo"):visible(true);
 					else
 						lifeBarSkinPlayer = getCustomOptionValuePlayer(player,"lifebarSkin");
 						self:playcommand("ReloadLifebarSkin",{lifebarskincw = lifeBarSkinPlayer});
@@ -3871,12 +4427,180 @@ function GetPreview(player)
 			    end;
 			};
 
+			Def.Quad{
+				Name="backPlayerms";
+				InitCommand=cmd(setsize,272,30;diffuse,color("#09ffd9");diffusealpha,0.6);
+				OnCommand=function(self)
+					self:y(118);
+					self:x(0);
+					self:zoom(1);
+				end;
+			};
+
+			LoadFont("_century gothic")..{
+				Name="textHeaderPlayerOffset";
+				OnCommand=function(self)
+					self:settext("Player OFFSET");
+					self:horizalign(center);
+					self:maxwidth(210);
+					self:zoom(0.45);
+					self:y(109);
+					self:x(102);
+					self:shadowlength(1);
+					self:shadowcolor(color("#191919"));
+				end;
+				OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+			};	
+
+			LoadFont("_century gothic")..{
+				Name="textHeaderPlayerOffsetNum";
+				OnCommand=function(self)
+					self:settext("OFFSET 0.0");
+					self:horizalign(center);
+					self:maxwidth(210);
+					self:zoom(0.45);
+					self:y(118);
+					self:x(102);
+					self:shadowlength(1);
+					self:shadowcolor(color("#191919"));
+				end;
+				OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+			};	
+
+
+			Def.Quad{
+				Name="back0ms";
+				InitCommand=cmd(setsize,136,30;diffuse,color("#afafaf");diffusealpha,1);
+				OnCommand=function(self)
+					self:y(118);
+					self:x(-68);
+					self:zoom(1);
+				end;
+			};
+
+
+			Def.Quad{
+				Name="centerLine";
+				InitCommand=cmd(setsize,1,140;diffuse,color("#ffffff");diffusealpha,1);
+				OnCommand=function(self)
+					self:y(118);
+					self:x(0);
+					self:zoom(1);
+				end;
+			};
+
+
+			--LINE OF REFERENCE
+			Def.Quad{
+				Name="centerLine";
+				InitCommand=cmd(setsize,1,60;diffuse,color("#ffffff");diffusealpha,1);
+				OnCommand=function(self)
+					self:y(118);
+					self:x(60);
+					self:zoom(1);
+				end;
+			};
+			--
+
+			Def.Sprite{
+				Name="arrowtimingreceptor0ms";
+			    InitCommand=function(self)
+			    		self:Load(THEME:GetPathG("","CommandWindow/timing/receptor"));
+			    		self:zoom(0.6);
+			    		self:y(70);
+			    		self:x(-35);
+			    end;
+			};	
+
+			Def.Sprite{
+				Name="arrowtiming0ms";
+			    InitCommand=function(self)
+			    		self:Load(THEME:GetPathG("","CommandWindow/timing/arrex"));
+			    		self:zoom(0.6);
+			    		self:y(118);
+			    		self:x(-35);
+			    end;
+			};	
+
+			LoadFont("_century gothic")..{
+				OnCommand=cmd(settext,"DEFAULT";horizalign,center;maxwidth,210;zoom,0.45;y,58;x,-115);
+				OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+			};	
+
+			LoadFont("_century gothic")..{
+				--OnCommand=cmd(settext,"OFFSET 0";horizalign,center;maxwidth,210;zoom,0.45;y,125;x,-115);
+				OnCommand=function(self)
+					self:settext("Default OFFSET Line");
+					self:horizalign(center);
+					self:maxwidth(210);
+					self:zoom(0.45);
+					self:y(109);
+					self:x(-92);
+					self:shadowlength(1);
+					self:shadowcolor(color("#191919"));
+				end;
+				OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+			};	
+
+			LoadFont("_century gothic")..{
+				--OnCommand=cmd(settext,"OFFSET 0";horizalign,center;maxwidth,210;zoom,0.45;y,125;x,-115);
+				OnCommand=function(self)
+					self:settext("OFFSET 0.0");
+					self:horizalign(center);
+					self:maxwidth(210);
+					self:zoom(0.45);
+					self:y(125);
+					self:x(-112);
+					self:shadowlength(1);
+					self:shadowcolor(color("#191919"));
+				end;
+				OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+			};	
+
+			LoadFont("_century gothic")..{
+				OnCommand=cmd(settext,"PLAYER";horizalign,center;maxwidth,210;zoom,0.45;y,58;x,115);
+				OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+			};	
+
+			--*****
+			LoadFont("_century gothic")..{
+				OnCommand=cmd(settext,"[ - 3.0 : "..getCWText("timingadjEarly").."]";horizalign,left;maxwidth,210;zoom,0.45;y,80;x,58);
+				OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+			};	
+
+			LoadFont("_century gothic")..{
+				OnCommand=cmd(settext,"[ + 3.0 : "..getCWText("timingadjLate").."]";horizalign,left;maxwidth,210;zoom,0.45;y,153;x,58);
+				OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+			};	
+
+			--*****
+
+			--INFO
+			Def.ActorFrame{
+				Name="stepjudgtimingtext";
+				OnCommand=function(self)
+					self:x(70);
+					self:y(178);
+				end;
+
+				LoadFont("_century gothic")..{
+					Name="recomendedTextJudg";
+					OnCommand=cmd(x,0;horizalign,center;maxwidth,210;zoom,0.45);
+					OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+				};	
+			};
+
+
+
+
+
 			Def.Sprite{
 				Name="arrowtimingreceptor";
 			    InitCommand=function(self)
 			    		self:Load(THEME:GetPathG("","CommandWindow/timing/receptor"));
 			    		self:zoom(0.6);
 			    		self:y(70);
+			    		self:x(35);
 			    end;
 			};	
 
@@ -3886,6 +4610,7 @@ function GetPreview(player)
 			    		self:Load(THEME:GetPathG("","CommandWindow/timing/arrex"));
 			    		self:zoom(0.6);
 			    		self:y(118);
+			    		self:x(35);
 			    end;
 			};			
 
@@ -3894,7 +4619,7 @@ function GetPreview(player)
 			    InitCommand=function(self)
 			    		self:Load(THEME:GetPathG("","CommandWindow/timing/RECTBASE"));
 			    		self:zoom(0.55);
-			    		self:y(118);
+			    		self:y(118.5);
 			    end;
 			};
 
@@ -3929,6 +4654,31 @@ function GetPreview(player)
 
 				timingPlayer = tonumber(timingAdjCustomOption) or 0.0;
 
+				local textTiming = string.format("%.1f", timingPlayer)
+				if timingPlayer > 0 then 						
+					textTiming = "+"..textTiming;
+				elseif timingPlayer == 0 then
+					textTiming = "0.0";
+				end;
+
+				--recomendation
+				local baseTextPlayerSelected = "";				
+				if player == PLAYER_1 then
+					baseTextPlayerSelected ="P1";
+				else
+					baseTextPlayerSelected ="P2";
+				end;
+
+				local recomendationForThisPlayer = GAMESTATE:Env()["recomendedOffset"..baseTextPlayerSelected];
+				if recomendationForThisPlayer ~= "" then
+					self:GetChild("stepjudgtimingtext"):visible(true);
+					self:GetChild("stepjudgtimingtext"):GetChild("recomendedTextJudg"):settext(getCWText("timingadjRecom").." : "..recomendationForThisPlayer);
+				else
+					self:GetChild("stepjudgtimingtext"):visible(true);
+				end;
+				-- end recomendation
+
+
 				--we need to think about the movement, we can move the
 				local basePixelMov = 0.5;
 				local placeTiming = timingPlayer / 0.1;
@@ -3936,6 +4686,10 @@ function GetPreview(player)
 
 				self:GetChild("playertiming"):y(116+(finalPlace));
 				self:GetChild("arrowtiming"):y(118+(finalPlace));
+				self:GetChild("backPlayerms"):y(118+(finalPlace));
+				self:GetChild("textHeaderPlayerOffset"):y(109+(finalPlace));
+				self:GetChild("textHeaderPlayerOffsetNum"):y(125+(finalPlace));
+				self:GetChild("textHeaderPlayerOffsetNum"):settext("OFFSET "..textTiming);
 			end;
 
 			CommandWindowSelectOptionMessageCommand=function(self,params)
@@ -3964,6 +4718,157 @@ function GetPreview(player)
 
 	};
 
+	--####COMPANION####
+	--background
+	af[#af+1] = Def.Quad {
+	    InitCommand = function(self)
+	    	self:addy(yPosPrevBase + 78);
+	    	self:visible(false);
+	    	self:addx(xPosNoteFieldPrevBase);
+	    end,
+
+	    OnCommand = function(self)
+	        self:zoomto(275, 135) -- Escala el rectángulo a 270x130
+	        self:diffuse(color("0,0,0,0.6"));
+	        self:visible(false);
+	    end;
+
+		CommandWindowSelectOptionMessageCommand=function(self,params)
+			if params.Player == player then
+				self:queuecommand("RefreshCwData");
+			end;
+		end;
+
+		CommandWindowModCancelMessageCommand=function(self,params)
+			if params.Player == player then
+				self:visible(false);
+			end;
+		end;
+
+		RefreshCwDataCommand=function(self)
+				self:sleep(0.1);
+				local data = getEnvPlayer(player,"playercwmenu");
+				if data == "companion" then
+					self:visible(true);
+				else
+					self:visible(false);
+				end;
+		end;
+	};
+
+	local previewCompanionW=280;
+	local previewCompanionH=200;
+	af[#af+1] = Def.ActorFrame{ 
+
+		Def.Sprite{
+				Name="companionPreview";
+			    InitCommand=function(self)
+			    		local skinActual = getCompanionPreviewData(player);
+			    		self:Load(skinActual[1]);
+			    		self:pause();
+			    		--self:zoom(0.6);
+			    		self:y(3);
+			    		self:visible(false);
+
+			            local w = self:GetWidth()
+			            local h = self:GetHeight()
+
+			            local scale = math.min(previewCompanionW / w, previewCompanionH / h)
+			            self:zoom(scale)
+
+			    end;
+		};
+			
+		OnCommand=function(self)
+			self:y(yInfoPanel-5);
+			companionSpriteObject[player] = self;
+			self:queuecommand("ProcCheck");
+		end;
+
+		ProcCheckCommand=function(self,params)
+			local this = self:GetChildren();
+			local passCompanion = "";
+			if params.companiondata then
+				passCompanion = params.companiondata;
+			end;
+
+			local actualCompanion = "";
+			if passCompanion == "" then
+				skinActual = getCompanionPreviewData(player);
+			else
+				skinActual = getCompanionPreviewDataByName(passCompanion);
+			end;
+
+			--load the preview
+			this.companionPreview:Load(skinActual);
+            local w = this.companionPreview:GetWidth()
+            local h = this.companionPreview:GetHeight()
+            local scale = math.min(previewCompanionW / w, previewCompanionH / h)
+            this.companionPreview:zoom(scale);
+
+            if player == PLAYER_1 then
+            	this.companionPreview:rotationy(0);
+            else
+            	this.companionPreview:rotationy(180);
+            end;            
+
+			this.companionPreview:visible(true);
+		end;
+
+		CommandWindowModCancelMessageCommand=function(self,params)
+			if params.Player == player then
+				local companionData = getCustomOptionValuePlayer(player,"companion");
+				self:playcommand("ProcCheck",{companiondata = companionData});
+			end;
+		end;
+
+		CommandWindowSelectModMessageCommand=function(self,params)
+			--self:queuecommand("ProcCheck");
+		end;
+
+		CommandWindowModCancelMessageCommand=function(self,params)
+			if params.Player == player then				
+				local companionData = getCustomOptionValuePlayer(player,"companion");
+				self:playcommand("ProcCheck",{companiondata = companionData});
+			end;
+		end;
+
+		CommandWindowSelectOptionMessageCommand=function(self,params)
+			if params.Player == player then
+				local data = params.Title;
+				local this = self:GetChildren();
+				if data == "timingadj" or data == "judgeskin" or data=="judgeskinzoom" or data == "lifebarskin" or data == "info" then
+					this.companionPreview:visible(false);
+					return;
+				else
+					this.companionPreview:visible(true);
+				end;
+
+				local companionData = getCustomOptionValuePlayer(player,"companion");
+
+				if companionData == nil or companionData == "none" then
+					self:playcommand("ProcCheck",{companiondata = companionList[1]});
+				end;
+
+				local companionData = getCustomOptionValuePlayer(player,"companion");
+				if data == "companion" then					
+					if companionData == nil or companionData == "none" then
+						self:playcommand("ProcCheck",{companiondata = companionList[1]});
+					end;
+				else
+					if companionData == nil or companionData == "none" then
+						self:playcommand("ProcCheck",{companiondata = "none"});
+					end;					
+				end;
+
+			end;
+		end;
+
+		CheckSelectedMessageCommand=function(self,params)
+			--self:queuecommand("ProcCheck");
+		end;
+	};
+
 
 	return af;
 
@@ -3987,12 +4892,13 @@ function CreateCommandForPlayer(player)
 		{
 			{order="01",name="speed",index=2,imgfile="Icons02 13x1"},
 			{order="11",name="av",index=2,imgfile="Icons11 6x1"},
-			{order="02",name="display",index=3,imgfile="Icons03 13x1"},
+			{order="21",name="cv",index=2,imgfile="Icons22 6x1"},
+			{order="02",name="display",index=3,imgfile="Icons03 14x1"},
 			{order="03",name="note skin",index=4,imgfile=nil},
 			{order="04",name="path",index=5,imgfile="Icons05 8x1"},
 			{order="05",name="alternate",index=6,imgfile="Icons06 3x1"},
-			{order="06",name="judge",index=7,imgfile="Icons07 17x1"},
-			{order="07",name="rush",index=7,imgfile="Icons07 17x1"},
+			{order="06",name="judge",index=7,imgfile="Icons07 18x1"},
+			{order="07",name="rush",index=7,imgfile="Icons07 18x1"},
 			{order="12",name="sort",index=8,imgfile="Icons08 1x1"},
 			{order="08",name="reset",index=0,imgfile=nil},
 		};
@@ -4001,12 +4907,27 @@ function CreateCommandForPlayer(player)
 		--		OPCIONES NUEVAS 	  --
 		--############################--
 		table.insert(array,{order="19",name="vsmode",index=15,imgfile="Icons20 2x1"});		
-		table.insert(array,{order="14",name="info",index=10,imgfile="Icons09 11x1"});
+		table.insert(array,{order="14",name="info",index=10,imgfile="Icons09 12x1"});
 		table.insert(array,{order="15",name="judgeskin",index=11,imgfile=nil});
 		table.insert(array,{order="16",name="judgeskinzoom",index=12,imgfile="Icons16 6x1"});
 		table.insert(array,{order="17",name="lifebarskin",index=13,imgfile=nil});
-		table.insert(array,{order="18",name="lifebarsettings",index=14,imgfile="Icons19 4x1"});
+		table.insert(array,{order="18",name="lifebarsettings",index=14,imgfile="Icons19 6x1"});
 		table.insert(array,{order="20",name="timingadj",index=16,imgfile="Icons21 6x1"});
+
+		--ONLY if we have anything installed we will have this option and if we are not guest
+		-- at in needs to be the last one.
+		-- ## PLAYER COMPANION ##--
+
+		if PROFILEMAN:IsPersistentProfile(player) then
+			if companionsInstalled > 0 then
+				table.insert(array,{order="99",name="companion",index=18,imgfile=nil});
+			end;
+		end;	
+		--[[
+		if companionsInstalled > 0 then
+			table.insert(array,{order="99",name="companion",index=17,imgfile=nil});
+		end;
+		]]
 
 		
 		
@@ -4064,6 +4985,24 @@ function CreateCommandForPlayer(player)
 			}
 		);
 
+		-- 3: CV
+		table.insert(array,
+			{	
+				{order="100", command="cv+100", stateindex=0},
+				{order="10", command="cv+10", stateindex=1},
+				{order="1", command="cv+1", stateindex=2},
+				{order="-1", command="cv-1", stateindex=3},
+				{order="-10", command="cv-10", stateindex=4},
+				{order="-100", command="cv-100", stateindex=5},
+				{order="100", command="cv+100", stateindex=0},
+				{order="10", command="cv+10", stateindex=1},
+				{order="1", command="cv+1", stateindex=2},
+				{order="-1", command="cv-1", stateindex=3},
+				{order="-10", command="cv-10", stateindex=4},
+				{order="-100", command="cv-100", stateindex=5}
+			}
+		);
+
 		-- 3: DISPLAY
 		table.insert(array,
 			{	
@@ -4074,6 +5013,7 @@ function CreateCommandForPlayer(player)
 				{order="FL", command="flash",},
 				{order="RANDOM NOTE", command="randomnote",},
 				{order="MI", command="mini" },
+				{order="FOOTGUIDE", command="footguide", stateindex=13 },
 				{order="BGA OFF", command="bgaoff", stateindex=7, disablestate=8, },
 				{order="BGA DARK", command="bgadark", stateindex=9, disablestate=10, },
 				{order="BGA PARTIAL", command="bgapartial", stateindex=11, disablestate=12, },
@@ -4120,34 +5060,37 @@ function CreateCommandForPlayer(player)
 				{order="SI", command="sink",},
 				{order="RI", command="rise",},
 				{order="SN", command="snake",},	
-				{order="ZZ", command="zigzag",},
+				{order="ZZ", command="piuzigzag",},
 			}
 		);		
 
 		-- 6: ALTERNATE
 		table.insert(array,
 			{	
-				{order="M", command="backwards", stateindex=0 },
+				{order="SS", command="backwards", stateindex=0 },
+				{order="M", command="mirror", stateindex=2 },
 				{order="RS", command="supershuffle", stateindex=1 },
-				{order="SS", command="mirror", stateindex=2 },
-				{order="M", command="backwards", stateindex=0 },
+				{order="SS", command="backwards", stateindex=0 },
+				{order="M", command="mirror", stateindex=2 },
 				{order="RS", command="supershuffle", stateindex=1 },
-				{order="SS", command="mirror", stateindex=2 },
-				{order="M", command="backwards", stateindex=0 },
+				{order="SS", command="backwards", stateindex=0 },
+				{order="M", command="mirror", stateindex=2 },
 				{order="RS", command="supershuffle", stateindex=1 },
-				{order="SS", command="mirror", stateindex=2 }
 			}
+
 		);	
 
 
 		-- 7: JUDGEMENT
 		table.insert(array,
 			{	
-				{order="HJ", command="hardjudgement",stateindex=0, },
+				{order="EJ", command="easyjudgement",stateindex=17,},
+				{order="HJ", command="hardjudgement",stateindex=0,},
 				{order="VJ", command="veryhardjudgement",stateindex=2,},
 				{order="XJ", command="extrajudgement",stateindex=3,},
 				{order="UJ", command="ultrahardjudgement",stateindex=4,},
 				{order="JR", command="judgereverse",stateindex=1, },
+				{order="EJ", command="easyjudgement",stateindex=17,},
 				{order="HJ", command="hardjudgement",stateindex=0, },
 				{order="VJ", command="veryhardjudgement",stateindex=2,},
 				{order="XJ", command="extrajudgement",stateindex=3,},
@@ -4208,6 +5151,7 @@ function CreateCommandForPlayer(player)
 				{order="SCOREPERCENTAJE", command="scorepercentajeui",stateindex=9},
 				{order="JUDGEDATA", command="judgedataui",stateindex=3},
 				{order="MUSICDURATION", command="musicdurationui",stateindex=4},
+				{order="TOPBARMUSIC", command="topbarmusicui",stateindex=11},
 				{order="STEPLV", command="steplvui",stateindex=5},
 				--{order="RANKDATA", command="rankdataui",stateindex=6},
 				{order="ALL", command="allui",stateindex=7},
@@ -4301,15 +5245,29 @@ function CreateCommandForPlayer(player)
 		end
 
 
-		-- 17: judg zoom
+		-- 17: judg zoom [repeat the options because there are 6, fuck xd]
 		table.insert(array,
 			{
+				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
+				{order="SUDDEND", command="suddendeath", stateindex=1},
+				{order="5MISSMAX", command="5missmax", stateindex=2},
+				{order="PFCMODE", command="pfcmode", stateindex=3},
+				{order="FCMODE", command="fcmode", stateindex=4},
+				{order="EFCMODE", command="efcmode", stateindex=5},
+				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
+				{order="SUDDEND", command="suddendeath", stateindex=1},
+				{order="5MISSMAX", command="5missmax", stateindex=2},
+				{order="PFCMODE", command="pfcmode", stateindex=3},
+				{order="FCMODE", command="fcmode", stateindex=4},
+				{order="EFCMODE", command="efcmode", stateindex=5},
+				--[[
 				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
 				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
 				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
 				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
 				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
 				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0}
+				]]
 				--[[
 				{order="SUDDEND", command="suddendeath", stateindex=1}, -- 1 miss break
 				{order="5MISSMAX", command="5missmax", stateindex=2}, -- max 5 miss, 6 miss = break
@@ -4331,6 +5289,8 @@ function CreateCommandForPlayer(player)
 				{order="-01", command="timing-01", stateindex=2},
 				{order="01", command="timing+01", stateindex=3},
 				{order="-01", command="timing-01", stateindex=2},
+				{order="01", command="timing+01", stateindex=3},
+				{order="-01", command="timing-01", stateindex=2},
 
 				--{order="005", command="timing+005", stateindex=4},
 				--{order="001", command="timing+001", stateindex=5},				
@@ -4341,262 +5301,34 @@ function CreateCommandForPlayer(player)
 			}
 		);	
 
-		local STATE = GAMESTATE:GetPlayerState(player);
-		if STATE:GetPlayerOptions('ModsLevel_Preferred'):MMod() ~= nil then
-			PAVenabled[player] = true;
-		else
-			PAVenabled[player] = false;
-		end;
-	
-		return array;
+		--ONLY if we have anything installed we will have this option
+		-- ## PLAYER COMPANION ##--
+		-- 19: Companion		
 
-	end;
+		if PROFILEMAN:IsPersistentProfile(player) then
+			if companionsInstalled > 0 then
 
+				table.insert(array,{});
+				local companionIndex = 0;
+				for ind=1,#Titles, 1 do
+					if (Titles[ind].name == "companion") then
+						companionIndex = ind;
+					end;
+				end;--companionList
 
-	local function GetModTitlesByName()
-		local array ={};
-		--##Struct##
-		-- order => name
-		-- command => command
-		--stateindex => state of the sprite for this item
-		--disablestate => the state in the sprite where the img shows a disable state of this item
+				for x=1,#companionList do
+					local fixedName = string.upper(companionList[x]);
+					if (string.len(fixedName) > 21) then
+						fixedName = string.sub(fixedName, 1, 21) .. "...";
+					end;
+					table.insert(array[companionIndex], {order=fixedName, command=companionList[x]});
+				end;
 
-
-		-- 1: SPEED
-		array["speed"] = {	
-				{order="1X", command="1x", },
-				{order="2X", command="2x",},
-				{order="3X", command="3x",},
-				{order="4X", command="4x",},
-				{order="5X", command="5x",},
-				{order="6X", command="6x",},
-				{order="+0.25", command="0.25",},	
-				{order="+0.5", command="0.5",},	
-				{order="EW", command="expand",},
-				{order="RV", command="randomvel",},
-				{order="AV", command="m550",},
-				{order="AC", command="accel",},
-				{order="DC", command="decel",}
-		};
-
-		-- 2: AV
-		array["av"] = {
-				{order="100", command="av+100", stateindex=0},
-				{order="10", command="av+10", stateindex=1},
-				{order="1", command="av+1", stateindex=2},
-				{order="-1", command="av-1", stateindex=3},
-				{order="-10", command="av-10", stateindex=4},
-				{order="-100", command="av-100", stateindex=5},
-				{order="100", command="av+100", stateindex=0},
-				{order="10", command="av+10", stateindex=1},
-				{order="1", command="av+1", stateindex=2},
-				{order="-1", command="av-1", stateindex=3},
-				{order="-10", command="av-10", stateindex=4},
-				{order="-100", command="av-100", stateindex=5}
-		};
-
-		-- 3: DISPLAY
-		array["display"] = {	
-				{order="V", command="vanish",},
-				{order="AP", command="appear",},
-				{order="NS", command="nonstep",},
-				{order="FD", command="dark",},
-				{order="FL", command="flash",},
-				{order="RANDOM NOTE", command="randomnote",},
-				{order="MI", command="mini" },
-				{order="BGA OFF", command="bgaoff", stateindex=7, disablestate=8, },
-				{order="BGA DARK", command="bgadark", stateindex=9, disablestate=10, },
-				{order="BGA PARTIAL", command="bgapartial", stateindex=11, disablestate=12, },
-		};
-
-		-- 4: NOTESKIN
-		array["note skin"] = {};
-
-		for x=1,#notelist do
-			local fixedName = string.upper(notelist[x]);
-			fixedName = string.gsub(fixedName, "-", " ");
-			fixedName = string.gsub(fixedName, "_", " ");
-			if (string.len(fixedName) > 15) then
-				fixedName = string.sub(fixedName, 1, 15) .. "...";
 			end;
-
-			table.insert(array["note skin"], {order=fixedName, command=notelist[x],});
 		end;
 
-		--Insert additional noteskin copies to fill missing spots
-		while #array["note skin"] < minNumItemsCW do
-			for x=1,#notelist do
-				table.insert(array["note skin"], array["note skin"][x])
-			end
-		end
+		
 
-		-- 5: PATH
-		array["path"] = {	
-				{order="X", command="xmode",},
-				{order="NX", command="nxmode",},
-				{order="UA", command="underattack",},
-				{order="DR", command="drop",},
-				{order="SI", command="sink",},
-				{order="RI", command="rise",},
-				{order="SN", command="snake",},	
-				{order="ZZ", command="zigzag",},
-		};
-
-		-- 6: ALTERNATE
-		array["alternate"] = {
-				{order="M", command="backwards", stateindex=0 },
-				{order="RS", command="supershuffle", stateindex=1 },
-				{order="SS", command="mirror", stateindex=2 },
-				{order="M", command="backwards", stateindex=0 },
-				{order="RS", command="supershuffle", stateindex=1 },
-				{order="SS", command="mirror", stateindex=2 },
-				{order="M", command="backwards", stateindex=0 },
-				{order="RS", command="supershuffle", stateindex=1 },
-				{order="SS", command="mirror", stateindex=2 }
-			};
-
-		-- 7: JUDGEMENT
-		array["judge"] = {
-				{order="HJ", command="hardjudgement",stateindex=0, },
-				{order="VJ", command="veryhardjudgement",stateindex=2,},
-				{order="XJ", command="extrajudgement",stateindex=3,},
-				{order="UJ", command="ultrahardjudgement",stateindex=4,},
-				{order="JR", command="judgereverse",stateindex=1, },
-				{order="HJ", command="hardjudgement",stateindex=0, },
-				{order="VJ", command="veryhardjudgement",stateindex=2,},
-				{order="XJ", command="extrajudgement",stateindex=3,},
-				{order="UJ", command="ultrahardjudgement",stateindex=4,},
-				{order="JR", command="judgereverse",stateindex=1, },
-			};
-
-		-- 8: RUSH
-		array["rush"] = {
-				{order="60", command="0.6", stateindex=5, disablestate=16, },
-				{order="70", command="0.7", stateindex=6, disablestate=16, },
-				{order="80", command="0.8", stateindex=7, disablestate=16, },
-				{order="90", command="0.9", stateindex=8, disablestate=16, },
-				{order="110", command="1.1", stateindex=9, disablestate=16, },
-				{order="120", command="1.2", stateindex=10, disablestate=16, },
-				{order="130", command="1.3", stateindex=11, disablestate=16, },
-				{order="140", command="1.4", stateindex=12, disablestate=16, },
-				{order="150", command="1.5", stateindex=13, disablestate=16, },
-				{order="160", command="1.6", stateindex=14, disablestate=16, },
-				{order="170", command="1.7", stateindex=15, disablestate=16, },
-		};
-
-		--SORT (ORDEN DE WHEEL)
-		array["sort"] = {
-			{order="TITLE", command="title",},
-		};		
-		--RESET
-		array["reset"] = {};
-
-		--RANK
-		array["rank"] = {
-			{order="RANK", command="rank",stateindex=0}
-		};
-
-		--vs mode
-		array["vsmode"] = {
-			{order="VSMODE", command="vsmode", stateindex=0,disablestate=1},
-		};
-
-		--INFO
-		array["info"] = {
-			{order="TIMING", command="timingui",stateindex=0},
-			{order="TIMINGBAR", command="timingbar",stateindex=10},
-			{order="BREAKICON", command="breakiconui",stateindex=1},
-			{order="SCORE", command="scoreui",stateindex=2},
-			{order="SCOREPERCENTAJE", command="scorepercentajeui",stateindex=9},
-			{order="JUDGEDATA", command="judgedataui",stateindex=3},
-			{order="MUSICDURATION", command="musicdurationui",stateindex=4},
-			{order="STEPLV", command="steplvui",stateindex=5},
-			--{order="RANKDATA", command="rankdataui",stateindex=6},
-			{order="ALL", command="allui",stateindex=7},
-			{order="NONE", command="noneui",stateindex=8}
-		};
-
-		-- 14: judg skins
-		array["judgeskin"] = {};
-		for x=1,#judgeSkinList do
-			local fixedName = string.upper(judgeSkinList[x]);
-			fixedName = string.gsub(fixedName, "i_", "");
-			fixedName = string.gsub(fixedName, "e_", "");
-			if (string.len(fixedName) > 15) then
-				fixedName = string.sub(fixedName, 1, 15) .. "...";
-			end;
-
-			table.insert(array["judgeskin"], {order=fixedName, command=judgeSkinList[x],});
-		end;	
-
-		--Insert additional judgeskin copies to fill missing spots
-		-- we update the base list to reflect those copies, the CW have a miss match of data :o
-		if #judgeSkinList > 0 then
-			while #array["judgeskin"] < minNumItemsCW do
-				for x=1,#judgeSkinList do
-					table.insert(array["judgeskin"], array["judgeskin"][x])
-				end
-			end
-		end
-
-		-- 15: judg zoom
-		array["judgeskinzoom"] = {
-				{order="25", command="zoomjdg+25", stateindex=0},
-				{order="10", command="zoomjdg+10", stateindex=1},
-				{order="1", command="zoomjdg+1", stateindex=2},
-				{order="-1", command="zoomjdg-1", stateindex=3},
-				{order="-10", command="zoomjdg-10", stateindex=4},
-				{order="-25", command="zoomjdg-25", stateindex=5},
-				{order="25", command="zoomjdg+25", stateindex=0},
-				{order="10", command="zoomjdg+10", stateindex=1},
-				{order="1", command="zoomjdg+1", stateindex=2},
-				{order="-1", command="zoomjdg-1", stateindex=3},
-				{order="-10", command="zoomjdg-10", stateindex=4},
-				{order="-25", command="zoomjdg-25", stateindex=5}
-		};
-
-		--Lifebar skins
-		array["lifebarskin"] = {};
-		--Agregamos la lista de skins disponibles a las opciones
-		for x=1,#lifebarSkinList do
-			local fixedName = string.upper(lifebarSkinList[x]);
-			fixedName = string.gsub(fixedName, "i_", "");
-			fixedName = string.gsub(fixedName, "e_", "");
-			if (string.len(fixedName) > 15) then
-				fixedName = string.sub(fixedName, 1, 15) .. "...";
-			end;
-
-			table.insert(array["lifebarskin"], {order=fixedName, command=lifebarSkinList[x],});
-		end;			
-
-		--Insert additional lifebarskin copies to fill missing spots
-		if #lifebarSkinList > 0 then
-			while #array["lifebarskin"] < minNumItemsCW do
-				for x=1,#lifebarSkinList do
-					table.insert(array["lifebarskin"], array["lifebarskin"][x])
-				end
-			end
-		end
-
-		--Judg zoom
-		array["lifebarsettings"] = {
-				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
-				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
-				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
-				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
-				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0},
-				{order="BREAKONLIFEBAR", command="breakonlifebarc", stateindex=0}
-		};
-
-		-- 18: timing adj
-		array["timingadj"] = {
-				{order="01", command="timing+01", stateindex=3},
-				{order="-01", command="timing-01", stateindex=2},
-				{order="01", command="timing+01", stateindex=3},
-				{order="-01", command="timing-01", stateindex=2},
-				{order="01", command="timing+01", stateindex=3},
-				{order="-01", command="timing-01", stateindex=2},
-		};
 
 		local STATE = GAMESTATE:GetPlayerState(player);
 		if STATE:GetPlayerOptions('ModsLevel_Preferred'):MMod() ~= nil then
@@ -4608,7 +5340,6 @@ function CreateCommandForPlayer(player)
 		return array;
 
 	end;
-	
 
 	local function IsSelected(mod,player)
 		local STATE = GAMESTATE:GetPlayerState(player);
@@ -4702,7 +5433,16 @@ function CreateCommandForPlayer(player)
 			else
 				return songTimeUi;
 			end;
-		end;		
+		end;	
+
+		if mod.command == "topbarmusicui" then
+			local songTopBarTimeUi = getCustomOptionValuePlayer(player,"gameplay_topTimerBar");
+			if songTopBarTimeUi == nil then
+				return false;
+			else
+				return songTopBarTimeUi;
+			end;
+		end;
 
 		if mod.command == "steplvui" then
 				local stepLvUi = getCustomOptionValuePlayer(player,"gameplay_lv_ui");
@@ -4730,12 +5470,28 @@ function CreateCommandForPlayer(player)
 		if mod.command == "breakonlifebarc" then
 			--1 INMEDIATE
 			--4 OFF
+			--[[
 			local failSetting = STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting();
 			if failSetting == "FailType_Immediate" then
 				return true;
 			else
 				return false;
 			end;
+			]]
+
+			local lifebarExtramode = getCustomOptionValuePlayer(player,"lifebar_extra_mode");
+			if lifebarExtramode == nil then 
+				return false; 
+			end;
+
+			if lifebarExtramode == "none" then
+				return false;
+			end;
+
+			if lifebarExtramode == "breakon" then 
+				return true;
+			end;
+
 		end;
 
 		if mod.command == "suddendeath" then
@@ -4783,6 +5539,35 @@ function CreateCommandForPlayer(player)
 			end;
 		end;
 
+		if mod.command == "fcmode" then
+			local lifebarExtramode = getCustomOptionValuePlayer(player,"lifebar_extra_mode");
+			if lifebarExtramode == nil then 
+				return false; 
+			end;
+
+			if lifebarExtramode == "none" then
+				return false;
+			end;
+
+			if lifebarExtramode == "fcmode" then 
+				return true;
+			end;
+		end;
+
+		if mod.command == "efcmode" then
+			local lifebarExtramode = getCustomOptionValuePlayer(player,"lifebar_extra_mode");
+			if lifebarExtramode == nil then 
+				return false; 
+			end;
+
+			if lifebarExtramode == "none" then
+				return false;
+			end;
+
+			if lifebarExtramode == "efcmode" then 
+				return true;
+			end;
+		end;
 
 		--[[
 		if mod.command == "infobasic" then
@@ -4825,9 +5610,13 @@ function CreateCommandForPlayer(player)
 			return true;
 		elseif mod.command == "bgapartial" and GAMESTATE:GetSongOptionsObject('ModsLevel_Preferred' ):BgaPartial() then
 			return true;
+		elseif mod.command == "footguide" and  GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Preferred' ):Guide() then
+			return true;
 		elseif string.lower(mod.command)==string.lower(round2(GAMESTATE:GetSongOptionsObject('ModsLevel_Preferred'):MusicRate(),1)) then
 			return true;
 		elseif mod.command:sub(1, 2) == "av" then
+			return true;
+		elseif mod.command:sub(1, 2) == "cv" then
 			return true;
 		end;
 
@@ -4847,7 +5636,11 @@ function CreateCommandForPlayer(player)
 			return true;
 		end;
 		
-		local noX = string.gsub(GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Preferred' ):XMod(),"x","");
+		local noX = 0;
+		if GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Preferred' ):XMod() then
+			local noX = string.gsub(GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Preferred' ):XMod(),"x","");
+		end;
+		
 		
 		if tonumber(noX) % 1 == .25 then
 			if mod.command == "0.25" then
@@ -4901,7 +5694,6 @@ function CreateCommandForPlayer(player)
 	--00--
 	local Titles = GetCommandTitles();
 	local Mods = GetModTitles();
-	local ModsAc = GetModTitlesByName();
 	local seted={};
 
 	local function ApplyAV(Splayer, Savcommand)
@@ -4925,13 +5717,105 @@ function CreateCommandForPlayer(player)
 		elseif newMMod > 999 then
 			newMMod = 999;
 		end;
+
+		--just for guest
+		if PROFILEMAN:IsPersistentProfile(Splayer) == false then
+			if newMMod == 300 then
+				if STATE:GetPlayerOptions('ModsLevel_Preferred'):MMod() == nil then
+					if getTempSpeedPlayer(Splayer) > 0 then
+						newMMod = getTempSpeedPlayer(Splayer);
+						setTempSpeedPlayer(Splayer,newMMod);
+					end;
+				else
+					if getTempSpeedPlayer(Splayer) > 301 then
+						newMMod = getTempSpeedPlayer(Splayer);
+						setTempSpeedPlayer(Splayer,newMMod);
+					else
+						setTempSpeedPlayer(Splayer,newMMod);
+					end;
+				end;
+			else
+				setTempSpeedPlayer(Splayer,newMMod);
+			end;
+		end;
+
 		STATE:GetPlayerOptions('ModsLevel_Preferred'):MMod(newMMod);
+		STATE:GetPlayerOptions('ModsLevel_Preferred'):CMod(nil);
 		STATE:GetPlayerOptions('ModsLevel_Preferred' ):RandomVel(false);
 		STATE:GetPlayerOptions('ModsLevel_Preferred' ):Expand(0);
 		STATE:GetPlayerOptions('ModsLevel_Preferred' ):Accel(0);
 		STATE:GetPlayerOptions('ModsLevel_Preferred' ):Decel(0);
 		MESSAGEMAN:Broadcast("CommandWindowAV", {Player = Splayer} );
 		
+	end;
+
+	local function ApplyCV(player,Command)
+			local STATE = GAMESTATE:GetPlayerState(player);
+			local cvModData = STATE:GetPlayerOptions('ModsLevel_Preferred' ):CMod();
+			local cvChange = tonumber(Command:sub(4));			
+			if Command:sub(3, 3) == "-" then
+				cvChange = -cvChange
+			end;
+
+			--we will use the AV saved as base always for now if cmod is null
+			if Command == "cv+0" then
+				if STATE:GetPlayerOptions('ModsLevel_Preferred' ):CMod() == nil then
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):CMod(GAMESTATE:GetSavedAV(player));
+				else
+					local cmodUsed = STATE:GetPlayerOptions('ModsLevel_Preferred' ):CMod();
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):CMod(cmodUsed);
+				end;
+			end;
+
+			if cvModData == nil then
+				if PROFILEMAN:IsPersistentProfile(player) == false then
+					if getTempSpeedPlayer(player) > 0 then
+						newCVMod = getTempSpeedPlayer(player);
+						STATE:GetPlayerOptions('ModsLevel_Preferred' ):CMod(newCVMod);
+					else
+						STATE:GetPlayerOptions('ModsLevel_Preferred' ):CMod(300);
+					end;
+				else
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):CMod(GAMESTATE:GetSavedAV(player));	
+				end;
+			end;
+
+			local storedCmod = STATE:GetPlayerOptions('ModsLevel_Preferred' ):CMod();
+			local newCmod = storedCmod + cvChange;
+			if newCmod > 999 then
+				newCmod = 999;
+			elseif newCmod < 100 then
+				newCmod = 100;
+			end;
+
+			STATE:GetPlayerOptions('ModsLevel_Preferred'):CMod(newCmod);
+			STATE:GetPlayerOptions('ModsLevel_Preferred'):MMod(nil);
+			STATE:GetPlayerOptions('ModsLevel_Preferred' ):RandomVel(false);
+			STATE:GetPlayerOptions('ModsLevel_Preferred' ):Expand(0);
+			STATE:GetPlayerOptions('ModsLevel_Preferred' ):Accel(0);
+			STATE:GetPlayerOptions('ModsLevel_Preferred' ):Decel(0);
+			MESSAGEMAN:Broadcast("CommandWindowCV", {Player = player} );
+			MESSAGEMAN:Broadcast("EnableCV", {Player = player} );
+
+			--[[
+			Trace("CV COMMAND:"..Mods[Scommand][Smod].command);
+			if Mods[Scommand][Smod].command == "cv+10" then
+				
+				STATE:GetPlayerOptions('ModsLevel_Preferred'):CMod(400);
+				STATE:GetPlayerOptions('ModsLevel_Preferred'):MMod(nil);
+
+				Trace("set CMOD 400");
+			else
+				STATE:GetPlayerOptions('ModsLevel_Preferred' ):CMod(nil);
+				Trace("set CMOD nil");
+			end;
+
+			if cvModData == nil then
+				Trace("CV null");	
+			else
+				Trace("CV"..cvModData);	
+			end;
+			]]
 	end;
 
 	local function ApplyMods(Scommand,Smod,Splayer)
@@ -5075,6 +5959,21 @@ function CreateCommandForPlayer(player)
 				end;
 			end;
 
+			if Mods[Scommand][Smod].command == "topbarmusicui" then	
+				local songTopBarTimeUi = getCustomOptionValuePlayer(Splayer,"gameplay_topTimerBar");
+				if songTopBarTimeUi == nil then
+					seted[Scommand][Smod] = false;
+				else
+					if songTopBarTimeUi then
+						seted[Scommand][Smod] = false;
+						setCustomOptionValuePlayer(Splayer,"gameplay_topTimerBar",false);
+					else
+						seted[Scommand][Smod] = true;
+						setCustomOptionValuePlayer(Splayer,"gameplay_topTimerBar",true);
+					end;
+				end;
+			end;
+
 			if Mods[Scommand][Smod].command == "steplvui" then	
 				local stepLvUi = getCustomOptionValuePlayer(Splayer,"gameplay_lv_ui");
 				if stepLvUi == nil then
@@ -5099,6 +5998,7 @@ function CreateCommandForPlayer(player)
 				setCustomOptionValuePlayer(Splayer,"gameplay_song_time_ui",true);
 				setCustomOptionValuePlayer(Splayer,"gameplay_lv_ui",true);
 				setCustomOptionValuePlayer(Splayer,"gameplay_timingbar",true);
+				setCustomOptionValuePlayer(Splayer,"gameplay_topTimerBar",true);
 			end;	
 
 			if Mods[Scommand][Smod].command == "noneui" then
@@ -5109,7 +6009,8 @@ function CreateCommandForPlayer(player)
 				setCustomOptionValuePlayer(Splayer,"gameplay_stats_ui",false);
 				setCustomOptionValuePlayer(Splayer,"gameplay_song_time_ui",false);
 				setCustomOptionValuePlayer(Splayer,"gameplay_lv_ui",false);	
-				setCustomOptionValuePlayer(Splayer,"gameplay_timingbar",false);			
+				setCustomOptionValuePlayer(Splayer,"gameplay_timingbar",false);	
+				setCustomOptionValuePlayer(Splayer,"gameplay_topTimerBar",false);		
 
 			end;				
 
@@ -5235,14 +6136,27 @@ function CreateCommandForPlayer(player)
 		if Titles[Scommand].name == "lifebarsettings" then	
 
 			if Mods[Scommand][Smod].command == "breakonlifebarc" then					
+
+				local typeLifeBarExtra = getCustomOptionValuePlayer(Splayer,"lifebar_extra_mode");
+				if typeLifeBarExtra == "breakon" then
+					setCustomOptionValuePlayer(Splayer,"lifebar_extra_mode","none");
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(4);
+				else
+					setCustomOptionValuePlayer(Splayer,"lifebar_extra_mode","breakon");
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(1); -- break on.
+				end;
+				--[[
 				--1 INMEDIATE --4 OFF
 				local failSetting = STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting();
+
+
 				if failSetting == "FailType_Immediate" then
 					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(4);
 				else
 					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(1);
 					setCustomOptionValuePlayer(Splayer,"lifebar_extra_mode","none");
 				end;
+				]]
 			end;
 
 			if Mods[Scommand][Smod].command == "suddendeath" then		
@@ -5251,9 +6165,10 @@ function CreateCommandForPlayer(player)
 
 				if typeLifeBarExtra == "suddendeath" then
 					setCustomOptionValuePlayer(Splayer,"lifebar_extra_mode","none");
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(4);
 				else
 					setCustomOptionValuePlayer(Splayer,"lifebar_extra_mode","suddendeath");
-					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(4); -- break on.
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(1); -- break on.
 				end;
 
 				local lifebarExtraSelected = getCustomOptionValuePlayer(Splayer,"lifebar_extra_mode");
@@ -5264,9 +6179,10 @@ function CreateCommandForPlayer(player)
 
 				if typeLifeBarExtra == "5missmax" then
 					setCustomOptionValuePlayer(Splayer,"lifebar_extra_mode","none");
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(4);
 				else
 					setCustomOptionValuePlayer(Splayer,"lifebar_extra_mode","5missmax");
-					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(4); -- break on.
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(1); -- break on.
 				end;
 
 				local lifebarExtraSelected = getCustomOptionValuePlayer(Splayer,"lifebar_extra_mode");
@@ -5277,9 +6193,38 @@ function CreateCommandForPlayer(player)
 
 				if typeLifeBarExtra == "pfcmode" then
 					setCustomOptionValuePlayer(Splayer,"lifebar_extra_mode","none");
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(4);
 				else
 					setCustomOptionValuePlayer(Splayer,"lifebar_extra_mode","pfcmode");
-					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(4); -- break on.
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(1); -- break on.
+				end;
+
+				local lifebarExtraSelected = getCustomOptionValuePlayer(Splayer,"lifebar_extra_mode");
+			end;
+
+			if Mods[Scommand][Smod].command == "fcmode" then		
+				local typeLifeBarExtra = getCustomOptionValuePlayer(Splayer,"lifebar_extra_mode");
+
+				if typeLifeBarExtra == "fcmode" then
+					setCustomOptionValuePlayer(Splayer,"lifebar_extra_mode","none");
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(4);
+				else
+					setCustomOptionValuePlayer(Splayer,"lifebar_extra_mode","fcmode");
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(1); -- break on.
+				end;
+
+				local lifebarExtraSelected = getCustomOptionValuePlayer(Splayer,"lifebar_extra_mode");
+			end;
+
+			if Mods[Scommand][Smod].command == "efcmode" then		
+				local typeLifeBarExtra = getCustomOptionValuePlayer(Splayer,"lifebar_extra_mode");
+
+				if typeLifeBarExtra == "efcmode" then
+					setCustomOptionValuePlayer(Splayer,"lifebar_extra_mode","none");
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(4);
+				else
+					setCustomOptionValuePlayer(Splayer,"lifebar_extra_mode","efcmode");
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting(1); -- break on.
 				end;
 
 				local lifebarExtraSelected = getCustomOptionValuePlayer(Splayer,"lifebar_extra_mode");
@@ -5352,6 +6297,26 @@ function CreateCommandForPlayer(player)
 		end;
 
 
+		if Titles[Scommand].name == "companion" then			
+			--ocuparemos siempre "sanity" como defecto.			
+			local getCompanionActive = getCustomOptionValuePlayer(Splayer,"companion");
+			
+			if getCompanionActive == false or getCompanionActive == nil or #getCompanionActive == 0 then
+				getCompanionActive = "none";
+			end;
+
+
+			--si ya lo tiene seleccionado entonces lo sacamos.
+			if Mods[Scommand][Smod].command == getCompanionActive then
+				seted[Scommand][Smod] = false;	
+				setCustomOptionValuePlayer(Splayer,"companion","none");
+			else
+				seted[Scommand][Smod] = true;
+				local companionSelected = Mods[Scommand][Smod].command;			
+				setCustomOptionValuePlayer(Splayer,"companion",companionSelected);
+			end;
+		end;	
+
 		--END NEW MODS--
 
 		--SPEED
@@ -5409,6 +6374,12 @@ function CreateCommandForPlayer(player)
 					STATE:GetPlayerOptions('ModsLevel_Preferred' ):RandomVel(false);
 					STATE:GetPlayerOptions('ModsLevel_Preferred' ):Decel(0);
 					STATE:GetPlayerOptions('ModsLevel_Preferred' ):Expand(0);
+
+					--just for guest
+					if PROFILEMAN:IsPersistentProfile(Splayer) == false then
+						setTempSpeedPlayer(Splayer,550);
+					end;
+
 				end;
 			end;
 			if Mods[Scommand][Smod].command == "expand" then
@@ -5475,6 +6446,10 @@ function CreateCommandForPlayer(player)
 		-- AV
 		if Titles[Scommand].name == "av" then
 			ApplyAV(Splayer, Mods[Scommand][Smod].command);
+		end;
+
+		if Titles[Scommand].name == "cv" then			
+			ApplyCV(Splayer, Mods[Scommand][Smod].command);
 		end;
 
 		-- DISPLAY
@@ -5587,6 +6562,16 @@ function CreateCommandForPlayer(player)
 				end;
 			end;
 			
+			if Mods[Scommand][Smod].command == "footguide" then
+				if seted[Scommand][Smod] then
+					seted[Scommand][Smod] = false;
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):Guide(false);
+				else
+					seted[Scommand][Smod] = true;
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):Guide(true);
+				end;
+			end;
+			
 		end;	
 		if Titles[Scommand].name == "path" then
 			if Mods[Scommand][Smod].command == "xmode" then
@@ -5652,13 +6637,13 @@ function CreateCommandForPlayer(player)
 					STATE:GetPlayerOptions('ModsLevel_Preferred' ):Snake(true);
 				end;
 			end;
-			if Mods[Scommand][Smod].command == "zigzag" then
+			if Mods[Scommand][Smod].command == "piuzigzag" then
 				if seted[Scommand][Smod] then
 					seted[Scommand][Smod] = false;
-					STATE:GetPlayerOptions('ModsLevel_Preferred' ):ZigZag(false);
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):PIUZigZag(false);
 				else
 					seted[Scommand][Smod] = true;
-					STATE:GetPlayerOptions('ModsLevel_Preferred' ):ZigZag(true);
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):PIUZigZag(true);
 				end;
 			end;
 			
@@ -5695,6 +6680,21 @@ function CreateCommandForPlayer(player)
 			end;
 		end;
 		if Titles[Scommand].name == "judge" then
+			if Mods[Scommand][Smod].command == "easyjudgement" and not GAMESTATE:GetSongOptionsObject('ModsLevel_Preferred' ):RankMode() then
+				if seted[Scommand][Smod] then
+					seted[Scommand][Smod] = false;
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):EasyJudgement(false);
+				else
+					seted[Scommand][Smod] = true;
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):EasyJudgement(true);
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):HardJudgement(false);
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):VeryHardJudgement(false);
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):UltraHardJudgement(false);
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):ExtraJudgement(false);
+					
+				end;
+			end;
+			
 			if Mods[Scommand][Smod].command == "hardjudgement" and not GAMESTATE:GetSongOptionsObject('ModsLevel_Preferred' ):RankMode() then
 				if seted[Scommand][Smod] then
 					seted[Scommand][Smod] = false;
@@ -5702,7 +6702,7 @@ function CreateCommandForPlayer(player)
 				else
 					seted[Scommand][Smod] = true;
 					STATE:GetPlayerOptions('ModsLevel_Preferred' ):HardJudgement(true);
-					
+					STATE:GetPlayerOptions('ModsLevel_Preferred' ):EasyJudgement(false);
 					STATE:GetPlayerOptions('ModsLevel_Preferred' ):VeryHardJudgement(false);
 					STATE:GetPlayerOptions('ModsLevel_Preferred' ):UltraHardJudgement(false);
 					STATE:GetPlayerOptions('ModsLevel_Preferred' ):ExtraJudgement(false);
@@ -5727,7 +6727,7 @@ function CreateCommandForPlayer(player)
 					else
 						seted[Scommand][Smod] = true;
 						STATE:GetPlayerOptions('ModsLevel_Preferred' ):VeryHardJudgement(true);
-						
+						STATE:GetPlayerOptions('ModsLevel_Preferred' ):EasyJudgement(false);
 						STATE:GetPlayerOptions('ModsLevel_Preferred' ):UltraHardJudgement(false);
 						STATE:GetPlayerOptions('ModsLevel_Preferred' ):ExtraJudgement(false);
 						STATE:GetPlayerOptions('ModsLevel_Preferred' ):HardJudgement(false);
@@ -5743,7 +6743,7 @@ function CreateCommandForPlayer(player)
 					else
 						seted[Scommand][Smod] = true;
 						STATE:GetPlayerOptions('ModsLevel_Preferred' ):ExtraJudgement(true);
-						
+						STATE:GetPlayerOptions('ModsLevel_Preferred' ):EasyJudgement(false);
 						STATE:GetPlayerOptions('ModsLevel_Preferred' ):UltraHardJudgement(false);
 						STATE:GetPlayerOptions('ModsLevel_Preferred' ):VeryHardJudgement(false);
 						STATE:GetPlayerOptions('ModsLevel_Preferred' ):HardJudgement(false);
@@ -5759,7 +6759,7 @@ function CreateCommandForPlayer(player)
 					else
 						seted[Scommand][Smod] = true;
 						STATE:GetPlayerOptions('ModsLevel_Preferred' ):UltraHardJudgement(true);
-						
+						STATE:GetPlayerOptions('ModsLevel_Preferred' ):EasyJudgement(false);
 						STATE:GetPlayerOptions('ModsLevel_Preferred' ):ExtraJudgement(false);
 						STATE:GetPlayerOptions('ModsLevel_Preferred' ):VeryHardJudgement(false);
 						STATE:GetPlayerOptions('ModsLevel_Preferred' ):HardJudgement(false);
@@ -5822,6 +6822,8 @@ function CreateCommandForPlayer(player)
 					if STATE:GetPlayerOptions('ModsLevel_Preferred' ):VeryHardJudgement() then STATE:GetPlayerOptions('ModsLevel_Preferred' ):VeryHardJudgement(false); end;
 					if STATE:GetPlayerOptions('ModsLevel_Preferred' ):ExtraJudgement() then STATE:GetPlayerOptions('ModsLevel_Preferred' ):ExtraJudgement(false); end;
 					if STATE:GetPlayerOptions('ModsLevel_Preferred' ):UltraHardJudgement() then STATE:GetPlayerOptions('ModsLevel_Preferred' ):UltraHardJudgement(false); end;
+					if STATE:GetPlayerOptions('ModsLevel_Preferred' ):EasyJudgement() then STATE:GetPlayerOptions('ModsLevel_Preferred' ):EasyJudgement(false); end;
+					
 					
 					STATE:GetPlayerOptions('ModsLevel_Preferred' ):Backwards(false);
 					STATE:GetPlayerOptions('ModsLevel_Preferred' ):SuperShuffle(false);
@@ -5907,6 +6909,48 @@ function GetAV(player)
 	end;
 end;
 
+function GetCV(player)
+	if GAMESTATE:IsPlayerEnabled(player) then
+		local STATE = GAMESTATE:GetPlayerState(player);
+		if STATE:GetPlayerOptions('ModsLevel_Preferred'):CMod() == nil then return ""; end;
+		return STATE:GetPlayerOptions('ModsLevel_Preferred'):CMod();
+	else
+		return ""
+	end;
+end;
+
+--This is only for guest player, AV doesn't save so we will make a temp var where we save the last number
+--used.
+function getTempSpeedPlayer(player)
+
+	if GAMESTATE:Env()["speedTempPlayer"] == nil then
+		-- AV CV temp
+		GAMESTATE:Env()["speedTempPlayer"] = {0,0};
+	end;
+
+	if player == PLAYER_1 then
+		return GAMESTATE:Env()["speedTempPlayer"][1];
+	else
+		return GAMESTATE:Env()["speedTempPlayer"][2];
+	end;
+end;
+
+function setTempSpeedPlayer(player,num)
+
+	if GAMESTATE:Env()["speedTempPlayer"] == nil then
+		-- AV CV temp
+		GAMESTATE:Env()["speedTempPlayer"] = {0,0};
+	end;
+
+	if player == PLAYER_1 then
+		GAMESTATE:Env()["speedTempPlayer"][1] = num;
+	else
+		GAMESTATE:Env()["speedTempPlayer"][2] = num;
+	end;
+end;
+--
+
+
 local function GetCommands(List, Current)
 		local NumItems = #List;
 		return { (Current-4)%NumItems+1, (Current-3)%NumItems+1, (Current-2)%NumItems+1, Current, Current%NumItems+1, (Current+1)%NumItems+1, (Current+2)%NumItems+1 };
@@ -5965,6 +7009,7 @@ local InitPosCommandLess = {
 			
 			for p=-1,1,2 do
 				if GAMESTATE:IsHumanPlayer(ARRAY[p]) then
+					GAMESTATE:GetPlayerState(ARRAY[p]):GetPlayerOptions('ModsLevel_Preferred' ):EasyJudgement(false);
 					GAMESTATE:GetPlayerState(ARRAY[p]):GetPlayerOptions('ModsLevel_Preferred' ):HardJudgement(false);
 					GAMESTATE:GetPlayerState(ARRAY[p]):GetPlayerOptions('ModsLevel_Preferred' ):ExtraJudgement(false);
 					GAMESTATE:GetPlayerState(ARRAY[p]):GetPlayerOptions('ModsLevel_Preferred' ):UltraHardJudgement(false);
@@ -5987,7 +7032,6 @@ local InitPosCommandLess = {
 				end;
 				CurrentTitles = GetCommands(Titles, SelectedTitle);
 				SCREENMAN:GetTopScreen():SetCommand(params.Player,Titles[SelectedTitle].name);
-				--Trace("### MOVED ###"..Titles[SelectedTitle].name);
 				MESSAGEMAN:Broadcast("MoveTitles", {Player = params.Player} )
 				MESSAGEMAN:Broadcast("CheckPreviewSelected" , {Player = params.Player, Title = Titles[SelectedTitle].name});			
 			end;
@@ -6162,6 +7206,8 @@ local InitPosCommandLess = {
 
 			end;
 
+
+
 			getActorPreviewOptionSelected(player,"zoom");
 			getActorPreviewOptionSelected(player,"timing");
 			getActorPreviewOptionSelected(player,"gameplayinfo");
@@ -6179,6 +7225,8 @@ local InitPosCommandLess = {
 			getActorPreviewOptionSelected(player,"vsmode");
 			getActorPreviewOptionSelected(player,"speed");
 			getActorPreviewOptionSelected(player,"av");
+			getActorPreviewOptionSelected(player,"cv");
+			getActorPreviewOptionSelected(player,"companion");
 
 		};
 
@@ -6206,7 +7254,7 @@ local InitPosCommandLess = {
 
 				if params.Player == player then
 					local sTitle = Titles[SelectedTitle].name;
-					self:finishtweening():linear(0.125):y( (sTitle == "av" and -32 or -50 ) );
+					self:finishtweening():linear(0.125):y( ( (sTitle == "av" or sTitle == "cv") and -32 or -50 ) );
 					
 				end;
 			end;
@@ -6225,7 +7273,7 @@ local InitPosCommandLess = {
 			CommandWindowSelectOptionMessageCommand=function(self,params)
 				if params.Player == player then
 					local sTitle = Titles[SelectedTitle].name;
-					self:finishtweening():linear(0.125):y(sTitle == "av" and -83 or -110):diffusealpha(1);
+					self:finishtweening():linear(0.125):y((sTitle == "av" or sTitle == "cv") and -83 or -110):diffusealpha(1);
 				end;
 			end;
 			CommandWindowModCancelMessageCommand=function(self,params)
@@ -6334,7 +7382,7 @@ local InitPosCommandLess = {
 			CommandWindowSelectOptionMessageCommand=function(self,params)
 				if params.Player == player then
 					local sTitle = Titles[SelectedTitle].name;
-					self:finishtweening():stopeffect():y(sTitle == "av" and 13 or -10):queuecommand("Recover");
+					self:finishtweening():stopeffect():y((sTitle == "av" or sTitle == "cv") and 13 or -10):queuecommand("Recover");
 				end;
 			end;
 			CommandWindowModCancelMessageCommand=function(self,params)
@@ -6358,7 +7406,7 @@ local InitPosCommandLess = {
 			CommandWindowSelectOptionMessageCommand=function(self,params)
 				if params.Player == player then
 					local sTitle = Titles[SelectedTitle].name;
-					self:finishtweening():stopeffect():y(sTitle == "av" and -32 or -72):visible(true):queuecommand("Recover");
+					self:finishtweening():stopeffect():y((sTitle == "av" or sTitle == "cv") and -32 or -72):visible(true):queuecommand("Recover");
 				end;
 			end;
 			CommandWindowModCancelMessageCommand=function(self,params)
@@ -6378,7 +7426,7 @@ local InitPosCommandLess = {
 				if params.Player == player then
 					local sTitle = Titles[SelectedTitle].name;
 					self:finishtweening():diffusealpha(1):y(-52):linear(.2):y(-128);
-					self:visible(sTitle == "av" and true or false);
+					self:visible((sTitle == "av" or sTitle == "cv") and true or false);
 				end;
 			end;
 			CommandWindowModCancelMessageCommand=function(self,params)
@@ -6397,12 +7445,16 @@ local InitPosCommandLess = {
 			CommandWindowSelectOptionMessageCommand=function(self,params)
 				if params.Player == player then
 					local sTitle = Titles[SelectedTitle].name;
-					self:finishtweening():stopeffect():y(-80):visible(sTitle == "av" and true or false):diffusealpha(1):diffusecolor(0,1,1,.6):linear(.3):diffusealpha(0):queuecommand("Recover");
+					self:finishtweening():stopeffect():y(-80):visible( (sTitle == "av" or sTitle == "cv") and true or false):diffusealpha(1):diffusecolor(0,1,1,.6):linear(.3):diffusealpha(0):queuecommand("Recover");
 				end;
 			end;
 			MoveModsMessageCommand=function(self, params)
 				local sTitle = Titles[SelectedTitle].name;
-				if params.Player == player and (sTitle == "av") then
+				if params.Player == player and sTitle == "av" then
+					self:finishtweening():stopeffect():visible(true):diffusealpha(1):diffusecolor(0,1,1,.6):linear(.3):diffusealpha(0):queuecommand("Recover");
+				end;
+
+				if params.Player == player and sTitle == "cv" then
 					self:finishtweening():stopeffect():visible(true):diffusealpha(1):diffusecolor(0,1,1,.6):linear(.3):diffusealpha(0):queuecommand("Recover");
 				end;
 			end;
@@ -6426,7 +7478,7 @@ local InitPosCommandLess = {
 			CommandWindowSelectOptionMessageCommand=function(self,params)
 				if params.Player == player then
 					local sTitle = Titles[SelectedTitle].name;
-					self:visible(sTitle == "av" and true or false):zoom(0.75):zoomx(0):linear(.13):zoomx(0.75);
+					self:visible( (sTitle == "av" or sTitle == "cv") and true or false):zoom(0.75):zoomx(0):linear(.13):zoomx(0.75);
 				end;
 			end;
 			CommandWindowModCancelMessageCommand=function(self,params)
@@ -6450,6 +7502,11 @@ local InitPosCommandLess = {
 				if params.Player == player and sTitle == "av" then
 					self:settext(GetAV(player)):zoomx(0):linear(.13):zoomx(.6);
 				end;
+
+				if params.Player == player and sTitle == "cv" then
+					self:settext(GetCV(player)):zoomx(0):linear(.13):zoomx(.6);
+				end;
+
 			end;
 			UpdateAVCommand=cmd(settext,GetAV(player);zoom,.6);
 			CommandWindowAVMessageCommand=function(self,params)
@@ -6459,9 +7516,26 @@ local InitPosCommandLess = {
 					self:queuecommand("UpdateAV");
 				end;
 			end;
+			CommandWindowCVMessageCommand=function(self,params)
+				local sTitle = Titles[SelectedTitle].name;
+				if params.Player == player and sTitle == "cv" then
+					self:stoptweening();
+					self:queuecommand("UpdateCV");
+				end;
+			end;
+
+			UpdateCVCommand=function(self)
+				local cvPlayer = GetCV(player);
+				self:settext(cvPlayer);
+				self:zoom(0.6);
+			end;
+
 			CommandWindowModCancelMessageCommand=function(self,params)
 				local sTitle = Titles[SelectedTitle].name;
 				if params.Player == player and sTitle == "av" then
+					self:zoomx(.6):linear(.08):zoomx(0);
+				end;
+				if params.Player == player and sTitle == "cv" then
 					self:zoomx(.6):linear(.08):zoomx(0);
 				end;
 			end;
@@ -6551,6 +7625,10 @@ local InitPosCommandLess = {
 			UpdateTimingTextCommand=function(self)
 
 					local timingAdjCustomOption = getCustomOptionValuePlayer(player,"timing_adjustment");
+
+					if timingAdjCustomOption == nil or timingAdjCustomOption == false then
+						timingAdjCustomOption = "0";
+					end;
 
 					--local timingPlayer = GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Preferred'):JudgeTiming();
 
@@ -6668,7 +7746,7 @@ local InitPosCommandLess = {
 				if params.Player == player then
 					self:finishtweening();
 					local sTitle = Titles[SelectedTitle].name;
-					self:y((sTitle == "av" and -85 or -111 ));		
+					self:y(( (sTitle == "av" or sTitle == "cv") and -85 or -111 ));		
 					self:sleep(0.125);
 					self:linear(0.125);
 					self:zoom(1);
@@ -6734,11 +7812,16 @@ local InitPosCommandLess = {
 					--prueba de env para modificar el otro coso.
 					setEnvPlayer(player,"playercwmenu",sTitle);
 
-					if sTitle == "av" and STATE:GetPlayerOptions('ModsLevel_Preferred'):MMod() == nil then -- RESET AUTO VEOLICTY
-						ApplyAV(player, "av+0");
+					if (sTitle == "av") and STATE:GetPlayerOptions('ModsLevel_Preferred'):MMod() == nil then -- RESET AUTO VEOLICTY
+						ApplyAV(player, "av+0");						
 						MESSAGEMAN:Broadcast("EnableAV", {Player = player} )
 					end;
 					
+					if (sTitle == "cv") and STATE:GetPlayerOptions('ModsLevel_Preferred'):CMod() == nil then -- RESET AUTO VEOLICTY
+						ApplyCV(player, "cv+0");
+						MESSAGEMAN:Broadcast("EnableCV", {Player = player} )
+					end;
+
 					SelectedMod=1;
 					--check for the mod selected on the lifeskins.
 					if sTitle == "lifebarskin" then
@@ -6747,6 +7830,10 @@ local InitPosCommandLess = {
 
 					if sTitle == "judgeskin" then
 						SelectedMod = getIndexModSelectedFromModList(Mods[SelectedTitle],getCustomOptionValuePlayer(player,"judgmentSkin"));
+					end;
+
+					if sTitle == "companion" then
+						SelectedMod = getIndexModSelectedFromModList(Mods[SelectedTitle],getCustomOptionValuePlayer(player,"companion"));
 					end;
 
 					CurrentMods = GetCommands(Mods[SelectedTitle], SelectedMod);					
@@ -6758,7 +7845,7 @@ local InitPosCommandLess = {
 						MESSAGEMAN:Broadcast("CheckSelected", {Player = player} )
 					end;
 					
-					self:finishtweening():linear(0.125):y((sTitle == "av" and -34 or -50 ));		
+					self:finishtweening():linear(0.125):y(( (sTitle == "av" or sTitle == "cv") and -34 or -50 ));		
 				end;
 			end;
 			CommandWindowModCancelMessageCommand=function(self,params)
@@ -7238,7 +8325,6 @@ local InitPosCommandLess = {
 						--lifebarSpriteObject[player].lifebarSkinCw = lifebarSkinList[CurrentMods[4]];
 						--lifebarSpriteObject[player]:queuecommand("ReloadLifebarSkin");
 
-						--Trace("::::WOAP::: current lifebar-> ".. lifebarSkinList[CurrentMods[4]]);
 						lifebarSpriteObject[player]:playcommand("ReloadLifebarSkin",{lifebarskincw = lifebarSkinList[CurrentMods[4]]});
 
 						if	pos==CurrentMods[1] then self:linear(.18);(InitPosCommand[1])(self);
@@ -7298,6 +8384,193 @@ local InitPosCommandLess = {
 		};
 	end;
 
+
+	--we only add this if we have a companion installed.
+	if companionsInstalled > 0 then
+
+		-- ## PLAYER COMPANION ##--
+		local companionArrIndex = 0; -- This indicates where in the mods list is all the skin for the CW
+		--here we search of the correct index of the list
+		for ind=1,#Titles, 1 do
+			if (Titles[ind].name == "companion") then
+				companionArrIndex = ind;
+			end;
+		end;
+
+
+		-- COMPANION ITEMS
+		-- Insert additional lifebarskin copies to fill missing spots
+		for pos=1,#companionList*math.ceil(minNumItemsCW/#companionList) do
+
+			local x = (pos-1)%#companionList+1
+
+			t[#t+1] = LoadActor(THEME:GetPathG("","CommandWindow/BackIcon"))..
+			{
+				InitCommand=function(self,params)
+					--self:scaletoclipped(59 ,46);
+					self:y(-110):zoom(0);
+				end;
+				CommandWindowSelectOptionMessageCommand=function(self,params)
+					if params.Player == player then					
+						self:finishtweening():linear(0.125):zoom(1);
+					end;
+				end;
+				CommandWindowModCancelMessageCommand=function(self,params)
+					if params.Player == player then
+						self:finishtweening():linear(0.125):zoom(0);
+					end;
+				end;
+							
+				MoveModsMessageCommand=function(self,params)
+
+					if params.Player == player then
+						if SelectedTitle == companionArrIndex then
+							self:finishtweening(); --detiene todas las animaciones
+							self:stopeffect();	--detiene el reset en caso de
+
+							if	pos==CurrentMods[1] then self:linear(.18);(InitPosCommand[1])(self);
+							elseif	pos==CurrentMods[2] then self:linear(.18);(InitPosCommand[2])(self);
+							elseif	pos==CurrentMods[3] then self:linear(.18);(InitPosCommand[3])(self);
+							elseif	pos==CurrentMods[4] then self:linear(.18);(InitPosCommand[4])(self); --center
+							elseif	pos==CurrentMods[5] then self:linear(.18);(InitPosCommand[5])(self);
+							elseif	pos==CurrentMods[6] then self:linear(.18);(InitPosCommand[6])(self);
+							elseif	pos==CurrentMods[7] then self:linear(.18);(InitPosCommand[7])(self);
+							else (cmd(finishtweening;diffusealpha,0))(self);
+							end;
+						else
+							 (cmd(finishtweening;diffusealpha,0))(self);
+						end;
+					end;
+				end;
+				InitModsMessageCommand=function(self,params)
+					if params.Player == player then	
+						if SelectedTitle == companionArrIndex then
+							-- self:finishtweening(); --detiene todas las animaciones
+							self:stopeffect();	--detiene el reset en caso de
+
+							if	pos==CurrentMods[1] then (InitPosCommand[1])(self);
+							elseif	pos==CurrentMods[2] then (InitPosCommand[2])(self);
+							elseif	pos==CurrentMods[3] then (InitPosCommand[3])(self);
+							elseif	pos==CurrentMods[4] then (InitPosCommand[4])(self); --center
+							elseif	pos==CurrentMods[5] then (InitPosCommand[5])(self);
+							elseif	pos==CurrentMods[6] then (InitPosCommand[6])(self);
+							elseif	pos==CurrentMods[7] then (InitPosCommand[7])(self);
+							else (cmd(finishtweening;diffusealpha,0))(self);
+							end;
+						else
+							 (cmd(finishtweening;diffusealpha,0))(self);
+						end;
+					end;
+				end;
+
+				CheckSelectedMessageCommand=function(self,params)
+					if params.Player == player then
+						self:diffusecolor(color("#555555"));
+						--probando con el getProfile y no por el index.
+						local skinloop = companionList[x];					
+						local companionPlayer = getCustomOptionValuePlayer(player,"companion");
+											
+						if companionPlayer ~= nil then
+							if skinloop ==  companionPlayer then
+								self:diffusecolor(color("#ffffff"));
+							end;
+						end;
+
+					end;
+				end;
+			};
+		
+
+			t[#t+1] = LoadActor(GetPNGICompanion(companionList[x]))..
+			{
+				InitCommand=function(self,params)
+					--self:scaletoclipped(59 ,46);
+					self:y(-110):zoom(0);
+				end;
+				CommandWindowSelectOptionMessageCommand=function(self,params)
+					if params.Player == player then					
+						self:finishtweening():linear(0.125):zoom(.9);
+					end;
+				end;
+				CommandWindowModCancelMessageCommand=function(self,params)
+					if params.Player == player then
+						self:finishtweening():linear(0.125):zoom(0);
+					end;
+				end;
+							
+				MoveModsMessageCommand=function(self,params)
+
+					if params.Player == player then	
+						if SelectedTitle == companionArrIndex then
+							self:finishtweening(); --detiene todas las animaciones
+							self:stopeffect();	--detiene el reset en caso de
+
+							--lifebarSpriteObject[player].lifebarSkinCw = lifebarSkinList[CurrentMods[4]];
+							--lifebarSpriteObject[player]:queuecommand("ReloadLifebarSkin");
+
+							companionSpriteObject[player]:playcommand("ProcCheck",{companiondata = companionList[CurrentMods[4]]});
+
+							if	pos==CurrentMods[1] then self:linear(.18);(InitPosCommand[1])(self);
+							elseif	pos==CurrentMods[2] then self:linear(.18);(InitPosCommand[2])(self);
+							elseif	pos==CurrentMods[3] then self:linear(.18);(InitPosCommand[3])(self);
+							elseif	pos==CurrentMods[4] then self:linear(.18);(InitPosCommand[4])(self); --center
+							elseif	pos==CurrentMods[5] then self:linear(.18);(InitPosCommand[5])(self);
+							elseif	pos==CurrentMods[6] then self:linear(.18);(InitPosCommand[6])(self);
+							elseif	pos==CurrentMods[7] then self:linear(.18);(InitPosCommand[7])(self);
+							else (cmd(finishtweening;diffusealpha,0))(self);
+							end;
+						else
+							 (cmd(finishtweening;diffusealpha,0))(self);
+						end;
+					end;
+				end;
+				InitModsMessageCommand=function(self,params)
+					if params.Player == player then	
+						if SelectedTitle == companionArrIndex then
+							-- self:finishtweening(); --detiene todas las animaciones
+							self:stopeffect();	--detiene el reset en caso de
+
+							if	pos==CurrentMods[1] then (InitPosCommand[1])(self);
+							elseif	pos==CurrentMods[2] then (InitPosCommand[2])(self);
+							elseif	pos==CurrentMods[3] then (InitPosCommand[3])(self);
+							elseif	pos==CurrentMods[4] then (InitPosCommand[4])(self); --center
+							elseif	pos==CurrentMods[5] then (InitPosCommand[5])(self);
+							elseif	pos==CurrentMods[6] then (InitPosCommand[6])(self);
+							elseif	pos==CurrentMods[7] then (InitPosCommand[7])(self);
+							else (cmd(finishtweening;diffusealpha,0))(self);
+							end;
+
+						else
+							 (cmd(finishtweening;diffusealpha,0))(self);
+						end;
+
+						self:diffusecolor(color("#555555"));
+					end;
+				end;
+
+				CheckSelectedMessageCommand=function(self,params)
+					if params.Player == player then
+						self:diffusecolor(color("#555555"));
+						--probando con el getProfile y no por el index.
+						local skinloop = companionList[x];					
+						local companionPlayer = getCustomOptionValuePlayer(player,"companion");
+						
+						if companionPlayer ~= nil then
+							if skinloop ==  companionPlayer then
+								self:diffusecolor(color("#ffffff"));
+							end;
+						end;
+
+					end;
+				end;
+
+			};
+		end;
+
+	end;
+
+
+
 	--estos son los iconos de los mods
 	for ind=1,#Titles, 1 do 
 	
@@ -7336,7 +8609,7 @@ local InitPosCommandLess = {
 						CommandWindowSelectOptionMessageCommand=function(self,params)
 							if params.Player == player then					
 								local sTitle = Titles[SelectedTitle].name;
-								self:finishtweening():linear(0.125):zoom(.5):y(sTitle == "av" and -84 or -110);
+								self:finishtweening():linear(0.125):zoom(.5):y( (sTitle == "av" or sTitle == "cv")and -84 or -110);
 							end;	
 						end;
 						CommandWindowModCancelMessageCommand=function(self,params)
@@ -7424,7 +8697,7 @@ local InitPosCommandLess = {
 						CheckSelectedMessageCommand=function(self,params)
 							if params.Player == player then
 								self:diffusecolor(color("#555555"));
-									
+								
 								if IsSelected(Mods[c][m], params.Player) then
 									self:diffusecolor(color("#ffffff"));
 								end;

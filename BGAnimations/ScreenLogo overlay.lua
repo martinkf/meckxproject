@@ -6,7 +6,7 @@ local function InputHandler(event)
 	end
 	
 	if event.button == "Center" or event.button == "Start" then
-		local nextScreen = Branch.GetStartScreen();
+		local nextScreen = Branch.AfterCompany();
 		SCREENMAN:SetNewScreen(nextScreen);
 	end;
 end;

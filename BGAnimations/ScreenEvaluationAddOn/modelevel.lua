@@ -53,8 +53,85 @@ end;
 local arrayBaseX={SCREEN_CENTER_X-145,SCREEN_CENTER_X+145};
 local baseY = SCREEN_TOP+185;
 local baseZoomLv=0.35;
+
+if isAspectRatio43() then
+	arrayBaseX={SCREEN_CENTER_X-170,SCREEN_CENTER_X+170};
+	baseY = SCREEN_CENTER_Y-173;
+end;
+
+
 for i=1,#arrayP do
 	
+	t[#t+1] = Def.ActorFrame{
+		OnCommand=function(self)
+			self:x(arrayBaseX[i]):y(baseY-35):visible(true):diffusealpha(1);
+
+
+			local CurrentStep = GAMESTATE:GetCurrentSteps(arrayP[i]);
+
+			if GAMESTATE:IsHumanPlayer(arrayP[i]) then
+				local stepArtist = CurrentStep:GetAuthorCredit();
+				if #stepArtist > 0 then
+
+					if #stepArtist <= 13 then
+						self:GetChild("saSprite"):visible(true);
+						self:GetChild("bigsaSprite"):visible(false);
+						self:GetChild("stepmakerName"):settext(stepArtist);
+					else
+						self:GetChild("bigsaSprite"):visible(true);
+						self:GetChild("saSprite"):visible(false);
+						self:GetChild("stepmakerName"):settext(stepArtist);
+					end;
+					
+					self:visible(true);
+				else
+					self:visible(false);
+				end;	
+				self:stoptweening();
+				self:linear(0.2);
+			else
+				self:visible(false);	
+			end;
+
+
+		end;
+
+		OffCommand=function(self)
+			self:stoptweening();
+			self:linear(0.15);
+			self:diffusealpha(0);
+		end;
+
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/stepartistsprite"))..{
+			Name="saSprite";
+			OnCommand=function(self)
+				self:zoom(0.6);
+			end;
+		};	
+
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/big_stepartistsprite"))..{
+			Name="bigsaSprite";
+			OnCommand=function(self)
+				self:zoom(0.6);
+			end;
+		};	
+
+		LoadFont("_century gothic")..{
+			Name="stepmakerName";
+			OnCommand=function(self)
+				self:zoom(0.6);
+				self:maxwidth(210);
+				self:y(-2);
+				self:x(37);
+				self:horizalign("center");
+			end;
+		};
+
+	};
+
+
+
+--[[
 	t[#t+1] = LoadActor(THEME:GetPathG("","ScreenSelectMusic/stepartistsprite"))..{
 			OnCommand=function(self)
 				self:visible(true):setstate(0):diffusealpha(1):animate(false):x(arrayBaseX[i]):y(baseY-30):zoom(baseZoomLv+0.15):visible(false);
@@ -134,7 +211,7 @@ for i=1,#arrayP do
 			end;
 		};	
 
-
+]]
 --BASIC MODE
 if GAMESTATE:GetGameMode() == 'Basic' then
 
@@ -288,7 +365,9 @@ end;
 		RefreshCommand=function(self)
 			if GAMESTATE:IsHumanPlayer(arrayP[i]) then
 				local CurrentStep = GAMESTATE:GetCurrentSteps(arrayP[i]);
+				--[[
 				local meter = CurrentStep:GetMeter();
+
 				meter = FixMeter(meter);
 				if (meter == "49" or meter == "50" or meter == "99") then
 					meter = "??";
@@ -296,7 +375,9 @@ end;
 				if meter == "51" then
 					meter = "!!";
 				end;
+				]]
 
+				local meter = DisplayLV_New(CurrentStep);
 				if CurrentStep:GetPlayers() ~= 1 then
 					meter = "x"..CurrentStep:GetPlayers();
 				end;
@@ -336,6 +417,7 @@ end;
 						self:diffuse(color("#007272"));
 					end;
 
+					--[[
 					local meter = CurrentStep:GetMeter();
 					meter = FixMeter(meter);
 					if (meter == "49" or meter == "50" or meter == "99") then
@@ -344,6 +426,9 @@ end;
 					if meter == "51" then
 						meter = "!!";
 					end;
+					]]
+					
+					local meter = DisplayLV_New(CurrentStep);
 					if CurrentStep:GetPlayers() ~= 1 then
 						meter = "x"..CurrentStep:GetPlayers();
 						self:diffuse(color("#8f752e"));

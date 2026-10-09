@@ -40,19 +40,31 @@ Branch	= {
 	]]
 
 	GetStartScreen = function()
+		check43ExtraModes();
 		if PREFSMAN:GetPreference('MainMenu') then
 			return "ScreenMainMenu"
 		else
-			return "ScreenTitleMenu"
+			return "ScreenLogo"
 		end
 	end;
 		
 	
+	GetLogoScreen = function()
+		check43ExtraModes();
+		if PREFSMAN:GetPreference('MainMenu') then
+			return "ScreenTitleMenu"
+		else
+			return "ScreenLogo"
+		end
+	end,
+
+
 	GetMainScreen = function()
+		check43ExtraModes();
 		if PREFSMAN:GetPreference('MainMenu') then
 			return "ScreenMainMenu"
 		else
-			return "ScreenTitleMenu"
+			return "ScreenLogo"
 		end
 	end,
 
@@ -67,6 +79,15 @@ Branch	= {
 
 	AfterEvaluation = function()
 	
+		--nonstop center
+		if isNonstopCenterModeActive() then
+			if getNextScreenNonstopCenter() == "ScreenLoadSong" then
+				return "ScreenLoadSong";
+			else
+				return "ScreenEvaluationNonstopCenter";
+			end;
+		end;
+
 		if GAMESTATE:GetSurvivalChannel() then
 			GAMESTATE:SetNextSurvivalSong();
 			return "ScreenLoadSong";
@@ -142,13 +163,14 @@ Branch	= {
 
 	end,
 
-	AfterStageBreak = function()	
+	AfterStageBreak = function()
 
+		local screen ="ScreenEvaluation";
 		-- EVENT
 		if GAMESTATE:IsEventMode() then
 		
 			if GAMESTATE:GetMusicTrainChannel() or GAMESTATE:GetProgressiveChannel() or GAMESTATE:GetRandomTrainChannel() then
-				return "ScreenSelectMusic";
+				return "ScreenEvaluation";
 			else
 				for pn in ivalues(PlayerNumber) do
 					if GAMESTATE:IsPlayerEnabled(pn) then
@@ -157,15 +179,15 @@ Branch	= {
 				end;
 				return "ScreenSelectMusic";
 			end
-		end;
-
-		local screen ="ScreenEvaluation";
+		end;		
 
 		if GAMESTATE:IsEventMode() and GAMESTATE:GetGameMode() == "Full" then
 			--- return "ScreenRandomWall";
-
 			if GAMESTATE:GetMusicTrainChannel() or GAMESTATE:GetProgressiveChannel() or GAMESTATE:GetRandomTrainChannel() then
-				return "ScreenSelectMusic";
+				--return "ScreenSelectMusic";
+				--if there is a song break on the train, the next time you play a train it will start with the last lifebar lol but if we go to the evaluation
+				--that doesn't happen
+				return "ScreenEvaluation";
 			else
 				for pn in ivalues(PlayerNumber) do
 					if GAMESTATE:IsPlayerEnabled(pn) then
@@ -174,11 +196,10 @@ Branch	= {
 				end;
 				return "ScreenSelectMusic";
 			end
-
 		end;
 
-
 		return screen;
+
 		--[[
 		for pn in ivalues(PlayerNumber) do
 			if GAMESTATE:IsPlayerEnabled(pn) then
@@ -199,6 +220,12 @@ Branch	= {
 			if GAMESTATE:GetGameMode() == "Quest" or GAMESTATE:GetGameMode() == "WorldMax" or GAMESTATE:GetGameMode() == "Infinity" or GAMESTATE:GetGameMode() == "QuestWorld" then
 				screen = "ScreenEvaluationQuest";
 			else
+				--here, if we have a break mode active, and it was a break we send the player to the screen select music.
+				if GAMESTATE:Env()["BreakFromMode"] ~= nil and GAMESTATE:Env()["BreakFromMode"] then
+					GAMESTATE:Env()["BreakFromMode"] = false;
+					return "ScreenSelectMusic";
+				end;
+
 				screen =  "ScreenEvaluation";
 			end;
 		end	

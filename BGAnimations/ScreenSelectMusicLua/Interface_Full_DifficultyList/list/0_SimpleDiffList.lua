@@ -28,6 +28,7 @@ xajs = (visibleCDLElements-1)/2;
 --why call the function every frame wtf or why was this way ._ .
 local frameDelay = 4;
 local isAspect1610On=isAspectRatio1610();
+local isAspect43On=isAspectRatio43();
 local t = Def.ActorFrame {};
 
 local StepsColor = {
@@ -69,7 +70,7 @@ local function CustomMeterforIcon(n,elemnts)
 		if isCustom then
 			DisplayLV(steps[n].meter);
 		else
-			return DisplayLV(steps[n]:GetMeter());
+			return DisplayLV_New(steps[n]); 
 		end;
 	end;
 	return "";
@@ -83,7 +84,7 @@ local function CustomMeterforIconTrainOthers(n,elemnts)
 	if #steps > elemnts and n == elemnts then
 		return #steps-elemnts+1
 	elseif n > 0 and n <= #steps then
-		return DisplayLV(steps[n].meter);
+		return DisplayLV(steps[n].meter);		
 	end;
 
 	return "";
@@ -130,11 +131,14 @@ local function SimpleListUpdater(self,index)
 	local slGradeP2 = self:GetChild("slgradep2");
 	local slGradeP2fail = self:GetChild("slgradep2fail");	
 	local basicMode = self:GetChild("bmode");
+	local missionModeStatus = self:GetChild("miniStatusMission");
 	slGradeP1fail:visible(false);
 	slGradeP1:visible(false);
 
 	slGradeP2fail:visible(false);
 	slGradeP2:visible(false);	
+
+	missionModeStatus:visible(false);
 
     local topScreen = SCREENMAN:GetTopScreen()
     if topScreen:GetName() == "ScreenSelectMusic" and topScreen:GetSelectionState() == "SelectingSong" then
@@ -191,15 +195,11 @@ local function SimpleListUpdater(self,index)
 					local StepsType = step:GetStepsType();
 					local getNumPlayersChart = step:GetPlayers();
 
-					backlvrect:visible(true);
-
-
-					local colorMode = getColorByStepType(StepsType,getNumPlayersChart);
-					backlvrect:diffuse(colorMode);
+					local colorMode = getColorByStepType(StepsType,getNumPlayersChart);					
+					backlvrect:stoptweening():diffuse(colorMode);					
+					backlvrect:stoptweening():diffusealpha(0):linear(0.25):diffusealpha(0.8);
 					LvBorder:diffuse(colorMode);
-					
-					backlvrect:diffusealpha(0.8);
-
+					backlvrect:visible(true);
 
 					if GAMESTATE:GetGameMode() == 'Basic' then						
 						basicMode:visible(true);
@@ -261,11 +261,12 @@ local function SimpleListUpdater(self,index)
 						LvText:settext(xplayers);
 						LvBorder:settext(xplayers):diffuse(color("#8f752e"));
 					end;
+
 					if GAMESTATE:GetQuestZoneChannel() then
 						CUSLABEL:setstate(0);
 						DIFFLABEL:setstate(0);
 						if tlabel == "s2" then
-							local chk = CheckLock("S1", GAMESTATE:GetMasterPlayerNumber())
+							local chk = CheckLock("S1", GAMESTATE:GetMasterPlayerNumber())							
 							Padlock:visible(chk);
 						elseif tlabel == "s3" then
 							local chk = CheckLock("S2", GAMESTATE:GetMasterPlayerNumber())
@@ -274,6 +275,28 @@ local function SimpleListUpdater(self,index)
 							local chk = CheckLock("S3", GAMESTATE:GetMasterPlayerNumber())
 							Padlock:visible(chk);
 						end;
+
+						local chkStatusMision = CheckMissionStatus(GAMESTATE:GetMasterPlayerNumber(),step);
+
+						if GAMESTATE:GetMasterPlayerNumber() == PLAYER_1 then
+							missionModeStatus:y(29);
+							missionModeStatus:x(-6);
+						else
+							missionModeStatus:y(-17);
+							missionModeStatus:x(10);
+						end;
+
+						if chkStatusMision == 1 then
+							missionModeStatus:setstate(0);
+							missionModeStatus:visible(true);
+						elseif chkStatusMision == 2 then
+							missionModeStatus:setstate(1);
+							missionModeStatus:visible(true);
+						else
+							missionModeStatus:visible(false);
+						end;
+
+
 					else
 						local nlabel = 0;
 							nlabel = tlabel == "ucs" and 2 or nlabel;
@@ -429,15 +452,16 @@ for i = 1, FullCDLElements, 1 do
 			InitCommand=cmd(zoom,0.63;xy,-2,29;visible,false;animate,false;setstate,1);
 			CurrentSongChangedMessageCommand=cmd(stoptweening;diffusealpha,0;sleep,sleepBaseLv;accelerate,0.18;diffusealpha,1);
 		};				
-		
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/mission/ministatus 1x2"))..{
+			Name="miniStatusMission";
+			InitCommand=cmd(zoom,.55;xy,0,0;animate,false;setstate,0;visible,false);
+			CurrentSongChangedMessageCommand=cmd(stoptweening;diffusealpha,0;sleep,sleepBaseLv;accelerate,0.18;diffusealpha,1);
+		};
 		FullModeMessageCommand=cmd(stoptweening;queuecommand,"UpdatePos");
 		RankModeMessageCommand=cmd(stoptweening;queuecommand,"UpdatePos");
 
 
 		OnCommand=function(self)
-
-
-
 			self:SetUpdateFunction(function(self)
 				--we stop calling simpleListUpdate if the items are ready...
 				if framesCounterSDL % frameDelay == 0 and LastCDLElementsProcesed[i] == false then
@@ -471,6 +495,11 @@ for i = 1, FullCDLElements, 1 do
 				if isAspect1610On then
 					self:addy(-10);
 				end;
+
+				if isAspect43On then
+					self:addy(-34);
+				end;
+
 			end;
 		end;
 

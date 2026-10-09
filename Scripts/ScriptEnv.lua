@@ -29,7 +29,7 @@ end;
 function createCustomOptionEnvPlayers(player)
     --same as Other/option.json
     local customOptions = { 
-        {Option = 'judgmentSkin', Value = 'i_default'},
+        {Option = 'judgmentSkin', Value = 'sanity'},
         {Option = 'judgmentZoom', Value = 100},
         {Option = 'lifebarSkin', Value = 'i_default'},
         {Option = 'gameplay_stats_ui', Value = false},
@@ -39,11 +39,19 @@ function createCustomOptionEnvPlayers(player)
         {Option = 'gameplay_break_icon_ui', Value = false},
         {Option = 'gameplay_lv_ui',  Value = false},
         {Option = 'gameplay_fastslow',  Value = false},
+        {Option = 'gameplay_timingbar',  Value = false},
+        {Option = 'gameplay_topTimerBar',  Value = false},
         {Option = 'lifebar_extra_mode',  Value = 'none'},
         {Option = 'channelMusic',  Value = 'default (loop).ogg'},
-        {Option = 'channelMusic_type',  Value = 'internal.ogg'},
+        {Option = 'channelMusic_type',  Value = 'internal'},
         {Option = 'performance_mode',  Value = false},
-        {Option = 'difficultyListMode',  Value = "sanity"},
+        {Option = 'performance_mode_type',  Value = 0},
+        {Option = 'timing_adjustment',  Value = 0},
+        {Option = 'difficultyListMode',  Value = 'list'},
+        {Option = 'evaluationSkin',  Value = 'i_xsanity'},
+        {Option = 'companion',  Value = 'none'},
+        {Option = 'frameSkin',  Value = 'i_simple'},
+        {Option = 'commandWindowMod',  Value = 'default'},
     };
 
     if player == PLAYER_1 then
@@ -78,7 +86,7 @@ function getCustomOptionGuest(player,option)
         end;
     end;
 
-    return false;
+    return nil;
 
 end;
 

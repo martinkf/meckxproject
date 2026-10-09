@@ -2,7 +2,7 @@ local xCount=14;
 local xCenter=7;
 local SONGSTEPS = nil;
 local ARRAY={};
-local StepsType={'StepsType_Pump_Single','StepsType_Pump_Halfdouble','StepsType_Pump_Double','StepsType_Pump_Single_P','StepsType_Pump_Double_P' };
+local StepsType={'StepsType_Pump_Single','StepsType_Pump_Halfdouble','StepsType_Pump_Double','StepsType_Pump_Single_P','StepsType_Pump_Double_P','StepsType_Pump_Couple' };
 
 
 local MaxFloors = 1;
@@ -42,6 +42,8 @@ local function StepTypeToMode(stype)
 		return "pump-single-p";
 	elseif stype == "StepsType_Pump_Double_P" then
 		return "pump-double-p";
+	elseif stype == "StepsType_Pump_Couple" then
+		return "pump-couple";
 	else
 		return "";
 	end;
@@ -121,7 +123,8 @@ local function GetSteps()
 		local auxSteps={};
 		for i=1 ,#vpSteps do
 			auxSteps[i] = {};
-			auxSteps[i].meter = vpSteps[i]:GetMeter();
+			--auxSteps[i].meter = DisplayLV_New(vpSteps[i]:GetMeter());
+			auxSteps[i].meter = DisplayLV_New(vpSteps[i]);
 			auxSteps[i].modes = StepTypeToMode(vpSteps[i]:GetStepsType());
 			auxSteps[i].players = 1;
 			auxSteps[i].label = "normal";
@@ -142,7 +145,8 @@ local function GetSteps()
 			local auxSteps={};
 			for i=1 ,#vpSteps ,1 do
 					auxSteps[#auxSteps+1] = {};
-					auxSteps[#auxSteps].meter = vpSteps[i]:GetMeter();
+					--auxSteps[#auxSteps].meter = vpSteps[i]:GetMeter();
+					auxSteps[#auxSteps].meter = DisplayLV_New(vpSteps[i]);
 					auxSteps[#auxSteps].modes = StepTypeToMode(vpSteps[i]:GetStepsType());
 					auxSteps[#auxSteps].players = vpSteps[i]:GetPlayers();
 					auxSteps[#auxSteps].label = LabelTypeToMode(vpSteps[i]:GetLabelType());
@@ -159,9 +163,12 @@ local function GetSteps()
 		local auxSteps={};
 		for st=1, #StepsType, 1 do
 			for i=1 ,#vpSteps ,1 do
+				--Trace("Checking StepType: ["..StepsType[st].."]-Desc:["..vpSteps[i]:GetDescription().."] -Lv:["..vpSteps[i]:GetMeter().."] StepType chart: ["..vpSteps[i]:GetStepsType().."]");
 				if vpSteps[i]:GetStepsType() == StepsType[st] then
+					--Trace("Step added to the stepType!");
 					auxSteps[#auxSteps+1] = {};
 					auxSteps[#auxSteps].meter = vpSteps[i]:GetMeter();
+					auxSteps[#auxSteps].meter = DisplayLV_New(vpSteps[i]);
 					auxSteps[#auxSteps].modes = StepTypeToMode(vpSteps[i]:GetStepsType());
 					auxSteps[#auxSteps].players = vpSteps[i]:GetPlayers();
 					auxSteps[#auxSteps].label = LabelTypeToMode(vpSteps[i]:GetLabelType());
@@ -315,6 +322,8 @@ for i=1,13,1 do
 							self:setstate(5);
 						elseif SONGSTEPS[i + iMasterFloor].modes == "pump-single" then
 							self:setstate(0);
+						elseif SONGSTEPS[i + iMasterFloor].modes == "pump-couple" then
+							self:setstate(0);
 						end;
 						
 						if SONGSTEPS[i + iMasterFloor].modes == "pump-double-p" and SONGSTEPS[i + iMasterFloor].players ~= 1  then
@@ -374,7 +383,7 @@ for i=1,13,1 do
 						local meter = SONGSTEPS[i+ iMasterFloor].meter;
 
 						
-						meter = string.format("%02i", meter);
+						--meter = string.format("%02i", meter);
 						
 						if (meter == "49" or meter == "50" or meter == "99") then
 							meter = "??";
@@ -431,7 +440,7 @@ for i=1,13,1 do
 						self:visible(true);
 						local meter = SONGSTEPS[i+ iMasterFloor].meter;
 						
-						meter = string.format("%02i", meter);
+						--meter = string.format("%02i", meter);
 						
 						if (meter == "49" or meter == "50" or meter == "99") then
 							meter = "??";

@@ -18,15 +18,17 @@ local t =  Def.ActorFrame
 					self:setsize(372,214);
 				elseif img_w == 340 and img_h == 340 then	-- trs related
 					self:setsize(374,374);
-				elseif img_w == 500 and img_h == 500 then	-- common
-					self:setsize(400,400);
-				elseif img_w == 512 and img_h == 512 then	-- common
-					self:setsize(400,400);	
-				elseif img_w == 1024 and img_h == 1024 then	-- common
-					self:setsize(400,400);	
 				else
-					self:setsize(440,280);
+					--anything outside 512 <-> and 512 | will be pushed back to 400x400. 
+					if img_w >= 500 or img_h >=500 then
+						self:setsize(400,400);
+					else
+						self:setsize(img_w,img_h);
+					end;
 				end;
+				self:zoom(1);
+			else
+				self:setsize(self:GetWidth(),self:GetHeight());
 				self:zoom(1);
 			end
 		end;

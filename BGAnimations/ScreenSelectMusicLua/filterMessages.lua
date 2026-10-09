@@ -32,6 +32,11 @@ t[#t+1] =  Def.ActorFrame
 
 	LoadActor(THEME:GetPathG("","ScreenSelectMusic/modeFilter/TypeNoteType/"..langHeader.."_header"))..{
 		InitCommand=cmd(zoom,0.8;y,-15);
+		OnCommand=function(self)
+			if langHeader == "ko" then
+				self:x(36);
+			end;
+		end;
 	};	
 
 	--base	
@@ -67,6 +72,8 @@ t[#t+1] =  Def.ActorFrame
 				self:x(-53);
 			elseif langHeader == "pt" then
 				self:x(-39);
+			elseif langHeader == "ko" then
+				self:x(-124);
 			end;
 			
 		end;
@@ -110,6 +117,11 @@ t[#t+1] =  Def.ActorFrame
 
 	LoadActor(THEME:GetPathG("","ScreenSelectMusic/modeFilter/TypeChannel/"..langHeader.."_header"))..{
 		InitCommand=cmd(zoom,0.8;y,-15);
+		OnCommand=function(self)
+			if langHeader == "ko" then
+				self:x(30);
+			end;
+		end;
 	};	
 	LoadActor(THEME:GetPathG("","ScreenSelectMusic/modeFilter/arrow_pink"))..{
 		InitCommand=cmd(x,-79;y,-15;zoom,0.85);
@@ -118,6 +130,8 @@ t[#t+1] =  Def.ActorFrame
 				self:x(-53);
 			elseif langHeader == "pt" then
 				self:x(-39);
+			elseif langHeader == "ko" then
+				self:x(-130);
 			end;
 			
 		end;

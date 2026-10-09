@@ -3,6 +3,9 @@ local t = Def.ActorFrame {};
 local cur_scr;
 
 local function GetCommandTitles()
+
+
+
 	local array=
 	{
 		{name="rank",index=1},
@@ -22,8 +25,19 @@ local function GetCommandTitles()
 		{name="lifebarsettings",index=14},
 		{name="vsmode",index=15},
 		{name="timingadj",index=16},
+
 		--{name="rank",index=1},	
 	};
+
+
+
+	--companions | we are always the last of the list.
+	local companionsInstalled = getNumberOfCompanionInstalled();
+	if companionsInstalled > 0 then
+		local lastIndexArray = array[#array]["index"];
+		table.insert(array,{name="companion",index=lastIndexArray+1});
+	end;
+
 	return array;
 end;
 local function GetModTitles()
@@ -61,6 +75,7 @@ local function GetModTitles()
 			{command="bgadarkrank"},
 			{command="bgapartial"},
 			{command="bgapartialrank"},
+			{command="footguide"},
 		},
 		{
 			
@@ -73,7 +88,7 @@ local function GetModTitles()
 			{command="sink"},
 			{command="rise"},
 			{command="snake"},
-			{command="zigzag"},
+			{command="piuzigzag"},
 		},
 		{
 			{command="backwards"},
@@ -119,6 +134,15 @@ local function GetModTitles()
 
 	}
 
+	--companions | we are always the last of the list.
+	--only if there is 1 at least.
+	local companionsInstalled = getNumberOfCompanionInstalled();
+	if companionsInstalled > 0 then
+		table.insert(array,{});
+	end;
+
+	
+
 	if PREFSMAN:GetPreference('UnlockJudgeCW') then
 		table.insert(array[7], {command="extrajudgement",});
 		table.insert(array[7], {command="ultrahardjudgement",});
@@ -136,6 +160,7 @@ local function GetModTitles()
 	table.insert(array[7], {command="1.7",});
 	
 	table.insert(array[7], {command="0.6rank",});
+	table.insert(array[7], {command="easyjudgement",});
 	--[[table.insert(array[7], {command="0.8rank",});
 	table.insert(array[7], {command="0.9rank",});
 	table.insert(array[7], {command="1.1rank",});
@@ -176,7 +201,6 @@ local function IsModSelected( index , modTitle , player)
 	
 	local SONGOPTIONS = GAMESTATE:GetSongOptionsObject('ModsLevel_Preferred');
 	local STATE = GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Preferred');
-	
 	--Agregar comprobaciones de nuevas opciones acá.
 	--como no tengo acceso a guardar opciones, que sean variables de entorno
 	--Esto mismo esta en ScreenSelectMusicModIcons.lua
@@ -188,7 +212,6 @@ local function IsModSelected( index , modTitle , player)
 	-- if player == PLAYER_2 then				
 	-- 	playerAfixInfo="infop2";
 	-- end;
-	-- Trace(STATE:StageInfoOption());
 	-- if modTitle == "stageinfooptionbasic" and STATE:StageInfoOption() == 1 then
 	-- 	-- if GAMESTATE:Env()[playerAfixInfo] == 1 then
 	-- 	return true;
@@ -239,8 +262,28 @@ local function IsModSelected( index , modTitle , player)
 	if GAMESTATE:IsHumanPlayer(player) and modTitle == "ultrahardjudgement"  and STATE:UltraHardJudgement() then
 		return true;
 	end;
+
+	if GAMESTATE:IsHumanPlayer(player) and modTitle == "easyjudgement"  and STATE:EasyJudgement() then
+		return true;
+	end;
+	
+	--[[
+	for i=1,#statePlayerArray do
+		if GAMESTATE:IsHumanPlayer(player) and modTitle == "easyjudgment" and statePlayerArray == "EasyJudgment" then
+			return true;
+		end;
+	end;
+
+	if GAMESTATE:IsHumanPlayer(player) and modTitle == "easyjudgement"  and STATE:EasyJudgement() then		
+		return true;
+	end;
+	]]
 	
 	if GAMESTATE:IsHumanPlayer(player) and modTitle == "mini" and STATE:Mini() > 0.0 then
+		return true;
+	end;
+	
+	if GAMESTATE:IsHumanPlayer(player) and modTitle == "footguide" and STATE:Guide() then
 		return true;
 	end;
 	
@@ -252,7 +295,10 @@ local function IsModSelected( index , modTitle , player)
 		return true;
 	end;
 	
-	local noX = string.gsub(STATE:XMod(),"x","");
+	local noX = 0;
+	if STATE:XMod() then
+		noX = string.gsub(STATE:XMod(),"x","");
+	end;
 	
 	if tonumber(noX) % 1 == .25 then
 		if modTitle == "0.25" then
@@ -294,7 +340,6 @@ local function IsModSelected( index , modTitle , player)
 	
 	local mods = GAMESTATE:GetPlayerState(player):GetPlayerOptionsArray( 'ModsLevel_Preferred' );
 	for i=1,#mods,1 do
-		-- Trace(mods[i]);
 		if string.lower(mods[i]) == string.lower(modTitle) then
 			return true;
 		end;
@@ -317,6 +362,16 @@ local function getAVNum(player)
 	end;
 end;
 
+local function getCVNum(player)
+	if GAMESTATE:IsPlayerEnabled(player) then
+		local STATE = GAMESTATE:GetPlayerState(player);
+		local AV = STATE:GetPlayerOptions('ModsLevel_Preferred'):CMod()
+		if AV == nil then return nil; end;
+		return AV;
+	else
+		return nil
+	end;
+end;
 				
 t[#t+1] =  Def.ActorFrame{
 	
@@ -454,7 +509,7 @@ function CreateModForPlayer(player)
 			
 			t[#t+1] = LoadActor(THEME:GetPathG("","CommandWindow/BackIcon"))..{
 				Name="backnoteskin";
-				InitCommand=cmd(y, 4 * yAuxPos;visible,false);
+				InitCommand=cmd(y, 4 * yAuxPos-1;visible,false);
 		
 				OnCommand=function(self, params)
 					if GAMESTATE:GetGameMode() ~= 'Basic' then
@@ -490,7 +545,7 @@ function CreateModForPlayer(player)
 			
 			t[#t+1] = LoadActor(THEME:GetPathG("","_blank"))..{
 				Name="noteskin";
-				InitCommand=cmd(y, 4 * yAuxPos;visible,false);
+				InitCommand=cmd(y, 4 * yAuxPos-1;visible,false);
 				OnCommand=function(self, params)
 		
 							
@@ -534,21 +589,14 @@ function CreateModForPlayer(player)
 	
 			};
 		elseif GetCommandTitles()[m].name == "judgeskin" then
-			--Trace("ScreenSelectMusicModIcons -> judgeskin");
 		elseif GetCommandTitles()[m].name == "judgeskinzoom" then
-			--Trace("ScreenSelectMusicModIcons -> judgeskinzoom");			
 		elseif GetCommandTitles()[m].name == "info" then
-			--Trace("ScreenSelectMusicModIcons -> gameplay info");
-		elseif GetCommandTitles()[m].name == "lifebarskin" then
-			--Trace("ScreenSelectMusicModIcons -> lifebarskin");		
+		elseif GetCommandTitles()[m].name == "lifebarskin" then	
 		elseif GetCommandTitles()[m].name == "lifebarsettings" then
-			--Trace("ScreenSelectMusicModIcons -> lifebarsettings");
 		elseif GetCommandTitles()[m].name == "vsmode" then
-			Trace("ScreenSelectMusicModIcons -> "..GetCommandTitles()[m].name);
 		elseif GetCommandTitles()[m].name == "timingadj" then
-			Trace("ScreenSelectMusicModIcons -> timingadj");
+		elseif GetCommandTitles()[m].name == "companion" then
 		else
-			--Trace(GetCommandTitles()[m].name);
 			local FileSprite = "icons0" .. m .. " " .. #GetModTitles()[m] .. "x1";
 			if (GetCommandTitles()[m].customdimension ~= nil ) then
 				FileSprite = "icons0" .. m .. " " .. GetCommandTitles()[m].customdimension;
@@ -567,9 +615,6 @@ function CreateModForPlayer(player)
 					for i=1,#GetModTitles()[m],1 do
 						
 						if IsModSelected(m, GetModTitles()[m][i].command, player)  then
-
-							MESSAGEMAN:Broadcast("Mod Selected COMMAND!!->"..GetModTitles()[m][i].command);
-							MESSAGEMAN:Broadcast("Mod Selected NAME!!->"..GetCommandTitles()[m].name);
 
 							MESSAGEMAN:Broadcast("GlowIconMod", {Player = player, Section = GetCommandTitles()[m].name });
 
@@ -852,6 +897,7 @@ function CreateModForPlayer(player)
 			local mod = params.Mod;
 			local title = GetCommandTitles()[ params.Command ].name;
 			
+
 			if title == "speed" then
 				if getAVNum(player) then
 					self:stoptweening():visible(true);
@@ -861,6 +907,14 @@ function CreateModForPlayer(player)
 			end;
 
 		end;
+
+		CodeModMessageCommand=function(self, params)
+			if params.Player ~= player then return; end;
+			if params.Command == "speed" then
+				self:stoptweening():visible(false);
+			end;
+		end;
+
 		
 		EnableAVMessageCommand=function(self, params)
 			if params.Player ~= player then return; end;
@@ -871,7 +925,7 @@ function CreateModForPlayer(player)
 			self:visible(false);
 		end;
 	};
-	
+
 	t[#t+1] = LoadFont("interphase/InterNumber numbers").. {
 		Name="AVText";
 		InitCommand=cmd(visible,false;y,2*yAuxPos - 5;zoom,.42;);
@@ -886,14 +940,19 @@ function CreateModForPlayer(player)
 			self:visible(GAMESTATE:IsHumanPlayer(player));
 		end;
 
+		CodeModMessageCommand=function(self, params)
+			if params.Player ~= player then return; end;
+			if params.Command == "speed" then
+				self:stoptweening():visible(false);
+			end;
+		end;
+
 		CheckSelectedMessageCommand=function(self, params)
 			if params.Player ~= player then return; end;
 									 
 			if (params.Mod == nil) then return; end;
 			
-			local mod = params.Mod;
-			
-			-- Trace("param commnad " .. params.Command)
+			local mod = params.Mod;			
 			local title = GetCommandTitles()[ params.Command ].name;
 		  
 			if title == "speed" then
@@ -914,7 +973,127 @@ function CreateModForPlayer(player)
 			self:stoptweening():queuecommand("On");
 		end;
 	};
-	
+
+	t[#t+1] = LoadActor(THEME:GetPathG("","CommandWindow/CVicon"))..{
+		Name="CVBack";
+		InitCommand=cmd(visible,false;y,2*yAuxPos;zoom,0.5);
+		OnCommand=function(self)
+			if getCVNum(player) ~= nil then
+				self:diffusealpha(0.25);
+				self:zoom(0.5);
+				self:linear(0.25);				
+				self:diffusealpha(1);
+				self:visible(GAMESTATE:IsHumanPlayer(player));	
+			else
+				self:visible(false);
+			end;
+		end;
+		CheckSelectedMessageCommand=function(self, params)
+			self:zoom(0.5);
+			if params.Player ~= player then return; end;
+			if (params.Mod == nil) then return; end;
+			
+			local mod = params.Mod;
+			local title = GetCommandTitles()[ params.Command ].name;
+			
+
+			if title == "speed" or title == "av" then
+				if getCVNum(player) then
+					self:stoptweening():visible(true);
+				else
+					self:stoptweening():visible(false);
+				end;
+			end;
+
+		end;
+
+		CodeModMessageCommand=function(self, params)
+			if params.Player ~= player then return; end;
+			if params.Command == "speed" or  params.Command == "av" then
+				self:stoptweening():visible(false);
+			end;
+		end;
+
+		
+		EnableAVMessageCommand=function(self, params)
+			if params.Player ~= player then return; end;
+			self:visible(false);
+		end;
+
+		EnableCVMessageCommand=function(self, params)
+			if params.Player ~= player then return; end;
+			self:stoptweening():queuecommand("On");
+		end;
+
+		CommandWindowResetMessageCommand=function(self, params)
+			if params.Player ~= player then return; end;
+			self:visible(false);
+		end;
+	};
+
+	t[#t+1] = LoadFont("interphase/InterNumber numbers").. {
+		Name="CVText";
+		InitCommand=cmd(visible,false;y,2*yAuxPos - 5;zoom,.42;);
+		OnCommand=function(self)
+			self:horizalign(center);
+			self:x(-1);
+			if getCVNum(player) ~= nil then
+				self:settext(getCVNum(player));
+			else
+				self:settext("");
+			end;
+			self:visible(GAMESTATE:IsHumanPlayer(player));
+		end;
+
+		CodeModMessageCommand=function(self, params)
+			if params.Player ~= player then return; end;
+			if params.Command == "speed" then
+				self:stoptweening():visible(false);
+			end;
+		end;
+
+		CheckSelectedMessageCommand=function(self, params)
+			if params.Player ~= player then return; end;
+									 
+			if (params.Mod == nil) then return; end;
+			
+			local mod = params.Mod;			
+			local title = GetCommandTitles()[ params.Command ].name;
+		  
+			if title == "speed" then
+				if getCVNum(player) then
+					self:stoptweening():queuecommand("On");
+				else
+					self:stoptweening():visible(false);
+				end;
+			end;
+
+			if title == "av" then
+				if getCVNum(player) then
+					self:stoptweening():queuecommand("On");
+				else
+					self:stoptweening():visible(false);
+				end;
+			end;
+		end;
+		
+		EnableAVMessageCommand=function(self, params)
+			if params.Player ~= player then return; end;
+			self:stoptweening():queuecommand("On");
+		end;
+		
+		EnableCVMessageCommand=function(self, params)
+			if params.Player ~= player then return; end;
+			self:stoptweening():queuecommand("On");
+		end;
+
+		CommandWindowResetMessageCommand=function(self, params)
+			if params.Player ~= player then return; end;
+			self:stoptweening():queuecommand("On");
+		end;
+	};
+
+
 	t[#t+1] = LoadActor(THEME:GetPathG("","THEME-EFFECT_GLOW"))..{
 		Name="AVGlow1";
 		InitCommand=cmd(animate,false;setstate,0;blend,Blend.Add;diffusealpha,0;y,2*yAuxPos);
@@ -935,6 +1114,26 @@ function CreateModForPlayer(player)
 		end;
 	};
 	
+	t[#t+1] = LoadActor(THEME:GetPathG("","THEME-EFFECT_GLOW"))..{
+		Name="CVGlow1";
+		InitCommand=cmd(animate,false;setstate,0;blend,Blend.Add;diffusealpha,0;y,2*yAuxPos);
+		AnimateAuxCommand=cmd(finishtweening;zoom,1;diffusealpha,1;sleep,0.1;linear,0.4;diffusealpha,0;zoom,1.125);
+		EnableCVMessageCommand=function(self, params)
+			if params.Player ~= player then return; end;
+			self:stoptweening():queuecommand("AnimateAux");
+		end;
+	};
+	
+	t[#t+1] = LoadActor(THEME:GetPathG("","THEME-EFFECT_GLOW"))..{
+		Name="CVGlow2";
+		InitCommand=cmd(animate,false;setstate,1;blend,Blend.Add;diffusealpha,0;y,2*yAuxPos);
+		AnimateAuxCommand=cmd(finishtweening;zoom,1;diffusealpha,1 - (1*0.5);sleep,0.1;linear,0.4;diffusealpha,0;zoom,1.125 + (1*0.2));
+		EnableCVMessageCommand=function(self, params)
+			if params.Player ~= player then return; end;
+			self:stoptweening():queuecommand("AnimateAux");
+		end;
+	};
+
 	t[#t+1] = LoadActor(THEME:GetPathG("","CommandWindow/AUTOicon"))..{
 		InitCommand=cmd(visible,false;y,yAuxPos);
 		OnCommand=function(self)

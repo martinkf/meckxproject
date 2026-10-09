@@ -194,6 +194,11 @@ t[#t+1] = Def.ActorFrame{
 				self:blend("BlendMode_Add");
 				self:diffuse(color("#ffffff"));
 				self:diffusealpha(0.5);
+
+				if isAspectRatio43() then
+					self:y(902);
+				end;
+
 			end;
 
 			FinalizedMessageCommand=function(self)
@@ -216,6 +221,11 @@ t[#t+1] = Def.ActorFrame{
 				self:diffuse(color("#0000ff"));
 				self:blend("BlendMode_Add");
 				self:diffusealpha(0.5);
+
+				if isAspectRatio43() then
+					self:y(902);
+				end;
+
 			end;
 
 			FinalizedMessageCommand=function(self)
@@ -252,6 +262,11 @@ t[#t+1] = Def.ActorFrame{
 			self:diffuse(color("#ffffff"));
 			self:diffusealpha(0.3);
 			self:rotationz(270);
+
+			if isAspectRatio43() then
+				self:y(902);
+			end;
+
 		end;
 
 		FinalizedMessageCommand=function(self)
@@ -275,6 +290,11 @@ t[#t+1] = Def.ActorFrame{
 			self:blend("BlendMode_Add");
 			self:diffusealpha(0.5);
 			self:rotationz(270);
+
+			if isAspectRatio43() then
+				self:y(902);
+			end;
+			
 		end;
 
 		FinalizedMessageCommand=function(self)

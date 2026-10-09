@@ -103,7 +103,6 @@ function getTrainProgresiveInfoLess(currentSong)
 				if string.find(customBpm, "-") then
 				    local partes = split(customBpm, "-")
 				    for i, v in ipairs(partes) do
-				    	--Trace("#Parts bpm="..v);
 				        table.insert(bpmList,v);
 				    end
 				else
@@ -297,7 +296,8 @@ function LabelTypeToMode(ltype)
         ["LABELTYPE_INFINITY"] = "infinity",
         ["LABELTYPE_JUMP"] = "jump",
         ["LABELTYPE_HIDDEN"] = "hidden",
-        ["LABELTYPE_TRAIN"] = "train"
+        ["LABELTYPE_TRAIN"] = "train",
+        ["LABELTYPE_COUPLE"] = "couple"
     }
     return mapping[ltype] or ""
 end
@@ -320,6 +320,8 @@ function DesCustomLabel(ltype)
         return "train"
     elseif string.find(fxlb, "BOSS") then
         return "boss"
+    elseif string.find(fxlb, "COUPLE") then
+        return "couple"
     elseif string.find(fxlb, "KEYBOARD") then
         return "keyboard"
     elseif string.find(fxlb, "KB") then
@@ -345,7 +347,7 @@ function setNormalLabelState(label, cuslabel)
 	
     local states = {
         quest = 1, another = 2, pro = 3, infinity = 4,
-        hidden = 5, jump = 6, train = 7, ucq = 8 , keyboard = 9, kb = 9, boss = 10
+        hidden = 5, jump = 6, train = 7, ucq = 8 , keyboard = 9, kb = 9, couple = 10
     }
 
     local state = states[label] or states[cuslabel]
@@ -425,4 +427,26 @@ function CheckLock(lfloor, pn, song)
 	end
 
 	return true
+end
+
+function CheckMissionStatus(pn,steps)
+	if not GAMESTATE:GetQuestZoneChannel() then return false end
+
+	local profile = PROFILEMAN:GetProfile(pn)
+		if not profile then return false end;
+
+	song = GAMESTATE:GetCurrentSong();
+		if not song then return false end;
+	local scorelist = profile:GetHighScoreList(song,steps):GetHighScores();
+
+	if #scorelist > 0 then
+		for i=1,#scorelist do
+			if scorelist[i]:GetSuccess() then
+				return 1; -- success
+			end;
+		end;
+		return 2; -- failed
+	else
+		return 0; -- no record.
+	end;
 end

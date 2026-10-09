@@ -33,4 +33,36 @@ t[#t+1] = LoadActor(GetPath())..{
 	InitCommand=cmd(TITLE);
 };
 
+--NSCENTER
+-- we fix the speed from the gamemode itself because we can change it between songs :o
+if isNonstopCenterModeActive() then
+		t[#t+1] = Def.ActorFrame{
+			OnCommand=function(self)
+				if GAMESTATE:IsHumanPlayer(PLAYER_1) then
+				    local ps = GAMESTATE:GetPlayerState(PLAYER_1);			   
+				    local playerIsAv = playerIsAvNonstopCenterMode(PLAYER_1);
+					if playerIsAv == false or getAvSpeedNonstopCenterMode(PLAYER_2) == 0 then
+						--speed
+					else
+						--av
+						local avPlayer = getAvSpeedNonstopCenterMode(PLAYER_1);
+						ps:GetPlayerOptions("ModsLevel_Preferred"):MMod(avPlayer);
+					end;
+				end;
+
+				if GAMESTATE:IsHumanPlayer(PLAYER_2) then
+					local ps = GAMESTATE:GetPlayerState(PLAYER_2);
+					local playerIsAv = playerIsAvNonstopCenterMode(PLAYER_2);					
+					if playerIsAv == false or getAvSpeedNonstopCenterMode(PLAYER_2) == 0 then
+						--speed
+					else
+						--av
+						local avPlayer = getAvSpeedNonstopCenterMode(PLAYER_2);
+						ps:GetPlayerOptions("ModsLevel_Preferred"):MMod(avPlayer);
+					end;
+				end;
+			end;
+		};
+end;
+
 return t;

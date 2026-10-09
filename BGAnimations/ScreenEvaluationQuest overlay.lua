@@ -116,13 +116,13 @@ local xRollPos = 400;
 local SnapDistance = 32.7;
 local function CreateStats( pnPlayer )
 
-	Trace("GENERATING STATS FOR:"..pnPlayer);
 	local pnStageStats = vStats:GetPlayerStageStats( pnPlayer );
 	tStatsGlobal = {		
 		Chapter		= GAMESTATE:GetCurrentSong():GetTranslitArtist();
 		Desc		= GAMESTATE:GetCurrentSteps(pnPlayer):GetQuestDesc();
 		Success		= pnStageStats:GetSuccess();
 	};	
+
 	local tStats = {
 		Perfect 	= pnStageStats:GetTapNoteScores("TapNoteScore_W1") +
 					  pnStageStats:GetTapNoteScores("TapNoteScore_W2") +
@@ -142,10 +142,13 @@ local function CreateStats( pnPlayer )
 		BrainX		= pnStageStats:GetTapNoteScores("TapNoteScore_BrainX");
 		Life		= pnStageStats:GetCurrentLife();
 		Score		= pnStageStats:GetPhoenixScore();
+		OldScore		= pnStageStats:GetOldScore();
 		Grade		= pnStageStats:GetGrade();
 		TierGrade	= gradeTransformState(pnStageStats:GetPhoenixScore());
 		
 		Failed		= pnStageStats:GetFailedAux();
+		wmgrade	    = pnStageStats:GetGradeWM();
+		oldGrade 	= translateOldeGadeToNewGrade(pnStageStats:GetGradeWM());
 	};
 	if pnPlayer == PLAYER_1 then
 		bothfailed[1] =tStats["Failed"];
@@ -178,6 +181,7 @@ local function CreateStats( pnPlayer )
 	statsAux[13] ="BrainX";
 	statsAux[14] ="Life";
 	statsAux[15] ="Score";
+	statsAux[16] ="OldScore";
 	tStats["Life"] = round(tStats["Life"],2) * 100;
 	local xSide;
 	local xAlign;
@@ -185,7 +189,6 @@ local function CreateStats( pnPlayer )
 	xSide = 1;
 	xAlign = 'HorizAlign_Right';
 	xAuxX=0;
-	
 
 	local t = Def.ActorFrame {};
 	
@@ -197,20 +200,34 @@ local function CreateStats( pnPlayer )
 	--letras
 	if tStats["Failed"] then
 
+		local tierGradeMission = 0;
+		if GAMESTATE:GetGameMode() == "WorldMax" or GAMESTATE:GetGameMode() =="QuestWorld" or GAMESTATE:GetGameMode() == "Infinity" then
+			tierGradeMission = tStats["oldGrade"];
+		else
+			tierGradeMission = TierToState(tStats["Grade"]);
+		end;
+
 		t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
-			OnCommand=cmd(Center;addx,iAux2Player*xSide;addy,0;animate,false;setstate,tStats["TierGrade"];zoom,1.4;diffusealpha,0;sleep,DelayGradeShow + 0.1;linear,0.13;diffusealpha,1;zoom,1.2;rotationz,-4;accelerate,.1;rotationz,4;accelerate,.1;rotationz,-2;linear,.05;rotationz,2;linear,.05;rotationz,0);			
+			OnCommand=cmd(Center;addx,iAux2Player*xSide;addy,0;animate,false;setstate,tierGradeMission;zoom,1.4;diffusealpha,0;sleep,DelayGradeShow + 0.1;linear,0.13;diffusealpha,1;zoom,1.2;rotationz,-4;accelerate,.1;rotationz,4;accelerate,.1;rotationz,-2;linear,.05;rotationz,2;linear,.05;rotationz,0);			
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
 		
 	else
 
+		local tierGradeMission = 0;
+		if GAMESTATE:GetGameMode() == "WorldMax" or GAMESTATE:GetGameMode() =="QuestWorld" or GAMESTATE:GetGameMode() == "Infinity" then
+			tierGradeMission = tStats["oldGrade"];
+		else
+			tierGradeMission = TierToState(tStats["Grade"]);
+		end;
+
 		t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
-			OnCommand=cmd(Center;addx,iAux2Player*xSide;addy,0;animate,false;setstate,tStats["TierGrade"];zoom,1.8;diffusealpha,0;sleep,DelayGradeShow + 0.1;linear,0.13;diffusealpha,1;zoom,1.2);			
+			OnCommand=cmd(Center;addx,iAux2Player*xSide;addy,0;animate,false;setstate,tierGradeMission;zoom,1.8;diffusealpha,0;sleep,DelayGradeShow + 0.1;linear,0.13;diffusealpha,1;zoom,1.2);			
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
 		
 		t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
-			OnCommand=cmd(Center;addx,iAux2Player*xSide;;addy,0;animate,false;setstate,tStats["TierGrade"];zoom,0.8325;diffusealpha,0;sleep,DelayGradeShow + 0.1;linear,0.2;diffusealpha,1;zoom,0.95;linear,0.4;zoom,1.8;diffusealpha,0;blend,Blend.Add);
+			OnCommand=cmd(Center;addx,iAux2Player*xSide;;addy,0;animate,false;setstate,tierGradeMission;zoom,0.8325;diffusealpha,0;sleep,DelayGradeShow + 0.1;linear,0.2;diffusealpha,1;zoom,0.95;linear,0.4;zoom,1.8;diffusealpha,0;blend,Blend.Add);
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
 	end;
@@ -276,12 +293,6 @@ local function CreateStats( pnPlayer )
 
 	bTier = TierToState(tStats["Grade"]);
 	
-	--Trace("TOTAL ITEMS: " .. pnStageStats:GetTapNoteScores("TapNoteScore_Item"));
-	--Trace("TOTAL Heart: " .. pnStageStats:GetTapNoteScores("TapNoteScore_Heart"));
-	--Trace("TOTAL POTIONS: " .. 	pnStageStats:GetTapNoteScores("TapNoteScore_Potion"));
-	--Trace("TOTAL mine: " .. pnStageStats:GetTapNoteScores("TapNoteScore_HitMine"));
-	--Trace("TOTAL VELO: " .. pnStageStats:GetTapNoteScores("TapNoteScore_Velocity"));
-	--Trace("TOTAL HIDDEN ITEMS: " .. pnStageStats:GetTapNoteScores("TapNoteScore_Hidden"));
 	
 	if GAMESTATE:GetNumSidesJoined() == 2 then
 		if pnPlayer == PLAYER_1 then
@@ -309,9 +320,18 @@ local function CreateStats( pnPlayer )
 	end;
 	
 	
-	t[#t+1] = EvalRollingNumbers(string.format("%03i", tStats[statsAux[15]]),0.1*15,SCREEN_CENTER_X+xStatPos*xSide,SCREEN_CENTER_Y-yStatPos+SnapDistance*15,xAlign, true)..{
-		FinalizedMessageCommand=cmd(finishtweening;visible,false);
-	};
+	if GAMESTATE:GetGameMode() == "WorldMax" or GAMESTATE:GetGameMode() =="QuestWorld" or GAMESTATE:GetGameMode() == "Infinity" then
+		t[#t+1] = EvalRollingNumbers(string.format("%03i", tStats[statsAux[16]]),0.1*15,SCREEN_CENTER_X+xStatPos*xSide,SCREEN_CENTER_Y-yStatPos+SnapDistance*15,xAlign, true)..{
+			FinalizedMessageCommand=cmd(finishtweening;visible,false);
+		};	
+	else
+		t[#t+1] = EvalRollingNumbers(string.format("%03i", tStats[statsAux[15]]),0.1*15,SCREEN_CENTER_X+xStatPos*xSide,SCREEN_CENTER_Y-yStatPos+SnapDistance*15,xAlign, true)..{
+			FinalizedMessageCommand=cmd(finishtweening;visible,false);
+		};	
+	end;
+
+
+
 	pnStageStats:FailPlayer();
 	return t
 end;
@@ -330,7 +350,6 @@ local function allZeroSkin(pnStageStats, skin)
 	pnStageStats:MaxComboSkin(skin) +
 	pnStageStats:MaxMissComboSkin(skin);
 	
-	Trace("TOTAL FOR:"..skin.." :"..iTotal);
 	if iTotal == 0 then
 		return true;
 	else
@@ -340,7 +359,6 @@ end;
 
 -- 3q3q3q
 local function CreateSeparateStats( pnPlayer )
-	Trace("GENERATING SEPARATE STATS FOR:"..pnPlayer);
 	local pnStageStats = vStats:GetPlayerStageStats( pnPlayer );
 	tStatsGlobal = {		
 		Chapter		= GAMESTATE:GetCurrentSong():GetTranslitArtist();
@@ -350,7 +368,6 @@ local function CreateSeparateStats( pnPlayer )
 	
 	
 	local preload = GAMESTATE:GetCurrentSteps(pnPlayer):GetPreloadNoteSkin();
-	Trace("ALL SKINS FOR PLAYER:"..pnPlayer.. " :"..preload);
 	preload = split(',',preload );
 	
 	local skin = { "xx" };
@@ -370,7 +387,6 @@ local function CreateSeparateStats( pnPlayer )
 			table.insert(skin, "dummy");
 		end;
 	end;
-	Trace("SKINS NUM:"..#skin);
 	local tStats={};
 	for i=1,#skin,1 do
 		tStats[i] = 
@@ -393,9 +409,12 @@ local function CreateSeparateStats( pnPlayer )
 			BrainX		= pnStageStats:GetTapNoteScores("TapNoteScore_BrainX");
 			Life		= pnStageStats:GetCurrentLife();
 			Score		= pnStageStats:GetPhoenixScore();
+			OldScore		= pnStageStats:GetOldScore();
 			Grade		= pnStageStats:GetGrade();		
 			
 			Failed		= pnStageStats:GetFailedAux();
+			wmgrade	    = pnStageStats:GetGradeWM();
+			oldGrade 	= translateOldeGadeToNewGrade(pnStageStats:GetGradeWM());
 		};
 	end;
 	
@@ -407,7 +426,6 @@ local function CreateSeparateStats( pnPlayer )
 		bothfailed[2] =tStats[1]["Failed"];
 	end;
 	
-	-- Trace(tStats[1]["Perfect"]);
 	
 	local tValues = {
 		CURRENT			= ( tStats[1]["Perfect"]*10 + tStats[1]["Great"]*5 + tStats[1]["Good"]*1 + tStats[1]["Bad"]*-2 + tStats[1]["Miss"]*-5), 
@@ -435,6 +453,7 @@ local function CreateSeparateStats( pnPlayer )
 	statsAux[13] ="BrainX";
 	statsAux[14] ="Life";
 	statsAux[15] ="Score";
+	statsAux[16] ="OldScore";
 	tStats[1]["Life"] = round(tStats[1]["Life"],2) * 100;
 	local xSide;
 	local xAlign;
@@ -473,14 +492,17 @@ local function CreateSeparateStats( pnPlayer )
 			-- };
 		-- end;
 	-- end;
-	if GAMESTATE:GetCurrentMission():GetPlayers() == 1 then
+
+	
+	--if GAMESTATE:GetCurrentMission():GetPlayers() == 1 then
+	if GAMESTATE:GetNumSidesJoined() == 1 then
 		for s=1,#skin,1 do
 			for i=1,13,1 do
 				t[#t+1] = EvalRollingNumbers(string.format("%03i", tStats[s][statsAux[i]]),0.1*i,SCREEN_CENTER_X + 420 + (s * 120) - (#skin * 120),SCREEN_CENTER_Y-yStatPos+SnapDistance*i,xAlign, false)..{
 					FinalizedMessageCommand=cmd(finishtweening;visible,false);
 				};
 			end;
-		end;
+		end;	
 	else
 		for s=1,#skin,1 do
 			for i=1,13,1 do
@@ -491,29 +513,30 @@ local function CreateSeparateStats( pnPlayer )
 		end;
 	end;
 	
-	if not tStatsGlobal["Success"]  then
+	
+if not tStatsGlobal["Success"]  then
 	
 		t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/mission/result_mission"))..{
-			OnCommand=cmd(Center;addy,100;animate,false;setstate,tStatsGlobal["Success"] and 0 or 1;diffusealpha,0;sleep,DelayMissionResult + 0.15;diffusealpha,1);
+			OnCommand=cmd(Center;addy,140;zoom,0.5;animate,false;setstate,1;diffusealpha,0;sleep,DelayMissionResult + 0.15;diffusealpha,1);
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
 		t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/mission/result_mission"))..{
-			OnCommand=cmd(Center;blend,Blend.Add;addx,-250;addy,100;animate,false;setstate,tStatsGlobal["Success"] and 0 or 1;diffusealpha,0;sleep,6.5;linear,0.15;diffusealpha,1;addx,250;linear,0.25;zoom,1.1;diffusealpha,0);
+			OnCommand=cmd(Center;blend,Blend.Add;addx,-250;addy,140;animate,false;setstate,1;diffusealpha,0;sleep,DelayMissionResult;linear,0.15;diffusealpha,1;addx,250;linear,0.15;zoom,0.5;diffusealpha,0);
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
 		t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/mission/result_mission"))..{
-			OnCommand=cmd(Center;blend,Blend.Add;addx,250;addy,100;animate,false;setstate,tStatsGlobal["Success"] and 0 or 1;diffusealpha,0;sleep,DelayMissionResult;linear,0.15;diffusealpha,1;addx,-250;linear,0.25;zoom,1.1;diffusealpha,0);
+			OnCommand=cmd(Center;blend,Blend.Add;addx,250;addy,140;animate,false;setstate,1;diffusealpha,0;sleep,DelayMissionResult;linear,0.15;diffusealpha,1;addx,-250;linear,0.15;zoom,0.5;diffusealpha,0);
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};	
 	else
 	
 		t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/mission/result_mission"))..{
-			OnCommand=cmd(Center;addy,100;animate,false;setstate,0;diffusealpha,0;sleep,DelayMissionResult + 0.15;linear,.5;diffusealpha,1);
+			OnCommand=cmd(Center;addy,140;zoom,0.5;animate,false;setstate,0;diffusealpha,0;sleep,DelayMissionResult + 0.15;linear,.5;diffusealpha,1);
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
 		
 		t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/mission/result_mission"))..{
-			OnCommand=cmd(Center;addy,100;animate,false;setstate,0;diffusealpha,0;sleep,DelayMissionResult + 0.15;linear,.3;diffusealpha,.5;linear,.5;zoomy,1.05;zoomx,1.1;diffusealpha,0);
+			OnCommand=cmd(Center;addy,140;animate,false;zoom,0.7;setstate,0;diffusealpha,0;sleep,DelayMissionResult + 0.15;linear,.13;diffusealpha,.5;linear,.25;zoomy,0.8;zoomx,0.5;diffusealpha,0);
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
 		
@@ -521,13 +544,6 @@ local function CreateSeparateStats( pnPlayer )
 
 	bTier = TierToState(tStats[1]["Grade"]);
 	
-	-- Trace("TOTAL ITEMS: " .. pnStageStats:GetTapNoteScores("TapNoteScore_Item"));
-	-- Trace("TOTAL Heart: " .. pnStageStats:GetTapNoteScores("TapNoteScore_Heart"));
-	-- Trace("TOTAL POTIONS: " .. 	pnStageStats:GetTapNoteScores("TapNoteScore_Potion"));
-	-- Trace("TOTAL mine: " .. pnStageStats:GetTapNoteScores("TapNoteScore_HitMine"));
-	-- Trace("TOTAL VELO: " .. pnStageStats:GetTapNoteScores("TapNoteScore_Velocity"));
-	-- Trace("TOTAL HIDDEN ITEMS: " .. pnStageStats:GetTapNoteScores("TapNoteScore_Hidden"));
-
 	-- t[#t+1] = EvalRollingNumbers(string.format("%03i", tStats[1][statsAux[14]]),0.1*14,SCREEN_CENTER_X+390*xSide,SCREEN_CENTER_Y-yStatPos+SnapDistance*14,xAlign, false)..{
 		-- FinalizedMessageCommand=cmd(finishtweening;visible,false);
 	-- };
@@ -536,9 +552,19 @@ local function CreateSeparateStats( pnPlayer )
 		t[#t+1] = EvalRollingNumbers(string.format("%03i", tStats[1][statsAux[14]]),0.1*14,SCREEN_CENTER_X+390*xSide,SCREEN_CENTER_Y-yStatPos+SnapDistance*14,xAlign, false)..{
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
+
+	if GAMESTATE:GetGameMode() == "WorldMax" or GAMESTATE:GetGameMode() =="QuestWorld" or GAMESTATE:GetGameMode() == "Infinity" then
+		t[#t+1] = EvalRollingNumbers(string.format("%03i", tStats[1][statsAux[16]]),0.1*15,SCREEN_CENTER_X+xStatPos*xSide,SCREEN_CENTER_Y-yStatPos+SnapDistance*15,xAlign, true)..{
+			FinalizedMessageCommand=cmd(finishtweening;visible,false);
+		};
+	else
 		t[#t+1] = EvalRollingNumbers(string.format("%03i", tStats[1][statsAux[15]]),0.1*15,SCREEN_CENTER_X+xStatPos*xSide,SCREEN_CENTER_Y-yStatPos+SnapDistance*15,xAlign, true)..{
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
+	end;
+
+
+
 		if pnPlayer == PLAYER_1 then
 			t[#t+1] = EvalRollingNumbers('%',0.1*14,SCREEN_CENTER_X+(xStatPos*xSide) - 20,SCREEN_CENTER_Y-yStatPos+SnapDistance*14,xAlign, false)..{
 				FinalizedMessageCommand=cmd(finishtweening;visible,false);
@@ -556,42 +582,67 @@ local function CreateSeparateStats( pnPlayer )
 		t[#t+1] = EvalRollingNumbers('%',0.1*14,SCREEN_CENTER_X+xStatPos*1,SCREEN_CENTER_Y-yStatPos+SnapDistance*14,xAlign)..{
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
-		t[#t+1] = EvalRollingNumbers(string.format("%03i", tStats[1][statsAux[15]]),0.1*15,SCREEN_CENTER_X+xStatPos*1,SCREEN_CENTER_Y-yStatPos+SnapDistance*15,xAlign, true)..{
-			FinalizedMessageCommand=cmd(finishtweening;visible,false);
-		};
+
+		if GAMESTATE:GetGameMode() == "WorldMax" or GAMESTATE:GetGameMode() =="QuestWorld" or GAMESTATE:GetGameMode() == "Infinity" then
+			t[#t+1] = EvalRollingNumbers(string.format("%03i", tStats[1][statsAux[16]]),0.1*15,SCREEN_CENTER_X+xStatPos*1,SCREEN_CENTER_Y-yStatPos+SnapDistance*15,xAlign, true)..{
+				FinalizedMessageCommand=cmd(finishtweening;visible,false);
+			};
+		else
+			t[#t+1] = EvalRollingNumbers(string.format("%03i", tStats[1][statsAux[15]]),0.1*15,SCREEN_CENTER_X+xStatPos*1,SCREEN_CENTER_Y-yStatPos+SnapDistance*15,xAlign, true)..{
+				FinalizedMessageCommand=cmd(finishtweening;visible,false);
+			};
+		end;
+
+
 	end;
 	
-	
-	
+
+
 	if tStats["Failed"] then
+
+		local tierGradeMission = 0;
+		if GAMESTATE:GetGameMode() == "WorldMax" or GAMESTATE:GetGameMode() =="QuestWorld" or GAMESTATE:GetGameMode() == "Infinity" then
+			tierGradeMission = tStats[1]["oldGrade"];
+		else
+			tierGradeMission = TierToState(tStats[1]["Grade"]);
+		end;
+
 		if GAMESTATE:GetNumSidesJoined() == 2 then
-			t[#t+1] = LoadActor(THEME:GetPathG("","SE-BROKENTIER"))..{
-				OnCommand=cmd(xy,SCREEN_CENTER_X + 300 * xSide,SCREEN_CENTER_Y - 20;animate,false;setstate,TierToState(tStats["Grade"]);zoom,1.5;diffusealpha,0;sleep,DelayGradeShow;linear,0.2;diffusealpha,1;zoom,1;rotationz,-4;accelerate,.1;rotationz,4;accelerate,.1;rotationz,-2;linear,.05;rotationz,2;linear,.05;rotationz,0);			
+			t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+				OnCommand=cmd(xy,SCREEN_CENTER_X + 300 * xSide,SCREEN_CENTER_Y - 20;animate,false;setstate,tierGradeMission;zoom,1.5;diffusealpha,0;sleep,DelayGradeShow;linear,0.2;diffusealpha,1;zoom,1;rotationz,-4;accelerate,.1;rotationz,4;accelerate,.1;rotationz,-2;linear,.05;rotationz,2;linear,.05;rotationz,0);			
 				FinalizedMessageCommand=cmd(finishtweening;visible,false);
 			};		
 		else
-			t[#t+1] = LoadActor(THEME:GetPathG("","SE-BROKENTIER"))..{
-				OnCommand=cmd(Center;addy,-20;animate,false;setstate,TierToState(tStats["Grade"]);zoom,1.5;diffusealpha,0;sleep,DelayGradeShow;linear,0.2;diffusealpha,1;zoom,1;rotationz,-4;accelerate,.1;rotationz,4;accelerate,.1;rotationz,-2;linear,.05;rotationz,2;linear,.05;rotationz,0);			
+			t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+				OnCommand=cmd(Center;addy,-20;animate,false;setstate,tierGradeMission;zoom,1.5;diffusealpha,0;sleep,DelayGradeShow;linear,0.2;diffusealpha,1;zoom,1;rotationz,-4;accelerate,.1;rotationz,4;accelerate,.1;rotationz,-2;linear,.05;rotationz,2;linear,.05;rotationz,0);			
 				FinalizedMessageCommand=cmd(finishtweening;visible,false);
 			};
 		end;
 	else
+
+		local tierGradeMission = 0;
+		if GAMESTATE:GetGameMode() == "WorldMax" or GAMESTATE:GetGameMode() =="QuestWorld" or GAMESTATE:GetGameMode() == "Infinity" then
+			tierGradeMission = tStats[1]["oldGrade"];
+		else
+			tierGradeMission = TierToState(tStats[1]["Grade"]);
+		end;
+
 		if GAMESTATE:GetNumSidesJoined() == 2 then
-			t[#t+1] = LoadActor(THEME:GetPathG("","SE-GRADETIER"))..{
-				OnCommand=cmd(xy,SCREEN_CENTER_X + 300 * xSide,SCREEN_CENTER_Y - 20;animate,false;setstate,TierToState(tStats[1]["Grade"]);zoom,1.5;diffusealpha,0;sleep,DelayGradeShow;linear,0.2;diffusealpha,1;zoom,1);			
+			t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+				OnCommand=cmd(xy,SCREEN_CENTER_X + 300 * xSide,SCREEN_CENTER_Y - 20;animate,false;setstate,tierGradeMission;zoom,1.5;diffusealpha,0;sleep,DelayGradeShow;linear,0.2;diffusealpha,1;zoom,1);			
 				FinalizedMessageCommand=cmd(finishtweening;visible,false);
 			};
-			t[#t+1] = LoadActor(THEME:GetPathG("","SE-GRADETIER"))..{
-				OnCommand=cmd(xy,SCREEN_CENTER_X + 300 * xSide,SCREEN_CENTER_Y - 20;animate,false;setstate,TierToState(tStats[1]["Grade"]);zoom,0.3325;diffusealpha,0;sleep,DelayGradeShow;linear,0.2;diffusealpha,1;zoom,1;linear,0.4;zoom,1.5;diffusealpha,0;blend,Blend.Add);
+			t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+				OnCommand=cmd(xy,SCREEN_CENTER_X + 300 * xSide,SCREEN_CENTER_Y - 20;animate,false;setstate,tierGradeMission;zoom,0.3325;diffusealpha,0;sleep,DelayGradeShow;linear,0.2;diffusealpha,1;zoom,1;linear,0.4;zoom,1.5;diffusealpha,0;blend,Blend.Add);
 				FinalizedMessageCommand=cmd(finishtweening;visible,false);
 			};
 		else
-			t[#t+1] = LoadActor(THEME:GetPathG("","SE-GRADETIER"))..{
-				OnCommand=cmd(Center;addy,-20;animate,false;setstate,TierToState(tStats[1]["Grade"]);zoom,1.5;diffusealpha,0;sleep,DelayGradeShow;linear,0.2;diffusealpha,1;zoom,1);			
+			t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+				OnCommand=cmd(Center;addy,-20;animate,false;setstate,tierGradeMission;zoom,1.5;diffusealpha,0;sleep,DelayGradeShow;linear,0.2;diffusealpha,1;zoom,1);			
 				FinalizedMessageCommand=cmd(finishtweening;visible,false);
 			};
-			t[#t+1] = LoadActor(THEME:GetPathG("","SE-GRADETIER"))..{
-				OnCommand=cmd(Center;addy,-20;animate,false;setstate,TierToState(tStats[1]["Grade"]);zoom,0.3325;diffusealpha,0;sleep,DelayGradeShow;linear,0.2;diffusealpha,1;zoom,1;linear,0.4;zoom,1.5;diffusealpha,0;blend,Blend.Add);
+			t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+				OnCommand=cmd(Center;addy,-20;animate,false;setstate,tierGradeMission;zoom,0.3325;diffusealpha,0;sleep,DelayGradeShow;linear,0.2;diffusealpha,1;zoom,1;linear,0.4;zoom,1.5;diffusealpha,0;blend,Blend.Add);
 				FinalizedMessageCommand=cmd(finishtweening;visible,false);
 			};
 		end;
@@ -673,7 +724,7 @@ local t = Def.ActorFrame {
 	};
 	
 	--OBTENER EL USB
-	GetUsb();
+	--GetUsb();
 	
 	Drum(WaitUntilDrum - 0.2, DelayDrum);
 	Def.Sound {	--BGM
@@ -793,5 +844,7 @@ if GAMESTATE:IsPlayerEnabled(PLAYER_2) then
 		end;
 	-- end;	
 end;
+
+t[#t+1] = LoadActor("profile/default")..{};
 
 return t

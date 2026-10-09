@@ -53,7 +53,8 @@ function ChartInfoFull(pn)
 							if StepsType == "StepsType_Pump_Single_P" or StepsType == "StepsType_Pump_Double_P" then
 								self:GetChild("SNames"):x(2*p);
 							end;
-					local level = DisplayLV(CurrentStep:GetMeter());
+
+					local level = DisplayLV_New(CurrentStep);
 						self:GetChild("LvFontA"):settext(level);
 						self:GetChild("LvFontB"):settext(level):diffuse(StepsColor[StepsType] or color("#eb1b00"));
 							
@@ -107,6 +108,7 @@ function ChartInfoFull(pn)
 				end;
 			end;			
 			SongChosenMessageCommand=cmd(finishtweening;sleep,.05;queuecommand,"Change");
+			OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
 		};
 	end;
 	return t;
@@ -120,6 +122,9 @@ local function getHsBM(PLAYER)
 	local isfailedMachineBest=0;
 	local stateGradeMachineBest=-1;
 
+	--we get the gradeSprites from the evaluation skin selected.
+	local gradeSpriteEvSkin = GetGradeSpriteFromEvaluationSkin(false,PLAYER);
+	local gradeFailSpriteEvSkin = GetGradeSpriteFromEvaluationSkin(true,PLAYER);
 
 
 	local mybestscore=0;
@@ -213,6 +218,46 @@ local function getHsBM(PLAYER)
 			end;		
 		};
 
+
+
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/nomiss"))..{
+			Name="nmSprite";
+			InitCommand=cmd(zoom,0.65;);
+			OnCommand=function(self)
+				if PLAYER == PLAYER_2 then
+					self:x(-68);
+				else
+					self:x(-42);
+				end;
+
+				self:y(-36);
+				self:diffusealpha(0);
+				
+			end;
+			CurrentSongChangedMessageCommand=function(self)				
+			end;		
+		};
+
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/nomiss"))..{
+			Name="nmSpriteGlow";
+			InitCommand=cmd(zoom,0.65;);
+			OnCommand=function(self)
+				if PLAYER == PLAYER_2 then
+					self:x(-68);
+				else
+					self:x(-42);
+				end;
+
+				self:y(-36);
+				self:blend("BlendMode_Add");
+				self:diffusealpha(0);
+				
+			end;
+			CurrentSongChangedMessageCommand=function(self)				
+			end;		
+		};
+
+
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/selector_machinebest"))..{
 			InitCommand=cmd(zoom,0.7;y,45;x,20);
 			OnCommand=function(self)
@@ -300,7 +345,8 @@ local function getHsBM(PLAYER)
 
 		--GRADE--
 		--letra my best
-		LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+		--LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+		LoadActor(gradeSpriteEvSkin)..{
 			Name="LetterMyBest";
 			OnCommand=cmd(y,0;x,78;animate,false;setstate,0;queuecommand,"SetLetter");
 			SetLetterCommand=function(self)
@@ -324,7 +370,8 @@ local function getHsBM(PLAYER)
 		};
 
 		--letra my best
-		LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+		--LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+		LoadActor(gradeFailSpriteEvSkin)..{
 			Name="LetterMyBestFail";
 			OnCommand=cmd(y,0;x,78;animate,false;setstate,0;queuecommand,"SetLetter");
 			SetLetterCommand=function(self)
@@ -426,7 +473,8 @@ local function getHsBM(PLAYER)
 
 		--GRADE--
 		--letra Machine best
-		LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+		--LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+			LoadActor(gradeSpriteEvSkin)..{
 			Name="LetterMachineBest";
 			OnCommand=cmd(y,52;x,-55;animate,false;setstate,0;visible,false;queuecommand,"SetLetter");
 			SetLetterCommand=function(self)
@@ -457,7 +505,8 @@ local function getHsBM(PLAYER)
 			end;	
 		};
 
-		LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+		--LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+		LoadActor(gradeFailSpriteEvSkin)..{
 			Name="LetterMachineBestFail";
 			OnCommand=cmd(y,52;x,-55;animate,false;setstate,0;visible,false;queuecommand,"SetLetter");
 			SetLetterCommand=function(self)
@@ -563,7 +612,20 @@ local function getHsBM(PLAYER)
 						self:GetChild("fcSprite"):stoptweening():diffusealpha(0);
 						self:GetChild("fcSpriteGlow"):stoptweening():diffusealpha(0);
 
+						self:GetChild("nmSprite"):stoptweening():diffusealpha(0);
+						self:GetChild("nmSpriteGlow"):stoptweening():diffusealpha(0);
+
 				else
+						self:GetChild("pfgSprite"):stoptweening():diffusealpha(0);
+						self:GetChild("pfgSpriteGlow"):stoptweening():diffusealpha(0);
+
+						self:GetChild("fcSprite"):stoptweening():diffusealpha(0);
+						self:GetChild("fcSpriteGlow"):stoptweening():diffusealpha(0);
+
+						self:GetChild("nmSprite"):stoptweening():diffusealpha(0);
+						self:GetChild("nmSpriteGlow"):stoptweening():diffusealpha(0);
+
+					
 						local backScore = getZeroStringFromScore(dataPlayerScoreFromSong["score"]);
 						self:GetChild("scoreBackMyBest"):settext(backScore);
 						self:GetChild("scoreFrontMyBest"):settext(dataPlayerScoreFromSong["score"]);
@@ -579,6 +641,13 @@ local function getHsBM(PLAYER)
 							self:GetChild("fcSprite"):stoptweening():linear(0.1):diffusealpha(1);
 							if p.Player == PLAYER then 
 								self:GetChild("fcSpriteGlow"):stoptweening():zoom(0.6):diffusealpha(1):linear(0.2):zoom(0.65):diffusealpha(0);
+							end;
+						end;
+
+						if dataPlayerScoreFromSong["nomiss"] == 1 and dataPlayerScoreFromSong["score"] < 1000000 then
+							self:GetChild("nmSprite"):stoptweening():linear(0.1):diffusealpha(1);
+							if p.Player == PLAYER then 
+								self:GetChild("nmSpriteGlow"):stoptweening():zoom(0.6):diffusealpha(1):linear(0.2):zoom(0.65):diffusealpha(0);
 							end;
 						end;
 
@@ -709,6 +778,10 @@ t[#t+1] = Def.ActorFrame{	--PLAYER1
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/selector_arrowin"))..{
 			InitCommand=cmd(x,55;zoomy,0.65;zoomx,0.8*0.8;diffusealpha,1;;rotationy,180;)
 		};
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/glow_selector_arrowin"))..{
+			InitCommand=cmd(x,55;zoomy,0.65;zoomx,0.8*0.8;diffusealpha,1;;rotationy,180;diffusealpha,0.4;blend,"BlendMode_Add";queuecommand,"Ani";diffuseshift;effectperiod,3;effectcolor1,color("#ffff00");effectcolor2,color("#00ffff55");fadebottom,1)
+		};
+
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/ReadyPlayer"))..{
 			InitCommand=cmd(x,-95;y,-200; zoomy,0.55;zoomx,0.9*0.9;diffusealpha,0;draworder,1000);
@@ -752,7 +825,7 @@ t[#t+1] = Def.ActorFrame{	--PLAYER1
 		};		
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/ReadyPlayer"))..{
-			InitCommand=cmd(x,-95;y,-200; zoomy,0.55;zoomx,0.9*0.9;diffusealpha,0;blend,"BlendMode_Add";draworder,1000);
+			InitCommand=cmd(x,-95;y,-200; zoomy,0.55;zoomx,0.9*0.9;diffusealpha,0;blend,"BlendMode_Add";draworder,1000);			
 			StepsChosenMessageCommand=function(self,params)
 				if params.Player == PLAYER_1 then
 					self:linear(0.08);
@@ -814,10 +887,35 @@ t[#t+1] = Def.ActorFrame{	--PLAYER1
 		ChartInfoFull(PLAYER_1)..{	InitCommand=cmd(xy,-60,0;zoom,1)	};
 		getHsBM(PLAYER_1)..{InitCommand=cmd(xy,-64,45;zoom,1)};
 		
-		--STEPARTIST
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/stepartistsprite"))..{
-			Name="stepartistbase";
-			OnCommand=cmd(x,-221;y,-203;;zoom,0.65;visible,false);
+
+		Def.ActorFrame{
+			OnCommand=function(self)
+				self:x(-221);
+				self:y(-203);
+				self:zoom(0.65);
+				self:visible(false);
+			end;
+			OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/big_stepartistsprite"))..{
+				Name="big_stepartistbase";
+				OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+			};
+
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/stepartistsprite"))..{
+				Name="stepartistbase";
+				OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+			};
+
+			LoadFont("_century gothic")..{
+				OnCommand=cmd(x,55;y,-4;settext,"ARKA";horizalign,center;queuecommand,"artistStep");
+				Name="stepartisttext";
+				OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+			};	
+
+			SongUnchosenMessageCommand=function(self,params)
+					self:visible(false);
+			end;
 
 			ChangeStepsMessageCommand=function(self,params)
 				if params.Player == PLAYER_1 then
@@ -827,10 +925,8 @@ t[#t+1] = Def.ActorFrame{	--PLAYER1
 			end;
 
 			SongChosenMessageCommand=function(self,params)
-				if params.Player == PLAYER_1 then
 					self:stoptweening();
 					self:queuecommand("artistStep");
-				end;
 			end;
 
 
@@ -841,67 +937,52 @@ t[#t+1] = Def.ActorFrame{	--PLAYER1
 			end;	
 
 			artistStepCommand=function(self)
+					if GAMESTATE:IsSideJoined(PLAYER_1) == false then return; end;
 					local steps = GAMESTATE:GetCurrentSteps(PLAYER_1);
 					local stepArtist = steps:GetAuthorCredit();
+					self:GetChild("stepartisttext"):maxwidth(210);
 					if #stepArtist > 0 then
 						self:visible(true);
+
+						if #stepArtist <= 13 then
+							self:GetChild("stepartisttext"):settext(stepArtist);
+							self:GetChild("stepartistbase"):visible(true);
+							self:GetChild("big_stepartistbase"):visible(false);
+							self:GetChild("stepartisttext"):x(60);
+							self:x(-222);
+						else
+							self:GetChild("stepartisttext"):x(60);
+							self:GetChild("stepartisttext"):settext(stepArtist);
+							self:GetChild("big_stepartistbase"):visible(true);
+							self:GetChild("stepartistbase"):visible(false);
+							self:x(-215);
+						end;
 					else
 						self:visible(false);
+						self:GetChild("stepartisttext"):settext("");
 					end;			
-			end;	
+			end;
+
 		};
 
-		LoadFont("_century gothic")..{
-			OnCommand=cmd(x,-188;y,-206;;zoom,0.65;settext,"";horizalign,center);
-
-			ChangeStepsMessageCommand=function(self,params)
-				if params.Player == PLAYER_1 then
-					self:stoptweening();
-					self:queuecommand("artistStep");
-				end;
-			end;
-
-			SongChosenMessageCommand=function(self,params)
-				if params.Player == PLAYER_1 then
-					self:stoptweening();
-					self:queuecommand("artistStep");
-				end;
-			end;
-
-
-			StepsUnchosenMessageCommand=function(self,params)
-				if params.Player == PLAYER_1 then
-					self:stoptweening();
-				end;
-			end;	
-
-			artistStepCommand=function(self)
-					local steps = GAMESTATE:GetCurrentSteps(PLAYER_1);
-					local stepArtist = steps:GetAuthorCredit();
-					if #stepArtist > 0 then
-						self:visible(true);
-						self:settext(stepArtist);
-					else
-						self:settext("");
-						self:visible(false);
-					end;			
-			end;		
-		};				
-
 	};
+
 
 	Def.ActorFrame{
 		OnCommand=cmd(x,SCREEN_CENTER_X*-1.2;y,-28;);
 		SongChosenMessageCommand=cmd(stoptweening;x,SCREEN_CENTER_X*-1.2;decelerate,0.12;x,SCREEN_CENTER_X*-.75;);
 		SongUnchosenMessageCommand=cmd(stoptweening;x,SCREEN_CENTER_X*-.75;accelerate,0.1;x,SCREEN_CENTER_X*-1.2;);
 		FinalizedMessageCommand=cmd(finishtweening;playcommand,"SongUnchosen");
+		OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/backSelectorCoverBig.png"))..{
 			InitCommand=cmd(x,-45;y,3;zoom,0.65;zoomx,0.8;diffusealpha,0.6;fadetop,0.1;rotationy,180);
+			OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
 		};
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/selector_level"))..{
 			InitCommand=cmd(x,-45;y,3;zoom,0.65;zoomx,0.8;rotationy,180);
+			OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
 			SongChosenMessageCommand=function(self)
 				if GAMESTATE:GetMusicTrainChannel() then
 					self:diffusealpha(0);
@@ -913,6 +994,12 @@ t[#t+1] = Def.ActorFrame{	--PLAYER1
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/selector_arrowout"))..{
 			InitCommand=cmd(x,55;zoom,0.65;rotationy,180;);
+			OffCommand=cmd(stoptweening;linear,0.2;diffusealpha,0);
+		};	
+
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/glow_selector_arrowout"))..{
+			InitCommand=cmd(x,55;zoom,0.65;rotationy,180;blend,"BlendMode_Add";diffuseshift;effectperiod,3;effectcolor1,color("#D0FF0033");effectcolor2,color("#ffffff11"));
+			OffCommand=cmd(stoptweening;linear,0.2;diffusealpha,0);
 		};	
 
 		
@@ -926,6 +1013,7 @@ end;
 if GAMESTATE:IsHumanPlayer(PLAYER_2) then
 t[#t+1] = Def.ActorFrame{	--PLAYER2
 	InitCommand=cmd(xy,SCREEN_CENTER_X,SCREEN_CENTER_Y*1.6;);
+	OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
 
 	SongChosenMessageCommand=function(self)
 		if GAMESTATE:GetMusicTrainChannel() or GAMESTATE:GetProgressiveChannel() then
@@ -940,6 +1028,7 @@ t[#t+1] = Def.ActorFrame{	--PLAYER2
 		SongChosenMessageCommand=cmd(stoptweening;x,SCREEN_CENTER_X*1.2;decelerate,0.18;x,SCREEN_CENTER_X*.36;queuecommand,"changeColor");
 		SongUnchosenMessageCommand=cmd(stoptweening;x,SCREEN_CENTER_X*.36;accelerate,0.15;x,SCREEN_CENTER_X*1.2;);
 		FinalizedMessageCommand=cmd(finishtweening;playcommand,"SongUnchosen");
+		OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/backSelectorCover.png"))..{
 			InitCommand=cmd(x,60;zoom,0.64;diffusealpha,0.3;blend,Blend.Add;diffusecolor,color("#000000");diffusebottomedge,color("#000000"));
@@ -1007,11 +1096,26 @@ t[#t+1] = Def.ActorFrame{	--PLAYER2
 
 		
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/selector_arrowin"))..{
-			InitCommand=cmd(x,-55;zoomy,0.65;zoomx,0.8*0.8;diffusealpha,1;)
+			InitCommand=cmd(x,-55;zoomy,0.65;zoomx,0.8*0.8;diffusealpha,1);
+			OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+		};
+
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/glow_selector_arrowin"))..{
+			InitCommand=cmd(x,-55;zoomy,0.65;zoomx,0.8*0.8;diffusealpha,0.4;blend,"BlendMode_Add";queuecommand,"Ani";diffuseshift;effectperiod,3;effectcolor1,color("#ffff00");effectcolor2,color("#00ffff55");fadebottom,1);
+			OffCommand=cmd(stoptweening;linear,0.2;diffusealpha,0);
+			AniCommand=function(self)
+				--[[
+				self:faderight(0);
+				self:linear(0.6);
+				self:faderight(1)
+				self:queuecommand("Ani");
+				]]
+			end;
 		};
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/ReadyPlayer"))..{
 			InitCommand=cmd(x,95;y,-200; zoomy,0.55;zoomx,0.9*0.9;diffusealpha,0;draworder,1000);
+			OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
 			StepsChosenMessageCommand=function(self,params)
 				if params.Player == PLAYER_2 then
 					self:linear(0.08);
@@ -1112,79 +1216,89 @@ t[#t+1] = Def.ActorFrame{	--PLAYER2
 		ChartInfoFull(PLAYER_2)..{	InitCommand=cmd(xy,60,0;zoom,1)	};
 		getHsBM(PLAYER_2)..{	InitCommand=cmd(xy,64,45;zoom,1)	};
 
-		--STEPARTIST
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/stepartistsprite"))..{
-			Name="stepartistbase";
-			OnCommand=cmd(x,219;y,-203;;zoom,0.65;visible,false);
+
+
+
+		Def.ActorFrame{
+			OnCommand=function(self)
+				self:x(221);
+				self:y(-203);
+				self:zoom(0.65);
+				self:visible(false);
+			end;
+			OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/big_stepartistsprite"))..{
+				Name="big_stepartistbase";
+				OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+			};
+
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/stepartistsprite"))..{
+				Name="stepartistbase";
+				OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+			};
+
+			LoadFont("_century gothic")..{
+				OnCommand=cmd(x,55;y,-4;settext,"ARKA";horizalign,center;queuecommand,"artistStep";maxwidth,210);
+				Name="stepartisttext";
+				OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+			};	
+
+			SongUnchosenMessageCommand=function(self,params)
+					self:visible(false);
+			end;
 
 			ChangeStepsMessageCommand=function(self,params)
 				if params.Player == PLAYER_2 then
-					self:stoptweening();
+					self:finishtweening();
 					self:queuecommand("artistStep");
 				end;
 			end;
 
 			SongChosenMessageCommand=function(self,params)
-				if params.Player == PLAYER_2 then
-					self:stoptweening();
+					self:finishtweening();
 					self:queuecommand("artistStep");
-				end;
 			end;
 
 
 			StepsUnchosenMessageCommand=function(self,params)
 				if params.Player == PLAYER_2 then
-					self:stoptweening();
+					self:finishtweening();
 				end;
 			end;	
 
 			artistStepCommand=function(self)
+					if GAMESTATE:IsSideJoined(PLAYER_2) == false then return; end;
+					self:GetChild("stepartisttext"):finishtweening();
+					self:GetChild("stepartistbase"):finishtweening();
+					self:GetChild("big_stepartistbase"):finishtweening();
+
 					local steps = GAMESTATE:GetCurrentSteps(PLAYER_2);
 					local stepArtist = steps:GetAuthorCredit();
+
 					if #stepArtist > 0 then
 						self:visible(true);
+
+						if #stepArtist <= 13 then
+							self:GetChild("stepartisttext"):settext(stepArtist);
+							self:GetChild("stepartistbase"):visible(true);
+							self:GetChild("big_stepartistbase"):visible(false);
+							self:GetChild("stepartisttext"):x(60);
+							self:x(218);
+						else
+							self:GetChild("stepartisttext"):x(60);
+							self:GetChild("stepartisttext"):settext(stepArtist);
+							self:GetChild("big_stepartistbase"):visible(true);
+							self:GetChild("stepartistbase"):visible(false);
+							self:x(222);
+						end;
 					else
 						self:visible(false);
+						self:GetChild("stepartisttext"):settext("");
 					end;			
-			end;	
-		};
-
-		LoadFont("_century gothic")..{
-			OnCommand=cmd(x,252;y,-206;;zoom,0.65;settext,"arka";horizalign,center);
-
-			ChangeStepsMessageCommand=function(self,params)
-				if params.Player == PLAYER_2 then
-					self:stoptweening();
-					self:queuecommand("artistStep");
-				end;
 			end;
 
-			SongChosenMessageCommand=function(self,params)
-				if params.Player == PLAYER_2 then
-					self:stoptweening();
-					self:queuecommand("artistStep");
-				end;
-			end;
-
-
-			StepsUnchosenMessageCommand=function(self,params)
-				if params.Player == PLAYER_2 then
-					self:stoptweening();
-				end;
-			end;	
-
-			artistStepCommand=function(self)
-					local steps = GAMESTATE:GetCurrentSteps(PLAYER_2);
-					local stepArtist = steps:GetAuthorCredit();
-					if #stepArtist > 0 then
-						self:visible(true);
-						self:settext(stepArtist);
-					else
-						self:settext("");
-						self:visible(false);
-					end;			
-			end;		
-		};		
+		};	
 
 
 
@@ -1195,13 +1309,16 @@ t[#t+1] = Def.ActorFrame{	--PLAYER2
 		SongChosenMessageCommand=cmd(stoptweening;x,SCREEN_CENTER_X*1.2;decelerate,0.12;x,SCREEN_CENTER_X*.75;queuecommand,"glowCheck");
 		SongUnchosenMessageCommand=cmd(stoptweening;x,SCREEN_CENTER_X*.75;accelerate,0.1;x,SCREEN_CENTER_X*1.2;);
 		FinalizedMessageCommand=cmd(finishtweening;playcommand,"SongUnchosen");
+		OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/backSelectorCoverBig.png"))..{
 			InitCommand=cmd(x,45;y,3;zoom,0.65;zoomx,0.8;diffusealpha,0.6;fadetop,0.1);
+			OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
 		};
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/selector_level"))..{
 			InitCommand=cmd(x,45;y,3;zoom,0.65;zoomx,0.8);
+			OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
 			SongChosenMessageCommand=function(self)
 				if GAMESTATE:GetMusicTrainChannel() then
 					self:diffusealpha(0);
@@ -1213,6 +1330,12 @@ t[#t+1] = Def.ActorFrame{	--PLAYER2
 	
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/selector_arrowout"))..{
 			InitCommand=cmd(x,-55;zoom,0.65;);
+			OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+		};
+
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/glow_selector_arrowout"))..{
+			InitCommand=cmd(x,-55;zoom,0.65;blend,"BlendMode_Add";diffuseshift;effectperiod,3;effectcolor1,color("#D0FF0033");effectcolor2,color("#ffffff11"));
+			OffCommand=cmd(stoptweening;linear,0.2;diffusealpha,0);
 		};
 
 		ScrollerList(PLAYER_2)..{	InitCommand=cmd(xy,40,4);	};

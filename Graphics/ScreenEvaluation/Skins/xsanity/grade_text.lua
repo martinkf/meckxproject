@@ -75,7 +75,7 @@ return function(pathFolderSkin,player)
         };
 
         bjActor[#bjActor+1] = LoadActor(pathFolderSkin.."extrajudg_text_evalab 1x2.png")..{
-            OnCommand=cmd(Center;zoom,0.6;addx,4;y,-108+ (35*1);animate,false;setstate,0;zoomy,0;sleep,0.03;linear,0.3;zoomy,0.6;diffusealpha,1);
+            OnCommand=cmd(Center;zoom,0.64;addx,4;y,-108+ (35*1);animate,false;setstate,0;zoomy,0;sleep,0.03;linear,0.3;zoomy,0.64;diffusealpha,1);
             FinalizedMessageCommand=cmd(finishtweening;linear,0.2;zoomy,0)
         }; 
 

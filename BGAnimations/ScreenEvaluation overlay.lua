@@ -325,6 +325,7 @@ local xRollPos = 180;
 local SnapDistance = 35;
 local bBrokenGrade = {false, false};
 
+
 -- Una vrgaaaaaaaaa
 local function GetHighScoreDifference(PLAYERNUM)
 
@@ -359,6 +360,28 @@ local function GetHighScoreDifference(PLAYERNUM)
 	return 0;
 end;
 
+function getFirstRecordPlayer(player)
+	local returnArray = {score=0,isNewRecord=false};
+	local song = GAMESTATE:GetCurrentSong();
+	local steps = GAMESTATE:GetCurrentSteps(player);
+	if steps == nil then
+		return returnArray;
+	end;
+
+	scorelist = PROFILEMAN:GetProfile(player):GetHighScoreList(song,steps);
+	if scorelist == nil then
+		return returnArray;
+	end;
+
+	local scores = scorelist:GetHighScores();
+	if #scores > 0 then
+		returnArray["score"] = scores[1]:GetPhoenixScore();
+		return returnArray;
+	else
+		return returnArray;
+	end;
+end;
+
 --Si existio un newscore, esto deberia obtener si subio o bajo el stat desde el record anterior
 --con esto podemos ponerle la flechita al lado del stat :) arka
 local function getDifferenceBetweenRecordStats(PLAYER)
@@ -376,7 +399,7 @@ local function getDifferenceBetweenRecordStats(PLAYER)
 		Combo = -1,
 	};	
 	
-	local paraUnFuturo=true;
+	local paraUnFuturo=false;
 	if paraUnFuturo then
 		return statusTns;
 	end;
@@ -388,10 +411,11 @@ local function getDifferenceBetweenRecordStats(PLAYER)
 		assert(scorelist)
 		local scores = scorelist:GetHighScores();		
 		local extraJudgmentSetted = GAMESTATE:GetExtraJudgment();
+		local statPlayer = vStats:GetPlayerStageStats(PLAYER);
 
 		if #scores == 1 then
 			--here we want the actual gameplay rather the hs because it's the highscore lol
-			local statPlayer = vStats:GetPlayerStageStats(PLAYER);
+
 
 			local plStats = {
 				Perfect 	= statPlayer:GetTapNoteScores("TapNoteScore_W1") +
@@ -432,17 +456,6 @@ local function getDifferenceBetweenRecordStats(PLAYER)
 				perf = plStats["Perfect"];
 			end;
 
-			--[[
-			Trace ("MP:"..mperf);
-			Trace ("P:"..perf);
-			Trace ("G:"..gr);
-			Trace ("G:"..gd);
-			Trace ("B:"..bd);
-			Trace ("M:"..miss);
-			Trace ("M:"..combo);
-			Trace ("C:"..score);
-			]]
-
 			if mperf > 0 then
 				statusTns["MPerfect"] = 0;
 			end;
@@ -470,6 +483,9 @@ local function getDifferenceBetweenRecordStats(PLAYER)
 
 
 		if #scores >= 2 then
+			if statPlayer:GetPhoenixScore() ~= scores[1] then
+				return statusTns;
+			end;
 			local Hs = scores[1];
 			local PreHs = scores[2];			
 			--trabajamos los records los records.
@@ -493,25 +509,6 @@ local function getDifferenceBetweenRecordStats(PLAYER)
 				miss = PreHs:GetTapNoteScore("TapNoteScore_Miss") + Hs:GetTapNoteScore("TapNoteScore_CheckpointMiss");
 				combo = PreHs:GetMaxCombo();
 			}
-			--[[
-			Trace("HSNEW:");
-			Trace("MP:"..hsDataNew["mperf"]);
-			Trace("P:"..hsDataNew["perf"]);
-			Trace("G:"..hsDataNew["great"]);
-			Trace("G:"..hsDataNew["good"]);
-			Trace("B:"..hsDataNew["bad"]);
-			Trace("M:"..hsDataNew["miss"]);
-			Trace("C:"..hsDataNew["combo"]);
-
-			Trace("HSOLD:");
-			Trace("MP:"..hsDataOld["mperf"]);
-			Trace("P:"..hsDataOld["perf"]);
-			Trace("G:"..hsDataOld["great"]);
-			Trace("G:"..hsDataOld["good"]);
-			Trace("B:"..hsDataOld["bad"]);
-			Trace("M:"..hsDataOld["miss"]);
-			Trace("C:"..hsDataOld["combo"]);
-			]]
 
 			if extraJudgmentSetted then
 				if hsDataNew["mperf"] > hsDataOld["mperf"] then
@@ -597,13 +594,19 @@ local function CreateStats( pnPlayer )
 
 	local bpmActual = "BPM " .. ProcessBPM(GAMESTATE:GetCurrentSong():GetCustomBPM());
 	local songartist = GAMESTATE:GetCurrentSong():GetDisplayArtist();
-	local getFolderSong = GAMESTATE:GetChannelName();
+	--local getFolderSong = GAMESTATE:GetChannelName();
+	local getFolderSong = GAMESTATE:GetCurrentSong():GetGroupName();
 	local MusicLength = GAMESTATE:GetCurrentSong():MusicLengthSeconds() or 0;
 	local durationSong = MusicLength > 0 and SecondsToMMSS(MusicLength) or "";
 
 	if GAMESTATE:GetMusicTrainChannel() or GAMESTATE:GetProgressiveChannel() then
 		local dataTrain = getTrainProgresiveInfoLess();
-		bpmActual = "BPM " .. ProcessBPM(dataTrain.bpm);
+		if dataTrain.bpm == nil then
+			bpmActual = "BPM " .. ProcessBPM(GAMESTATE:GetCurrentSong():GetCustomBPM());
+		else
+			bpmActual = "BPM " .. ProcessBPM(dataTrain.bpm);	
+		end;
+		
 		songartist = "V.A";
 		durationSong = dataTrain.duration > 0 and SecondsToMMSS(dataTrain.duration) or "";
 	end;
@@ -629,6 +632,7 @@ local function CreateStats( pnPlayer )
 					  pnStageStats:GetTapNoteScores("TapNoteScore_CheckpointMiss");
 		MaxCombo 	= pnStageStats:MaxCombo();
 		Score		= pnStageStats:GetPhoenixScore();
+		LegacyScore = pnStageStats:GetOldScore();
 		Kcal		= pnStageStats:GetCaloriesBurned();
 		Grade		= pnStageStats:GetGrade();
 		
@@ -642,7 +646,16 @@ local function CreateStats( pnPlayer )
 		PerfectExtraJudg = pnStageStats:GetTapNoteScores("TapNoteScore_W2"); --2
 	};
 
-
+	if GAMESTATE:GetRandomTrainChannel() or GAMESTATE:GetMusicTrainChannel() or GAMESTATE:GetProgressiveChannel() then
+		tStats["Kcal"] = STATSMAN:GetAccumPlayedStageStats():GetPlayerStageStats(pnPlayer):GetCaloriesBurned();
+	end;
+	-- Coop Calories - Coop Fatigue
+	--local cals    = pnStageStats:GetCaloriesBurnedCoop()   -- {p1, p2, etc }
+	--local fatigue = pnStageStats:GetFatigueCoop()          -- {p1, p2, etc }
+	--
+	--for i = 1, #cals do
+	--	Trace( ("Jugador %d: %.1f kcal, fatiga %.2f"):format(i, cals[i], fatigue[i]) )
+	--end
 
 
 	--Generamos la letra nueva
@@ -853,18 +866,23 @@ local function CreateStats( pnPlayer )
 			self:zoom(posScoreZoomBase);
 
 			-- we check for fullcombo
+			local tnsgreat = pnStageStats:GetTapNoteScores('TapNoteScore_W3');
+			local tnsgood = pnStageStats:GetTapNoteScores('TapNoteScore_W4');
 			local tnsbadmiss 	= pnStageStats:GetTapNoteScores('TapNoteScore_W5') +
 						  pnStageStats:GetTapNoteScores("TapNoteScore_Miss") +
 						  pnStageStats:GetTapNoteScores("TapNoteScore_CheckpointMiss");
 
-			if tnsbadmiss == 0 and pnStageStats:GetPhoenixScore() <= 999999 then
+			
+		    if tnsbadmiss == 0 and tnsgood > 0  and pnStageStats:GetPhoenixScore() <= 999999 then
+				self:GetChild("nmPlayerBg"):queuecommand("Ani");
+				self:GetChild("nmPlayerBgGlow"):queuecommand("Ani");
+		    elseif tnsbadmiss == 0 and tnsgood == 0  and pnStageStats:GetPhoenixScore() <= 999999 then
 				self:GetChild("fcPlayerBg"):queuecommand("Ani");
 				self:GetChild("fcPlayerBgGlow"):queuecommand("Ani");
-			end;
-
-			if pnStageStats:GetPhoenixScore() > 999999 then
-				self:GetChild("ScorePlayerBg"):queuecommand("Ani");
-				self:GetChild("ScorePlayerBgGlow"):queuecommand("Ani");
+			elseif pnStageStats:GetPhoenixScore() > 999999 and tnsgreat == 0 and tnsgood == 0 and tnsbadmiss == 0 then
+				self:GetChild("PfcPlayerBg"):queuecommand("Ani");
+				self:GetChild("PfcPlayerBgGlow"):queuecommand("Ani");
+				self:GetChild("starPFCAni"):visible(true);
 			end;
 		end;
 
@@ -875,6 +893,8 @@ local function CreateStats( pnPlayer )
 			OnCommand=cmd(zoom,0.65;zoomx,0.6;zoomy,0.625;diffusealpha,0.4);
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
+
+
 
 		LoadActor(THEME:GetPathG("","ScreenEvaluation/texto-score"))..{
 			Name="ScorePlayerBg";
@@ -916,7 +936,7 @@ local function CreateStats( pnPlayer )
 
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/pfg"))..{
-			Name="ScorePlayerBg";
+			Name="PfcPlayerBg";
 			OnCommand=cmd(zoom,0.8;cropright,1;diffusealpha,1;y,40);
 			AniCommand=function(self)
 				self:sleep(0.3);
@@ -926,7 +946,7 @@ local function CreateStats( pnPlayer )
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/pfg"))..{
-			Name="ScorePlayerBgGlow";
+			Name="PfcPlayerBgGlow";
 			OnCommand=cmd(zoom,0.8;diffusealpha,0;y,40;blend,"BlendMode_Add");
 			AniCommand=function(self)
 				self:sleep(0.5);
@@ -959,6 +979,37 @@ local function CreateStats( pnPlayer )
 				self:zoom(1);
 			end;
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
+		};
+
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/nomiss"))..{
+			Name="nmPlayerBg";
+			OnCommand=cmd(zoom,0.8;cropright,1;diffusealpha,1;y,40);
+			AniCommand=function(self)
+				self:sleep(0.3);
+				self:linear(0.2);
+				self:cropright(0);
+			end;
+			FinalizedMessageCommand=cmd(finishtweening;visible,false);
+		};
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/nomiss"))..{
+			Name="nmPlayerBgGlow";
+			OnCommand=cmd(zoom,0.8;diffusealpha,0;y,40;blend,"BlendMode_Add");
+			AniCommand=function(self)
+				self:sleep(0.5);
+				self:diffusealpha(0.6);
+				self:linear(0.1);
+				self:diffusealpha(0);
+				self:zoom(1);
+			end;
+			FinalizedMessageCommand=cmd(finishtweening;visible,false);
+		};
+
+		generarEstrellaBoom(0.5,20,0,35,"default")..{
+			Name="starPFCAni";
+			InitCommand=function(self)	
+				self:zoom(0.65);
+				self:visible(false);
+			end;
 		};
 
 	};
@@ -1060,6 +1111,54 @@ local function CreateStats( pnPlayer )
 		
 	}
 
+	--legacy score
+	t[#t+1] = Def.ActorFrame{
+
+		OnCommand=function(self)
+				
+				if xSide < 0 then
+					self:x(SCREEN_CENTER_X-110);					
+				else
+					self:x(SCREEN_CENTER_X+110);
+				end;
+
+
+				if GAMESTATE:GetGameMode() == 'Basic' then					
+					self:visible(false);
+				else
+					if GAMESTATE:GetNumSidesJoined() == 2 and checkVsMode() then
+						self:visible(false);
+					else
+						self:y(SCREEN_CENTER_Y+273);
+						self:GetChild("legacyScoreTxt"):settext(formatNumberWithDots(tStats["LegacyScore"]));
+						self:GetChild("legacyScoreTxt"):zoom(0.8):linear(0.05):diffusealpha(1):zoom(0.65);
+						self:visible(true);					
+						self:GetChild("legacyScoreTxt"):maxwidth(120);
+					end;
+
+
+				end;
+
+
+		end;
+
+		LoadActor(THEME:GetPathG("","ScreenEvaluation/lscore_back"))..{
+			OnCommand=cmd(zoom,0.67;diffusealpha,1);
+			FinalizedMessageCommand=cmd(finishtweening;linear,0.15;diffusealpha,0);
+		};
+		LoadActor(THEME:GetPathG("","ScreenEvaluation/lscore_text"))..{
+			OnCommand=cmd(zoom,0.67;diffusealpha,1;y,-10);
+			FinalizedMessageCommand=cmd(finishtweening;linear,0.15;diffusealpha,0);
+		};
+
+		LoadFont("smallscore")..{
+			OnCommand=cmd(diffusealpha,1;zoom,0.7;y,5;x,0;shadowlength,1;shadowcolor,color("#191919");horizalign,"center");
+			Name = "legacyScoreTxt";
+			FinalizedMessageCommand=cmd(finishtweening;linear,0.15;diffusealpha,0);
+		};	
+		
+	}
+
 	--[[
 
 	t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/texto-score"))..{
@@ -1134,29 +1233,35 @@ local function CreateStats( pnPlayer )
 	local isNewHSForPlayer = false;
 	local diffOnRecords = {};
 
+	local FirstHsRecord = getFirstRecordPlayer(pnPlayer);
 	if vStats:PlayerHasHighScore(pnPlayer) then
-		isNewHSForPlayer = true;
-		diffOnRecords = getDifferenceBetweenRecordStats(pnPlayer);
+		if FirstHsRecord["score"] > 0 and FirstHsRecord["score"] == pnStageStats:GetPhoenixScore() then
+			isNewHSForPlayer= true;
+			diffOnRecords = getDifferenceBetweenRecordStats(pnPlayer);
+		end;
+	end;
 
+	if isNewHSForPlayer then
+		
 		t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/nrecord_label"))..{
 			OnCommand=cmd(Center;addy,-207;zoom,0.7;diffusealpha,1;queuecommand,"SetPos");
 			SetPosCommand=function(self)
 				if xSide < 0 then
-					self:x(SCREEN_CENTER_X-275);
+					self:x(SCREEN_CENTER_X-365);
 				else
-					self:x(SCREEN_CENTER_X+280);
+					self:x(SCREEN_CENTER_X+373);
 				end;
 			end;
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
 
 		t[#t+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/nrecord_label"))..{
-			OnCommand=cmd(Center;addy,-207;zoom,0.7;diffusealpha,1;blend,"BlendMode_Add";queuecommand,"SetPos");
+			OnCommand=cmd(Center;addy,-207;zoom,0.7;diffusealpha,0.8;blend,"BlendMode_Add";queuecommand,"SetPos");
 			SetPosCommand=function(self)
 				if xSide < 0 then
-					self:x(SCREEN_CENTER_X-275);
+					self:x(SCREEN_CENTER_X-365);
 				else
-					self:x(SCREEN_CENTER_X+280);
+					self:x(SCREEN_CENTER_X+373);
 				end;
 				self:queuecommand("Ani");
 			end;
@@ -1173,6 +1278,7 @@ local function CreateStats( pnPlayer )
 			end;
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};	
+
 	end;
 
 
@@ -1180,6 +1286,13 @@ local function CreateStats( pnPlayer )
 	--##### STATS GAMEPLAY ####----
 	-- total de p,g,g,b,m,c etc
 	local judgmentActor = Def.ActorFrame{};
+	local xRollPosArrowJudg = 0;
+	if xSide == -1 then
+		xRollPosArrowJudg = xRollPos + 30;
+	else
+		xRollPosArrowJudg = xRollPos;
+	end;
+
 	if extraJudgment then
 		local extraYfix=50;	
 		for i=1,2,1 do	-- extraJudg
@@ -1199,7 +1312,7 @@ local function CreateStats( pnPlayer )
 
 				if diffOnRecords[arrayName] > -1 then
 					judgmentActor[#judgmentActor+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/arr_hs"))..{
-						InitCommand=cmd(xy,(SCREEN_CENTER_X+15)+xRollPos*xSide,SCREEN_CENTER_Y-yStatPos+SnapDistance*i;diffusealpha,1;animate,false;setstate,diffOnRecords[arrayName];zoom,0.4);
+						InitCommand=cmd(xy,(SCREEN_CENTER_X+15)+xRollPosArrowJudg*xSide,SCREEN_CENTER_Y-yStatPos+SnapDistance*i;diffusealpha,1;animate,false;setstate,diffOnRecords[arrayName];zoom,0.4);
 						OnCommand=function(self)
 							self:addy(8);
 						end;
@@ -1230,7 +1343,7 @@ local function CreateStats( pnPlayer )
 
 				if diffOnRecords[arrayName] > -1 then
 					judgmentActor[#judgmentActor+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/arr_hs"))..{
-						InitCommand=cmd(xy,(SCREEN_CENTER_X+15)+xRollPos*xSide,(SCREEN_CENTER_Y+35)-yStatPos+SnapDistance*i;diffusealpha,1;animate,false;setstate,diffOnRecords[arrayName];zoom,0.4);
+						InitCommand=cmd(xy,(SCREEN_CENTER_X+15)+xRollPosArrowJudg*xSide,(SCREEN_CENTER_Y+35)-yStatPos+SnapDistance*i;diffusealpha,1;animate,false;setstate,diffOnRecords[arrayName];zoom,0.4);
 						OnCommand=function(self)
 							self:addy(8);
 						end;
@@ -1263,7 +1376,7 @@ local function CreateStats( pnPlayer )
 
 				if diffOnRecords[arrayName] > -1 then
 					judgmentActor[#judgmentActor+1] = LoadActor(THEME:GetPathG("","ScreenEvaluation/arr_hs"))..{
-						InitCommand=cmd(xy,(SCREEN_CENTER_X+15)+xRollPos*xSide,SCREEN_CENTER_Y-yStatPos+SnapDistance*i;diffusealpha,1;animate,false;setstate,0;zoom,0.5);
+						InitCommand=cmd(xy,(SCREEN_CENTER_X+15)+xRollPosArrowJudg*xSide,SCREEN_CENTER_Y-yStatPos+SnapDistance*i;diffusealpha,1;animate,false;setstate,0;zoom,0.5);
 						OnCommand=function(self)
 							self:addy(28);
 						end;
@@ -1429,7 +1542,11 @@ local t = Def.ActorFrame {
 		OnCommand=cmd(visible,GAMESTATE:GetGameMode() ~= 'Basic');
 	};
 	]]
-	LoadActor("profile/default")..{};
+	LoadActor("profile/default")..{
+	    InitCommand = function(self)
+	        self:playcommand("modifyForResult");
+	    end
+	};
 	
 	Drum(WaitUntilDrum - 0.2, DelayDrum);
 	
@@ -1748,6 +1865,258 @@ t[#t+1] = Def.Quad{
 --VS MODE
 if GAMESTATE:GetNumSidesJoined() == 2 and checkVsMode() then
 	t[#t+1] = LoadActor("ScreenEvaluationAddOn/vsMode")..{};
+end;
+
+--********
+-- NONSTOP CENTER
+--********
+--1) CHECK IF IT'S ON
+if isNonstopCenterModeActive() then
+		--we save the stat of the player.
+		if GAMESTATE:GetNumSidesJoined() == 2 then
+			savePlayerStatsGameplay(PLAYER_1);
+			savePlayerStatsGameplay(PLAYER_2);
+		else
+			savePlayerStatsGameplay(GAMESTATE:GetMasterPlayerNumber());
+		end;
+
+		local timerScreen = getSecondsBeforeSongNonstopCenter();
+		local chartBase = getNextSongGameplayNonstopCenter();
+
+		if chartBase ~= nil then
+			local songBase = SONGMAN:GetSongFromSteps(chartBase);		
+			local bannerNewPath = GetBannerFromSong(songBase);
+			local bpmActual = "-";
+
+			if chartBase ~= nil then
+				bpmActual = "BPM ".. ProcessBPM(songBase:GetCustomBPM());
+			end;
+
+			t[#t+1] = LoadActor( THEME:GetPathG("","ScreenCreateOwnTrain/HG") )..{
+					InitCommand=function(self)
+						self:zoom(0.6);
+						self:xy(SCREEN_CENTER_X,SCREEN_TOP+20);						
+					end;
+			};
+
+			t[#t+1] = LoadFont("MenuTimer numbers")..{
+				OnCommand=cmd(zoom,0.6;shadowlength,1;shadowcolor,0,0,0,1;horizalign,center;y,SCREEN_TOP+2 ;x,SCREEN_CENTER_X;settext,timerScreen;queuecommand,"timer");
+				timerCommand=function(self)
+
+					self:sleep(1);
+					timerScreen = timerScreen - 1;
+					if timerScreen < 0 then
+						timerScreen = 0;
+					end;
+
+					if timerScreen < 10 then
+						self:settext("0"..timerScreen);
+					else
+						self:settext(timerScreen);	
+					end;
+					
+					if timerScreen == 0 then
+						--SCREENMAN:GetTopScreen():StartTransitioningScreen("SM_GoToNextScreen");
+					else
+						self:queuecommand("timer");
+					end;
+
+
+				end;
+				FinalizedMessageCommand=cmd(stoptweening;visible,false);	
+				OffCommand=function(self)
+					self:stoptweening();
+					self:linear(0.15);
+					self:diffusealpha(0);
+				end;
+			};
+			branchGameplayNonstopCenter();
+
+			--INFO NOSTOP CENTER
+			t[#t+1] = Def.ActorFrame{
+				OnCommand=function(self)
+					self:xy(SCREEN_CENTER_X,SCREEN_BOTTOM-92);
+				end;
+				OffCommand=function(self)
+					self:stoptweening();
+					self:linear(0.15);
+					self:diffusealpha(0);
+				end;
+				LoadActor( THEME:GetPathG("","ScreenCreateOwnTrain/RESULT/base") )..{
+						InitCommand=function(self)
+							self:zoom(0.7);
+							self:zoomy(1)
+						end;
+				};
+
+				Def.Banner {	
+					Name="songBanner";	--banner standard,
+					InitCommand=cmd(scaletoclipped,120,80;xy,0,1;);
+					OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,1;);
+					OnCommand=function(self)
+						self:stoptweening():LoadFromCachedBanner(bannerNewPath["bpath"]);					
+					end;
+				};
+
+				LoadFont("_TitleXolonium")..{
+					Name="title";
+					Text="NEXT SONG";
+					InitCommand=cmd(zoom,0.4);
+					OnCommand=function(self)
+						self:y(-48);
+					end;
+				};
+				LoadFont("_TitleXolonium")..{
+					Name="bpm";
+					Text=bpmActual;
+					InitCommand=cmd(zoom,0.35);
+					OnCommand=function(self)
+						self:y(48);
+					end;
+				};
+			};
+
+			--SPEED 
+			--with this thing we can change the speed on the fly.
+			t[#t+1] = LoadActor("ScreenEvaluationAddOn/speedModNonstopCenter")..{
+				OffCommand=function(self)
+					self:stoptweening();
+					self:linear(0.15);
+					self:diffusealpha(0);
+				end;
+			};
+
+		else
+			--end of the road.
+			t[#t+1] = LoadActor("ScreenEvaluationAddOn/speedModNonstopCenter")..{
+				OnCommand=function(self)
+					self:diffusealpha(0);
+				end;
+				OffCommand=function(self)
+					self:stoptweening();
+					self:linear(0.15);
+					self:diffusealpha(0);
+				end;
+			};
+			branchGameplayNonstopCenter();
+		end;
+end;
+
+-- offset recomendation
+local function medianaJudgmentData(t)
+	
+	if t == nil or #t == 0 then
+		return 0;
+	end;
+
+	local offsetTimingList = {};
+	--we only allow offsets >= 0.01
+
+	local toleranceFast=-0.01; -- below of the receptor.
+	local toleranceSlow=0.025; -- on top of the receptor
+
+	for i=1,#t do
+		if t[i].rawOffset_ms >= toleranceSlow or t[i].rawOffset_ms <= toleranceFast then
+			table.insert(offsetTimingList,t[i].rawOffset_ms);
+		end;
+	end;
+
+    table.sort(offsetTimingList, function(a, b)
+        return a < b
+    end)
+
+    local n = #offsetTimingList
+    if n == 0 then
+    	return 0;
+    end;
+
+    local mid = math.floor(n / 2)
+    if n % 2 == 0 then
+        return (offsetTimingList[mid] + offsetTimingList[mid + 1]) / 2
+    else
+        return offsetTimingList[mid + 1]
+    end
+end
+
+function offsetRecomendation(player)
+
+	local plText = "";
+	if player == PLAYER_1 then
+		plText = "P1";
+	else
+		plText = "P2";
+	end;
+
+	-- because anything inside those timing is normal? no one is capable to stay at 0.0 xD but 
+	-- those parameters works fine to remove that noise.
+
+	local toleranceFast=-0.015; -- below of the receptor.
+	local toleranceSlow=0.03; -- on top of the receptor
+
+	local tableOffsets = {};
+
+	if GAMESTATE:Env()["timing"..plText] ~= nil then
+		tableOffsets = GAMESTATE:Env()["timing"..plText];
+	end;
+	
+	if #tableOffsets > 50 then
+		local medPlayer = medianaJudgmentData(tableOffsets);
+		
+		if medPlayer == 0 then
+			GAMESTATE:Env()["recomendedOffset"..plText] = "";
+			return;
+		end;
+
+
+		local timingAdjCustomOption = getCustomOptionValuePlayer(player,"timing_adjustment");
+		local timingPlayer = 0.0;
+		timingPlayer = tonumber(timingAdjCustomOption) or 0.0;
+
+		local newTimingForPlayer = (medPlayer*10) + timingPlayer;
+
+		--this is what we want, i don't want to work with float numbers because they just work like ass xD.
+		local stringTiming = string.format("%.1f", newTimingForPlayer);
+
+		if medPlayer < toleranceFast or medPlayer >= toleranceSlow then
+
+			if newTimingForPlayer > 0 then
+				stringTiming = "+"..stringTiming;
+			end;
+
+			GAMESTATE:Env()["recomendedOffset"..plText] = stringTiming;
+		else
+			--kind of ok, here we don't need to change.
+			--Trace("seems OK :D");
+			GAMESTATE:Env()["recomendedOffset"..plText] = "";
+		end;
+	else
+		--Trace("Not enough data ->["..#tableOffsets.." inputs / 50]");
+	end;
+
+end;
+
+if GAMESTATE:IsSideJoined(PLAYER_1) then
+	offsetRecomendation(PLAYER_1);
+end;
+
+if GAMESTATE:IsSideJoined(PLAYER_2) then
+	offsetRecomendation(PLAYER_2);
+end;
+
+if GAMESTATE:IsHumanPlayer(PLAYER_1) then
+	local profileSkinData = getProfileSkinPlayer(PLAYER_1);
+	if profileSkinData["isDefault"] == false then
+		local profileFrameSkinFunc = LoadActor(profileSkinData["luaPath"]);
+		t[#t+1] = profileFrameSkinFunc(profileSkinData["basePathSkin"],PLAYER_1,"ScreenEvaluation");
+	end;
+end;
+
+if GAMESTATE:IsHumanPlayer(PLAYER_2) then
+	local profileSkinData = getProfileSkinPlayer(PLAYER_2);
+	if profileSkinData["isDefault"] == false then
+		local profileFrameSkinFunc = LoadActor(profileSkinData["luaPath"]);
+		t[#t+1] = profileFrameSkinFunc(profileSkinData["basePathSkin"],PLAYER_2,"ScreenEvaluation");
+	end;
 end;
 
 return t

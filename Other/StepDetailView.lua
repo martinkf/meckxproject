@@ -26,7 +26,7 @@ function StepDetailView(pn,tdata)
 				local clabeldesc = string.lower(DesCustomLabel(step:GetDescription()))
 				
 				chartInfo.sltr = DirectIconLayer(step);
-				chartInfo.lv = DisplayLV(step:GetMeter());
+				chartInfo.lv = DisplayLV_New(step);
 				chartInfo.sType = iconstate;
 				chartInfo.stpartist = FixedChartCreditNames(step:GetAuthorCredit());
 				chartInfo.dlabel = (labeltype == "ucs" and 2) or (labeltype == "another" and 3) or 0;

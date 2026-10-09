@@ -1,16 +1,6 @@
 {
   "option": [
     {
-      "title": "customInt",
-      "valuestype": "int",
-      "defaultvalue": 4
-    },
-    {
-      "title": "customString",
-      "valuestype": "string",
-      "defaultvalue": "zwei"
-    },
-    {
       "title": "judgmentSkin",
       "valuestype": "string",
       "defaultvalue": "sanity"
@@ -66,6 +56,11 @@
       "defaultvalue": false
     },
     {
+      "title": "gameplay_topTimerBar",
+      "valuestype": "bool",
+      "defaultvalue": false
+    },
+    {
       "title": "lifebar_extra_mode",
       "valuestype": "string",
       "defaultvalue": "none"
@@ -86,6 +81,11 @@
       "defaultvalue": false
     },
     {
+      "title": "performance_mode_type",
+      "valuestype": "int",
+      "defaultvalue": 0
+    },
+    {
       "title": "timing_adjustment",
       "valuestype": "string",
       "defaultvalue": "0"
@@ -99,6 +99,46 @@
       "title": "evaluationSkin",
       "valuestype": "string",
       "defaultvalue": "i_xsanity"
-    }   
+    },
+    {
+      "title": "companion",
+      "valuestype": "string",
+      "defaultvalue": "none"
+    },
+    {
+      "title": "frameSkin",
+      "valuestype": "string",
+      "defaultvalue": "i_simple"
+    },
+    {
+      "title": "commandWindowMod",
+      "valuestype": "string",
+      "defaultvalue": "default"
+    },
+    {
+      "title": "infoSchemeSkin",
+      "valuestype": "string",
+      "defaultvalue": "default"
+    },
+    {
+      "title": "profileSkin",
+      "valuestype": "string",
+      "defaultvalue": "default"
+    },
+    {
+      "title": "theme_show_song_graph",
+      "valuestype": "bool",
+      "defaultvalue": true
+    },
+    {
+      "title": "profileTitleMod",
+      "valuestype": "string",
+      "defaultvalue": "none"
+    },
+    {
+      "title": "profileTitleModId",
+      "valuestype": "int",
+      "defaultvalue": 0
+    }
   ]
 }

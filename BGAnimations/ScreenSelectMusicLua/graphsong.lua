@@ -577,16 +577,6 @@ function Triangulo(x, y, player)
 					local songduration = GAMESTATE:GetCurrentSong():MusicLengthSeconds();
 					local bpm = ProcessBPMGraph(GAMESTATE:GetCurrentSong():GetCustomBPM());
 
-					--[[
-					Trace("#######SONG DATA#######");
-					Trace("TAPS:"..taps);
-					Trace("jumps:"..jumps);
-					Trace("tripl:"..tripl);
-					Trace("songduration:"..songduration);
-					Trace("bpm:"..bpm);
-					Trace("##############");
-					]]
-
 					local colorGreen = {0, 1, 0, 0.85};
 					local colorRed={1, 0, 0, 0.85};
 					local colorCeleste={0, 1, 1, 0.85};
@@ -645,41 +635,64 @@ function Triangulo(x, y, player)
 
 end
 
-t[#t+1] =  Triangulo(SCREEN_CENTER_X-450,SCREEN_CENTER_Y-60,PLAYER_1)..{
-			CommandWindowOpenMessageCommand=function(self,params)
-			if params.Player == PLAYER_1 then
-				self:stoptweening();
-				self:linear(0.05);
-				self:diffusealpha(0);
-			end;			
-		end;
-		CommandWindowOptionCancelMessageCommand=function(self,params)
-			if params.Player == PLAYER_1 then
-				self:stoptweening();
-				self:linear(0.15);
-				self:diffusealpha(1);
-			end;
-		end;
-};
+if GAMESTATE:IsSideJoined(PLAYER_1) then
 
-t[#t+1] =  Triangulo(SCREEN_CENTER_X+450,SCREEN_CENTER_Y-60,PLAYER_2)..{
-			CommandWindowOpenMessageCommand=function(self,params)
-			if params.Player == PLAYER_2 then
-				self:stoptweening();
-				self:linear(0.05);
-				self:diffusealpha(0);
-			end;
-		
-		end;
-		CommandWindowOptionCancelMessageCommand=function(self,params)
-			if params.Player == PLAYER_2 then
-				self:stoptweening();
-				self:linear(0.15);
-				self:diffusealpha(1);
-			end;
-		end;
-};
+	local showGraphSongPlayer1 = getCustomOptionValuePlayer(PLAYER_1,"theme_show_song_graph");
+	if showGraphSongPlayer1 == nil then
+		showGraphSongPlayer1 = true;
+	end;
+
+	if showGraphSongPlayer1 then
+		t[#t+1] =  Triangulo(SCREEN_CENTER_X-450,SCREEN_CENTER_Y-60,PLAYER_1)..{
+					CommandWindowOpenMessageCommand=function(self,params)
+					if params.Player == PLAYER_1 then
+						self:stoptweening();
+						self:linear(0.05);
+						self:diffusealpha(0);
+					end;			
+				end;
+				CommandWindowOptionCancelMessageCommand=function(self,params)
+					if params.Player == PLAYER_1 then
+						self:stoptweening();
+						self:linear(0.15);
+						self:diffusealpha(1);
+					end;
+				end;
+		};
+	end;
+
+end;
 
 
+if GAMESTATE:IsSideJoined(PLAYER_2) then
+
+	local showGraphSongPlayer2 = getCustomOptionValuePlayer(PLAYER_2,"theme_show_song_graph");
+	if showGraphSongPlayer2 == nil then
+		showGraphSongPlayer2 = true;
+	end;
+
+	if showGraphSongPlayer2 then
+
+		t[#t+1] =  Triangulo(SCREEN_CENTER_X+450,SCREEN_CENTER_Y-60,PLAYER_2)..{
+					CommandWindowOpenMessageCommand=function(self,params)
+					if params.Player == PLAYER_2 then
+						self:stoptweening();
+						self:linear(0.05);
+						self:diffusealpha(0);
+					end;
+				
+				end;
+				CommandWindowOptionCancelMessageCommand=function(self,params)
+					if params.Player == PLAYER_2 then
+						self:stoptweening();
+						self:linear(0.15);
+						self:diffusealpha(1);
+					end;
+				end;
+		};
+
+	end;
+
+end;
 
 return t;

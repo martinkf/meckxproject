@@ -56,4 +56,17 @@ if GAMESTATE:GetGameMode() ~= 'Rank' then
 end;
 
 
+-- :::FRAMESKIN:::
+local isUsingDefaultSkin = true;
+--:::: FRAME SKIN ::::--
+--we get the installed themes. if it's intern we will asume is it the simple.
+local luaFrameSkinSelected = getFrameSkinForPlayers("underlay","ScreenGamePlay");
+
+if luaFrameSkinSelected["isDefault"]  == false then
+	local frameSkinFunc = LoadActor(luaFrameSkinSelected["lua"]);
+	t[#t+1] = frameSkinFunc(luaFrameSkinSelected["path"]);
+	isUsingDefaultSkin = false;
+end;
+
+
 return t

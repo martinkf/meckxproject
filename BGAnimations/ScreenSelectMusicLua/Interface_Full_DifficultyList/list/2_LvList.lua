@@ -44,7 +44,7 @@ function StepDetailView(pn,tdata)
 				local clabeldesc = string.lower(DesCustomLabel(step:GetDescription()))
 				
 				chartInfo.sltr = DirectIconLayer(step);
-				chartInfo.lv = DisplayLV(step:GetMeter());
+				chartInfo.lv = DisplayLV_New(step);
 				chartInfo.sType = iconstate;
 				chartInfo.stpartist = FixedChartCreditNames(step:GetAuthorCredit());
 				chartInfo.dlabel = (labeltype == "ucs" and 2) or (labeltype == "another" and 3) or 0;
@@ -134,7 +134,19 @@ function StepDetailView(pn,tdata)
 					self:rotationy(180);
 				end;
 			end;
-		};		
+		};	
+
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/selector_nm"))..{
+			Name="nmselector";
+			OnCommand=function(self)
+				self:x(100*xpos);
+				self:y(-12);
+				self:zoom(0.68);
+				if pn == PLAYER_1 then
+					self:rotationy(180);
+				end;
+			end;
+		};	
 
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/artifacts/sl_grade"))..{
@@ -215,6 +227,7 @@ local function ListUpdaterInfinite(self, pn, index, dir)
 		glowSelector = self:GetChild("glowSelector"),
 		pfgStars = self:GetChild("pfgselector"),
 		fcStars = self:GetChild("fcselector"),
+		nmStars = self:GetChild("nmselector"),
     }
 	local StepsxPos = {
 		StepsType_Pump_Single 		= 28,
@@ -268,7 +281,7 @@ local function ListUpdaterInfinite(self, pn, index, dir)
 					local clabel = string.lower(DesCustomLabel(step.cuslabel))
 					local setlclabel = setNormalLabelState(tlabel, clabel)
 					local nlabel = (tlabel == "ucs" and 2) or (tlabel == "another" and 3) or 0
-					local fixlv = DisplayLV(step.meter)
+					local fixlv = DisplayLV_New(step.currentStep)
 					
 					children.lva:settext(fixlv)
 					children.lvb:settext(fixlv):diffuse(StepsColor[StepsType] or color("#eb1b00"));
@@ -309,8 +322,8 @@ local function ListUpdaterInfinite(self, pn, index, dir)
 					local clabel = string.lower(DesCustomLabel(step:GetDescription()))
 					local setlclabel = setNormalLabelState(tlabel, clabel)
 					local nlabel = (tlabel == "ucs" and 2) or (tlabel == "another" and 3) or 0
-					
-					local fixlv = DisplayLV(step:GetMeter())
+				
+					local fixlv = DisplayLV_New(step)
 					lvDebug = fixlv;
 					children.lva:settext(fixlv)
 					children.lvb:settext(fixlv):diffuse(StepsColor[StepsType] or color("#eb1b00"));
@@ -414,6 +427,12 @@ local function ListUpdaterInfinite(self, pn, index, dir)
 					children.fcStars:diffusealpha(1);
 				else
 					children.fcStars:diffusealpha(0);
+				end;
+
+				if scoreLevel["nomiss"] == 1 and scoreLevel["score"] < 1000000 then
+					children.nmStars:diffusealpha(1);
+				else
+					children.nmStars:diffusealpha(0);
 				end;
 
 				if scoreLevel["score"] > 999999 then

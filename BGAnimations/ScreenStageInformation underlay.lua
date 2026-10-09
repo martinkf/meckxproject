@@ -49,27 +49,44 @@ t[#t+1] = Def.ActorFrame {
 			self:x(SCREEN_CENTER_X);
 			self:y(SCREEN_CENTER_Y+310);
 
+			self:GetChild("textsap1"):maxwidth(210);
+			self:GetChild("textsap2"):maxwidth(210);
+
 			if GAMESTATE:IsSideJoined(PLAYER_1) then				
 				local CurrentStepP1 = GAMESTATE:GetCurrentSteps(PLAYER_1);
 				local stepArtistP1 = CurrentStepP1:GetAuthorCredit();
 				if #stepArtistP1 > 0 then
-					self:GetChild("sap1"):visible(true);
-					self:GetChild("textsap1"):settext(stepArtistP1);
+
+					if #stepArtistP1 <= 13 then
+						self:GetChild("sap1"):visible(true);
+						self:GetChild("textsap1"):settext(stepArtistP1);
+						self:GetChild("textsap1"):x(-450);
+					else
+						self:GetChild("bigsap1"):visible(true);
+						self:GetChild("textsap1"):x(-430);
+						self:GetChild("textsap1"):settext(stepArtistP1);
+					end;
 				else
 					self:GetChild("sap1"):visible(false);
 					self:GetChild("textsap1"):settext("");
 				end;
-				
-
-
 			end;
 
 			if GAMESTATE:IsSideJoined(PLAYER_2) then
 				local CurrentStepP2 = GAMESTATE:GetCurrentSteps(PLAYER_2);
 				local stepArtistP2 = CurrentStepP2:GetAuthorCredit();
 				if #stepArtistP2 > 0 then
-					self:GetChild("sap2"):visible(true);
-					self:GetChild("textsap2"):settext(stepArtistP2);
+
+					if #stepArtistP2 <= 13 then
+						self:GetChild("sap2"):visible(true);
+						self:GetChild("textsap2"):x(545);
+						self:GetChild("textsap2"):settext(stepArtistP2);
+					else
+						self:GetChild("bigsap2"):visible(true);
+						self:GetChild("textsap2"):x(530);
+						self:GetChild("textsap2"):settext(stepArtistP2);
+					end;
+
 				else
 					self:GetChild("sap2"):visible(false);
 					self:GetChild("textsap2"):settext("");
@@ -87,10 +104,19 @@ t[#t+1] = Def.ActorFrame {
 				end;
 
 		};
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/big_stepartistsprite"))..{
+				Name="bigsap1";
+				InitCommand=function(self)
+					self:zoom(0.8);
+					self:x(-480);
+					self:visible(false);
+				end;
+
+		};
 
 		LoadFont("_century gothic")..{
 			Name="textsap1";
-			OnCommand=cmd(x,-510;y,-3;zoom,0.8;horizalign,left);
+			OnCommand=cmd(y,-3;zoom,0.8;horizalign,center);
 		};
 
 
@@ -103,9 +129,18 @@ t[#t+1] = Def.ActorFrame {
 			end;
 		};
 
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/big_stepartistsprite"))..{
+			Name="bigsap2";
+			InitCommand=function(self)
+				self:zoom(0.8);
+				self:x(480);
+				self:visible(false);
+			end;
+		};
+
 		LoadFont("_century gothic")..{
 			Name="textsap2";
-			OnCommand=cmd(x,490;y,-3;zoom,0.8;horizalign,left);
+			OnCommand=cmd(y,-3;zoom,0.8;horizalign,center);
 		};
 };
 

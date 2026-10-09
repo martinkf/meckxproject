@@ -35,7 +35,7 @@ function getRankList(player)
 		if hslist[i]["failed"] == 0 then
 			typeLightStatus = "clear";
 		end;	
-		table.insert(hlistProc,{guid=hslist[i]["guid"],name=hslist[i]["name"],failed=hslist[i]["failed"],score=hslist[i]["score"],lightStatus=typeLightStatus,fc=hslist[i]["fc"],judg=judgStateRecord,dateScore=hslist[i]["dateScore"]});
+		table.insert(hlistProc,{guid=hslist[i]["guid"],name=hslist[i]["name"],failed=hslist[i]["failed"],score=hslist[i]["score"],lightStatus=typeLightStatus,fc=hslist[i]["fc"],nomiss=hslist[i]["nomiss"],judg=judgStateRecord,dateScore=hslist[i]["dateScore"]});
 	end;
 	return hlistProc;
 end;
@@ -59,6 +59,8 @@ else
 	diffListTypeLocalRank = getCustomOptionValuePlayer(PLAYER_2,"difficultyListMode");
 end;
 
+	local gradeSpriteEvSkin = GetGradeSpriteFromEvaluationSkin(false,localRecordActivePlayer);
+	local gradeFailSpriteEvSkin = GetGradeSpriteFromEvaluationSkin(true,localRecordActivePlayer);
 
 if diffListTypeLocalRank == nil or #diffListTypeLocalRank == 0 then
 	localRecordY = SCREEN_CENTER_Y+120; -- this is the default place
@@ -67,9 +69,14 @@ else
 	if diffListTypeLocalRank == defaultDifficultyListSkin() then
 		localRecordY = SCREEN_CENTER_Y+120;
 		localRecordZoom = 0.45;
-	elseif diffListTypeLocalRank == "orbs" then
-		localRecordY = SCREEN_CENTER_Y+180;
-		localRecordZoom = 0.32;
+	elseif diffListTypeLocalRank ~= "list" then
+		localRecordY = SCREEN_CENTER_Y+176;
+		localRecordZoom = 0.36;
+
+		if isAspectRatio43() then
+			localRecordY = SCREEN_CENTER_Y+200;
+		end;
+
 	else
 		localRecordY = SCREEN_CENTER_Y+120; -- this is the default place
 		localRecordZoom = 0.45;
@@ -108,17 +115,26 @@ t[#t+1] =  Def.ActorFrame {
 			localMachineRecordItems[1]:GetChild("placeRanking"):settext("");
 			localMachineRecordItems[1]:GetChild("judgPlayerRank"):visible(false);
 			localMachineRecordItems[1]:GetChild("fcomboTag"):stoptweening():visible(false);
+			localMachineRecordItems[1]:GetChild("nmcomboTag"):stoptweening():visible(false);
 			localMachineRecordItems[1]:GetChild("pfcTag"):stoptweening():visible(false);
 
 		else
+
+
 			localMachineRecordItems[1]:GetChild("nodata"):visible(false);
 			localMachineRecordItems[1]:GetChild("judgPlayerRank"):visible(true);
 
 			for i=1,#recordsReg do
+
+				localMachineRecordItems[i]:GetChild("pfcTag"):visible(false);
+				localMachineRecordItems[i]:GetChild("fcomboTag"):stoptweening():visible(false);
+				localMachineRecordItems[i]:GetChild("nmcomboTag"):stoptweening():visible(false);
+
 				localMachineRecordItems[i]:visible(true);
 				local place = i;
 				local playerName = recordsReg[i]["name"];
 				local itsFc = recordsReg[i]["fc"];
+				local itsNomiss = recordsReg[i]["nomiss"];
 				local itsPfc = false;
 
 				if recordsReg[i]["score"] == 1000000 then
@@ -141,16 +157,43 @@ t[#t+1] =  Def.ActorFrame {
 					localMachineRecordItems[i]:GetChild("lampRankingGlow"):stoptweening():glowshift():effectcolor1(color("0.549,0.894,1,0")):effectcolor2(color("0.549,0.894,1,0.5")):effectperiod(0.1):visible(true):diffusealpha(0.25);
 					localMachineRecordItems[i]:GetChild("pfcTag"):stoptweening():visible(true);
 					localMachineRecordItems[i]:GetChild("backr_1"):stoptweening():setstate(3);
+
+					if judgRecord == 5 then
+						localMachineRecordItems[i]:GetChild("backr_1"):stoptweening():setstate(6);
+					else
+						localMachineRecordItems[i]:GetChild("backr_1"):stoptweening():setstate(3);
+					end;
+
 				elseif itsFc then
 					stateLamp = 1;
 					localMachineRecordItems[i]:GetChild("lampRankingGlow"):stoptweening():glowshift():effectcolor1(color("#FFA23900")):effectcolor2(color("#FFA239FF")):effectperiod(0.1):visible(true):diffusealpha(0.25);
 					localMachineRecordItems[i]:GetChild("fcomboTag"):stoptweening():visible(true);
 					localMachineRecordItems[i]:GetChild("backr_1"):stoptweening():setstate(2);
+
+					if judgRecord == 5 then
+						localMachineRecordItems[i]:GetChild("backr_1"):stoptweening():setstate(6);
+					else
+						localMachineRecordItems[i]:GetChild("backr_1"):stoptweening():setstate(2);
+					end;
+
+				elseif itsNomiss then
+					stateLamp = 4;
+					localMachineRecordItems[i]:GetChild("lampRankingGlow"):stoptweening():glowshift():effectcolor1(color("#11ff0000")):effectcolor2(color("#0afa36FF")):effectperiod(0.1):visible(true):diffusealpha(0.25);
+					localMachineRecordItems[i]:GetChild("nmcomboTag"):stoptweening():visible(true);
+					localMachineRecordItems[i]:GetChild("backr_1"):stoptweening():setstate(1);
+
+					if judgRecord == 5 then
+						localMachineRecordItems[i]:GetChild("backr_1"):stoptweening():setstate(6);
+					else
+						localMachineRecordItems[i]:GetChild("backr_1"):stoptweening():setstate(1);
+					end;
+
 				else
 					stateLamp = 4;
 					localMachineRecordItems[i]:GetChild("lampRankingGlow"):stoptweening():visible(false);
 					localMachineRecordItems[i]:GetChild("fcomboTag"):stoptweening():visible(false);
 					localMachineRecordItems[i]:GetChild("pfcTag"):stoptweening():visible(false);
+					localMachineRecordItems[i]:GetChild("nmcomboTag"):stoptweening():visible(false);
 					localMachineRecordItems[i]:GetChild("backr_1"):stoptweening():setstate(1);
 				end;
 				localMachineRecordItems[i]:GetChild("lampRanking"):stoptweening():setstate(stateLamp);
@@ -161,6 +204,7 @@ t[#t+1] =  Def.ActorFrame {
 					localMachineRecordItems[i]:GetChild("fcomboTag"):stoptweening():visible(false);
 					localMachineRecordItems[i]:GetChild("pfcTag"):stoptweening():visible(false);
 					localMachineRecordItems[i]:GetChild("fcomboTag"):stoptweening():visible(false);
+					localMachineRecordItems[i]:GetChild("nmcomboTag"):stoptweening():visible(false);
 					localMachineRecordItems[i]:GetChild("backr_1"):stoptweening():setstate(5);	
 					localMachineRecordItems[i]:GetChild("lampRanking"):stoptweening():setstate(3);
 				end;
@@ -195,6 +239,8 @@ t[#t+1] =  Def.ActorFrame {
 					localMachineRecordItems[i]:GetChild("judgPlayerRank"):setstate(3);
 				elseif judgRecord == 4 then
 					localMachineRecordItems[i]:GetChild("judgPlayerRank"):setstate(4);
+				elseif judgRecord == 5 then
+					localMachineRecordItems[i]:GetChild("judgPlayerRank"):setstate(6);
 				else
 					localMachineRecordItems[i]:GetChild("judgPlayerRank"):setstate(0);
 				end;
@@ -324,7 +370,8 @@ for i=1,5 do
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);
 		};
 
-		LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+		--LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+			LoadActor(gradeSpriteEvSkin)..{
 			Name="passRes";
 			InitCommand=cmd(x,232;visible,true;diffusealpha,1;animate,false;setstate,0);
 			OnCommand=function(self)
@@ -334,7 +381,8 @@ for i=1,5 do
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);			
 		};
 
-		LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+		--LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+		LoadActor(gradeFailSpriteEvSkin)..{
 			Name="failPassRes";
 			InitCommand=cmd(x,232;visible,false;diffusealpha,1;animate,false;setstate,0);
 			OnCommand=function(self)
@@ -449,8 +497,8 @@ for i=1,5 do
 				self:visible(false);
 				self:diffusealpha(1);
 				self:x(310);
-				self:y(96 + (90 * (i-1) ));
-				self:zoom(0.7);
+				self:y(93 + (90 * (i-1) ));
+				self:zoom(0.82);
 			end;
 
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);			
@@ -462,8 +510,20 @@ for i=1,5 do
 				self:visible(false);
 				self:diffusealpha(1);
 				self:x(310);
+				self:y(97 + (90 * (i-1) ));
+				self:zoom(0.95);
+			end;		
+			FinalizedMessageCommand=cmd(finishtweening;visible,false);			
+		};
+
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/ranking/nomiss"))..{
+			Name="nmcomboTag";
+			OnCommand=function(self)
+				self:visible(false);
+				self:diffusealpha(1);
+				self:x(310);
 				self:y(100 + (90 * (i-1) ));
-				self:zoom(0.7);
+				self:zoom(1);
 			end;		
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);			
 		};

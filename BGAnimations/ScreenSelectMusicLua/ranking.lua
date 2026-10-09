@@ -50,7 +50,8 @@ function createRanking()
 		playerActive = PLAYER_2;
 	end;
 
-
+	local gradeSpriteEvSkin = GetGradeSpriteFromEvaluationSkin(false,playerActive);
+	local gradeFailSpriteEvSkin = GetGradeSpriteFromEvaluationSkin(true,playerActive);
 
 	local rankActor = Def.ActorFrame{
 
@@ -291,7 +292,7 @@ function createRanking()
 
 
 
-			LoadActor( THEME:GetPathG("","CommandWindow/Icons07 17x1") )..{
+			LoadActor( THEME:GetPathG("","CommandWindow/Icons07 18x1") )..{
 					Name="judgeRecord";
 					InitCommand=function(self)
 						self:animate(false);
@@ -372,7 +373,9 @@ function createRanking()
 					FinalizedMessageCommand=cmd(finishtweening;visible,false);
 			};
 
-			LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+
+			--LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+			LoadActor(gradeSpriteEvSkin)..{
 				Name="LetterRecord";
 				OnCommand=cmd(animate,false;setstate,0;queuecommand,"SetLetter");
 				SetLetterCommand=function(self)
@@ -386,7 +389,8 @@ function createRanking()
 				FinalizedMessageCommand=cmd(finishtweening;visible,false);
 			};
 
-			LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+			--LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+			LoadActor(gradeFailSpriteEvSkin)..{
 				Name="failLetterRecord";
 				OnCommand=cmd(animate,false;setstate,0;queuecommand,"SetLetter");
 				SetLetterCommand=function(self)

@@ -109,15 +109,30 @@ function CreatePlayer(player)
 					end;
 				end;
 
+				local startLessCharts = 0;
 				for i=1 ,#vpSteps , 1 do
+
+					if dl_q ~= 2 then
+						if #vpSteps == 3  then
+							startLessCharts = 110;
+						end;
+						if #vpSteps == 2  then
+							startLessCharts = 200;
+						end;
+						if #vpSteps == 1  then
+							startLessCharts = 290;
+						end;
+					end;
+
+
 					self:GetParent():GetChild('dlbf'..count):diffuse(color("#18327e"));
 					self:GetParent():GetChild('dln'..count):setstate(0);
 					--self:GetParent():GetChild('dln'..count):diffusealpha(1);
-					self:GetParent():GetChild('dln'..count):x(count*dl_distance - ((dl_distance*dl_q)/2));
+					self:GetParent():GetChild('dln'..count):x( (count*dl_distance - ((dl_distance*dl_q)/2) ) + startLessCharts );
 					--self:GetParent():GetChild('dlf'..count):diffusealpha(1);
-					self:GetParent():GetChild('dlf'..count):x(count*dl_distance - ((dl_distance*dl_q)/2));
+					self:GetParent():GetChild('dlf'..count):x( (count*dl_distance - ((dl_distance*dl_q)/2) ) + startLessCharts);
 					--self:GetParent():GetChild('dlbf'..count):diffusealpha(1);
-					self:GetParent():GetChild('dlbf'..count):x(count*dl_distance - ((dl_distance*dl_q)/2));
+					self:GetParent():GetChild('dlbf'..count):x( (count*dl_distance - ((dl_distance*dl_q)/2) ) + startLessCharts);
 
 
 					local modeStateColorLevel = basicModeLevelStateAndColor(vpSteps[i]:GetMeter(),vpSteps[i]:GetStepsType());
@@ -140,7 +155,7 @@ function CreatePlayer(player)
 								self:GetParent():GetChild('CURSORP'..player..'0'):setstate(1);
 							end;
 
-							self:GetParent():GetChild('CURSORP'..player..'0'):x(dl_distance*count - ((dl_distance*dl_q)/2) - 3);
+							self:GetParent():GetChild('CURSORP'..player..'0'):x( (dl_distance*count - ((dl_distance*dl_q)/2) - 3) + startLessCharts );
 							--self:GetParent():GetChild('CURSORP'..player..'1'):x(dl_distance*count - ((dl_distance*dl_q)/2) + 85);
 							
 							self:GetParent():GetChild('dln'..count):diffusealpha(1);

@@ -12,12 +12,21 @@ local t = Def.ActorFrame
 	LoadActor("SaniNetGame")..
 	{
 	};
+
+	JudgmentMessageCommand=function(self,param)
+
+	end;
 };
 
 local stage= GAMESTATE:GetCurrentStageIndex()+1;
 local oldnoteskin={};
 local TweakY = 28;
 setStageCounterInGameplay(true);
+
+--true: is using Lua for halfdouble
+--false: is using Lua but the doubles because there is no halfdouble lua.
+--nil: is not using lua.
+local isUsingHalfDoublePositionLua = isHalfDoubleSkinPositionItemsLua();
 
 
 function songBar()
@@ -26,168 +35,127 @@ function songBar()
 			if isAspectRatio1610() then
 				self:y(SCREEN_TOP+1);
 			end;
+
+			if isAspectRatio43() then
+				self:y(SCREEN_TOP+1);
+			end;
+
 		end;		
 		StreamWidth=SCREEN_WIDTH;
 		Stream=Def.Quad { 
 			InitCommand=cmd(diffusealpha,1;draworder,99;zoomto,1,4;diffuse,color("#ffffff")); 
 		};
-		Tip=LoadActor(THEME:GetPathG("","ScreenGameplay/song position tip"));
+		Tip=LoadActor(THEME:GetPathG("","ScreenGameplay/song position tip"))..{
+			OnCommand=function(self)
+				self:zoom(0.8);
+			end;
+		};
 	};
 end;
 
---[[
---:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
---Lifebar Options::
---suddendeath = 1 miss break song
---5missmax = at 6 miss break song
---pfcmode = anything below perfect break song
-
-local failSettingP1 = "";
-local failSettingP2 = "";
-local typeExtraLifeBarP1 = "none";
-local typeExtraLifeBarP2 = "none";
-
-if GAMESTATE:IsHumanPlayer(PLAYER_1)  then
-	failSettingP1 = GAMESTATE:GetPlayerState(PLAYER_1):GetPlayerOptions('ModsLevel_Preferred' ):FailSetting();
-	local exlP1Temp = getCustomOptionValuePlayer(PLAYER_1,"lifebar_extra_mode");
-	if exlP1Temp == nil then
-		typeExtraLifeBarP1 = "none";
-	else
-		typeExtraLifeBarP1 = exlP1Temp;
-	end;
-
-end;
-
-if GAMESTATE:IsHumanPlayer(PLAYER_2)  then
-	failSettingP2 = GAMESTATE:GetPlayerState(PLAYER_2):GetPlayerOptions('ModsLevel_Preferred' ):FailSetting();
-	local exlP2Temp =  getCustomOptionValuePlayer(PLAYER_2,"lifebar_extra_mode");
-	if exlP2Temp == nil then
-		typeExtraLifeBarP2 = "none";
-	else
-		typeExtraLifeBarP2 = exlP2Temp;
-	end;	
-end;
-
-local statusFailPlayerLifeBarExtra = {false,false};
-
-t[#t+1] = Def.Quad {
+-- :::******************:::
+-- ::: BAR LIFE OPTIONS :::
+-- :::******************:::
+function createLifeBarMode(player,typeMode)
+	return Def.Quad {
 		InitCommand=cmd(zoomto,0,0;visible,false);
 		JudgmentMessageCommand=function(self,param)
+			if param.Player ~= player then return end;
+			self:queuecommand("CheckModeStatus");
+		end;
+		
+		CheckModeStatusCommand=function(self)
+			local gr = STATSMAN:GetCurStageStats():GetPlayerStageStats(player):GetTapNoteScores("TapNoteScore_W3");
+			local gd = STATSMAN:GetCurStageStats():GetPlayerStageStats(player):GetTapNoteScores("TapNoteScore_W4");
+			local bd= STATSMAN:GetCurStageStats():GetPlayerStageStats(player):GetTapNoteScores("TapNoteScore_W5");
+			local miss= STATSMAN:GetCurStageStats():GetPlayerStageStats(player):GetTapNoteScores("TapNoteScore_Miss")+ STATSMAN:GetCurStageStats():GetPlayerStageStats(player):GetTapNoteScores("TapNoteScore_CheckpointMiss");
+			local allTns = gr+gd+bd+miss;
+			local fcTns = gd+bd+miss;
+			local efcTns = bd+miss;
 
-			if typeExtraLifeBarP2 == "none" and typeExtraLifeBarP1 == "none" then
-				--nada
-			else
-				if param.Player == PLAYER_1 then
-
-					local gr = STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):GetTapNoteScores("TapNoteScore_W3");
-					local gd = STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):GetTapNoteScores("TapNoteScore_W4");
-					local bd= STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):GetTapNoteScores("TapNoteScore_W5");
-					local miss= STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):GetTapNoteScores("TapNoteScore_Miss")+ STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):GetTapNoteScores("TapNoteScore_CheckpointMiss");
-					local allTns = gr+gd+bd+miss;
-
-					if typeExtraLifeBarP1 == "suddendeath" then
-						if miss > 0 then
-							STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):FailPlayer();
-							statusFailPlayerLifeBarExtra[1] = true;
-							--SCREENMAN:SetNewScreen("ScreenStageBreak");
-						end;
-					end;
-
-					if typeExtraLifeBarP1 == "5missmax" then
-						if miss > 5 then
-							STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):FailPlayer();
-							statusFailPlayerLifeBarExtra[1] = true;
-							--SCREENMAN:SetNewScreen("ScreenStageBreak");
-						end;
-					end;
-
-					if typeExtraLifeBarP1 == "pfcmode" then
-						if allTns > 0 then
-							STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):FailPlayer();
-							statusFailPlayerLifeBarExtra[1] = true;
-							--SCREENMAN:SetNewScreen("ScreenStageBreak");
-						end;
-					end;
-
-					if typeExtraLifeBarP1 == "none" then
-						if failSettingP1 == "FailType_Immediate" then
-							--debemos saber si estas muerto para cambiar el estado.
-							local isFailedp1Aux =STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):GetFailedAux();
-							statusFailPlayerLifeBarExtra[1] = isFailedp1Aux;
-						end;
-					end;
-
-				end;
-
-
-
-				if param.Player == PLAYER_2 then
-
-					local gr = STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):GetTapNoteScores("TapNoteScore_W3");
-					local gd = STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):GetTapNoteScores("TapNoteScore_W4");
-					local bd= STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):GetTapNoteScores("TapNoteScore_W5");
-					local miss= STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):GetTapNoteScores("TapNoteScore_Miss")+ STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):GetTapNoteScores("TapNoteScore_CheckpointMiss");
-					local allTns = gr+gd+bd+miss;
-
-					if typeExtraLifeBarP2 == "suddendeath" then
-						if miss > 0 then
-							STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):FailPlayer();
-							statusFailPlayerLifeBarExtra[2] = true;
-							SCREENMAN:SetNewScreen("ScreenFastStageBreak");
-						end;
-					end;
-
-					if typeExtraLifeBarP2 == "5missmax" then
-						if miss > 5 then
-							STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):FailPlayer();
-							statusFailPlayerLifeBarExtra[2] = true;
-							SCREENMAN:SetNewScreen("ScreenFastStageBreak");
-						end;
-					end;
-
-					if typeExtraLifeBarP2 == "pfcmode" then
-						if allTns > 0 then
-							STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):FailPlayer();
-							statusFailPlayerLifeBarExtra[2] = true;
-							SCREENMAN:SetNewScreen("ScreenFastStageBreak");
-						end;
-					end;
-
-					if typeExtraLifeBarP2 == "none" then
-						if failSettingP2 == "FailType_Immediate" then
-							--debemos saber si estas muerto para cambiar el estado.
-							local isFailedp2Aux =STATSMAN:GetCurStageStats():GetPlayerStageStats(param.Player):GetFailedAux();
-							statusFailPlayerLifeBarExtra[2] = isFailedp2Aux;
-						end;
-					end;
-
-				end;
-
-				if GAMESTATE:IsSideJoined(PLAYER_1) and GAMESTATE:IsSideJoined(PLAYER_2) then
-					-- ~=
-					if statusFailPlayerLifeBarExtra[1] == true and statusFailPlayerLifeBarExtra[2] == true then
-						SCREENMAN:SetNewScreen("ScreenFastStageBreak");
-					end;
-
-				else
-					--here only if one of the special lifebars is selected, if not, we just ignore.
-					if GAMESTATE:IsSideJoined(PLAYER_1) then
-						if statusFailPlayerLifeBarExtra[1] == true and typeExtraLifeBarP1 ~= "none" then
-							SCREENMAN:SetNewScreen("ScreenFastStageBreak");
-						end;
+			if typeMode == "suddendeath" then
+				if miss > 0 then
+					GAMESTATE:Env()["BreakFromMode"] = true;
+					if GAMESTATE:GetNumSidesJoined() == 2 then
+						STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_1):FailPlayer();
+						STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_2):FailPlayer();						
 					else
-						if statusFailPlayerLifeBarExtra[2] == true and typeExtraLifeBarP2 ~= "none" then
-							SCREENMAN:SetNewScreen("ScreenFastStageBreak");
-						end;
+						STATSMAN:GetCurStageStats():GetPlayerStageStats(player):FailPlayer();
+					end;
+					
+					SCREENMAN:GetTopScreen():give_up();
+				end;
+			elseif typeMode == "5missmax" then
+				if miss > 5 then
+					GAMESTATE:Env()["BreakFromMode"] = true;
+					if GAMESTATE:GetNumSidesJoined() == 2 then
+						STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_1):FailPlayer();
+						STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_2):FailPlayer();
+					else
+						STATSMAN:GetCurStageStats():GetPlayerStageStats(player):FailPlayer();	
 					end;
 
-				end;	
-					
+					SCREENMAN:GetTopScreen():give_up();
+				end;
+			elseif typeMode == "pfcmode" then
+				if allTns > 0 then
+					GAMESTATE:Env()["BreakFromMode"] = true;
+					if GAMESTATE:GetNumSidesJoined() == 2 then
+						STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_1):FailPlayer();
+						STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_2):FailPlayer();
+					else
+						STATSMAN:GetCurStageStats():GetPlayerStageStats(player):FailPlayer();	
+					end;
+
+					SCREENMAN:GetTopScreen():give_up();
+				end;
+			elseif typeMode == "fcmode" then
+				if fcTns > 0 then
+					GAMESTATE:Env()["BreakFromMode"] = true;
+					if GAMESTATE:GetNumSidesJoined() == 2 then
+						STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_1):FailPlayer();
+						STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_2):FailPlayer();
+					else
+						STATSMAN:GetCurStageStats():GetPlayerStageStats(player):FailPlayer();
+
+					end;
+
+					SCREENMAN:GetTopScreen():give_up();
+				end;
+			elseif typeMode == "efcmode" then
+				if efcTns > 0 then
+					GAMESTATE:Env()["BreakFromMode"] = true;
+					if GAMESTATE:GetNumSidesJoined() == 2 then
+						STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_1):FailPlayer();
+						STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_2):FailPlayer();
+					else
+						STATSMAN:GetCurStageStats():GetPlayerStageStats(player):FailPlayer();	
+					end;
+
+					SCREENMAN:GetTopScreen():give_up();
+				end;
 			end;
 
 		end;
-};
-]]
+	};
+
+end;
+
+
+if GAMESTATE:IsHumanPlayer(PLAYER_1)  then
+	local exlP1Temp = getCustomOptionValuePlayer(PLAYER_1,"lifebar_extra_mode");
+	if exlP1Temp ~= nil and exlP1Temp ~= "none" then
+		t[#t+1] = createLifeBarMode(PLAYER_1,exlP1Temp);
+	end;	
+end;
+
+if GAMESTATE:IsHumanPlayer(PLAYER_2)  then
+	local exlP2Temp =  getCustomOptionValuePlayer(PLAYER_2,"lifebar_extra_mode");
+	if exlP2Temp ~= nil and exlP2Temp ~= "none" then
+		t[#t+1] = createLifeBarMode(PLAYER_2,exlP2Temp);
+	end;	
+end;
+
 --:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 --opciones 
@@ -356,52 +324,95 @@ end;
 
 --MODO DOBLE
 if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_OnePlayerTwoSides" then
-	t[#t+1] = LoadActor("ScreenGameplayDouble") .. {
-		OnCommand=cmd(addy,-1);
-	}; 
+
+	local isHalf = GAMESTATE:GetCurrentStyle():GetName() == "halfdouble";
+	if isHalf then
+		t[#t+1] = LoadActor("ScreenGameplayHalfDouble") .. {
+			OnCommand=cmd(addy,-1);
+		}; 
+	else
+		t[#t+1] = LoadActor("ScreenGameplayDouble") .. {
+			OnCommand=cmd(addy,-1);
+		}; 		
+	end;
+
+
+
+
 end;
 
---STAGE BACKGROUND
-t[#t+1] = Def.ActorFrame{
-	Name="HeaderCounter";
-	OnCommand=function(self)
-		self:x(SCREEN_CENTER_X);
-		self:y(SCREEN_TOP+TweakY);
 
-		if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_OnePlayerTwoSides" then
-			self:x(SCREEN_LEFT+214);
-		end;
+-- :::FRAMESKIN:::
+local isUsingDefaultSkin = true;
+--:::: FRAME SKIN ::::--
+--we get the installed themes. if it's intern we will asume is it the simple.
+local luaFrameSkinSelected = getFrameSkinForPlayers("overlay","ScreenGamePlay");
 
-		if GAMESTATE:GetNumSidesJoined() == 1  then
-			if getStageCounterInGameplay() ~= nil and getStageCounterInGameplay() == false then
-					self:visible(false);
-			end;
-		end;
+if luaFrameSkinSelected["isDefault"]  == false then
+	--LOAD EVERYTHING FROM THE FRAMESKIN
 
-
-	end;
-
-	ToggleOffCounterCommand=function(self)
-		self:visible(false);
-	end;
-
-	LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/SG-STAGEBACK")) .. {
-		InitCommand=function(self)
-			self:zoom(0.5);
-		end;
-	};
-
-	LoadFont("stagefull")..{
+	local frameSkinFunc = LoadActor(luaFrameSkinSelected["lua"]);
+	t[#t+1] = frameSkinFunc(luaFrameSkinSelected["path"]);
+	isUsingDefaultSkin = false;
+	
+else
+	--DEFAULT THINGS FOR THIS GAMEPLAY SCREEN	
+	t[#t+1] = Def.ActorFrame{
+		Name="HeaderCounter";
 		OnCommand=function(self)
-			self:zoom(.9);
-			self:settext(string.format("%02i", stage));
-			--self:xy(SCREEN_CENTER_X,SCREEN_TOP+(TweakY+5));
-			self:y(5);
+			self:x(SCREEN_CENTER_X);
+			self:y(SCREEN_TOP+TweakY);
+
+			if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_OnePlayerTwoSides" then
+				
+				local isHalf = GAMESTATE:GetCurrentStyle():GetName() == "halfdouble";
+				if isHalf then
+
+					if isUsingHalfDoublePositionLua == nil then
+						self:x(SCREEN_CENTER_X-280);
+					elseif isUsingHalfDoublePositionLua then
+						self:x(SCREEN_CENTER_X-280); 
+					else
+						self:x(SCREEN_LEFT+214);
+					end;
+
+				else
+					self:x(SCREEN_LEFT+214);
+				end;
+				
+
+			end;
+
+			if GAMESTATE:GetNumSidesJoined() == 1  then
+				if getStageCounterInGameplay() ~= nil and getStageCounterInGameplay() == false then
+						self:visible(false);
+				end;
+			end;
+
 
 		end;
-	};
-};
 
+		ToggleOffCounterCommand=function(self)
+			self:visible(false);
+		end;
+
+		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/SG-STAGEBACK")) .. {
+			InitCommand=function(self)
+				self:zoom(0.5);
+			end;
+		};
+
+		LoadFont("stagefull")..{
+			OnCommand=function(self)
+				self:zoom(.9);
+				self:settext(string.format("%02i", stage));
+				--self:xy(SCREEN_CENTER_X,SCREEN_TOP+(TweakY+5));
+				self:y(5);
+
+			end;
+		};
+	};	
+end;
 
 -- NUKE FX
 local NukePlaying = false;
@@ -438,6 +449,9 @@ t[#t+1] = Def.ActorFrame{
 	
 }
 
+
+
+
 --## GLOBAL UI OPTIONS ##--
 --## PARAMS ##--
 local fastP1 = 0;
@@ -445,6 +459,7 @@ local slowP1 = 0;
 local fastP2 = 0;
 local slowP2 = 0;
 local UI_display_song_time = false;
+local UI_display_songTimeTopBar = false;
 local UI_display_LV_song = false;
 
 
@@ -453,12 +468,22 @@ if GAMESTATE:IsHumanPlayer(PLAYER_1) then
 	if player_display_song_time_p1 ~= nil and player_display_song_time_p1 == true then
 		UI_display_song_time = true;
 	end;
+
+	local player_display_topbar_song_time_p1 = getCustomOptionValuePlayer(PLAYER_1,"gameplay_topTimerBar");
+	if player_display_topbar_song_time_p1 ~= nil and player_display_topbar_song_time_p1 then
+		UI_display_songTimeTopBar = true;
+	end;
 end;
 
 if GAMESTATE:IsHumanPlayer(PLAYER_2) then
 	local player_display_song_time_p2 = getCustomOptionValuePlayer(PLAYER_2,"gameplay_song_time_ui");
 	if player_display_song_time_p2 ~= nil and player_display_song_time_p2 == true then
 		UI_display_song_time = true;
+	end;
+
+	local player_display_topbar_song_time_p2 = getCustomOptionValuePlayer(PLAYER_2,"gameplay_topTimerBar");
+	if player_display_topbar_song_time_p2 ~= nil and player_display_topbar_song_time_p2 then
+		UI_display_songTimeTopBar = true;
 	end;
 end;
 
@@ -469,10 +494,20 @@ local bShowTime = PREFSMAN:GetPreference('ShowExtraInfo');
 local bShowSongLevel = PREFSMAN:GetPreference('ShowExtraInfo');
 --local bShowGameDifficulty = PREFSMAN:GetPreference('ShowExtraInfo');
 
---SONG DURATION BAR
-t[#t+1] = songBar()..{InitCommand=cmd(x,SCREEN_CENTER_X;y,SCREEN_CENTER_Y-360);};
-
 function getBreakIconPlayer_StaticUI(player)
+
+	-- revisamos si es que tenemos icono de break.
+	local schemePlayerSelected = getSkinSelectedInfoSchemePath(player);
+
+	-- 
+	if schemePlayerSelected["default"] == false then
+		local isValid = checkLuaSkinSelectedInfoScheme(schemePlayerSelected["pathLua"],"BreakIcon");
+		if isValid then
+			local actorFunc = LoadActor(schemePlayerSelected["pathLua"].."BreakIcon/default.lua");
+			return actorFunc(schemePlayerSelected["pathLua"],player);
+		end;
+	end;
+
 
 	local MedRateH=0.5;
 
@@ -480,31 +515,106 @@ function getBreakIconPlayer_StaticUI(player)
 	local offsetPlayer = 0;
 	local offsetTop = SCREEN_TOP + 26;
 
+	local usingHeartDecreaseMiss = false;
+	local modeUsed = "";
+	local numHearts = 1;
+	local paddingMoreHearts = 15;
+
+	local lifebarExtraSelected = getCustomOptionValuePlayer(player,"lifebar_extra_mode");
+	if lifebarExtraSelected == "5missmax" then
+		modeUsed = "5missmax";
+		usingHeartDecreaseMiss = true;
+		numHearts = 6;
+	end;
+
+	if lifebarExtraSelected == "suddendeath" then
+		modeUsed = "suddendeath";
+		MedRateH = 0.25;
+	end;
+
 	if player == PLAYER_1 then
 		offsetPlayer = SCREEN_LEFT + 188;
+		paddingMoreHearts = paddingMoreHearts * -1;
+
+		if modeUsed == "5missmax" then
+			offsetPlayer = SCREEN_LEFT + 194;
+			zoomBaseNum = 0.33
+		end;
+		
 	else
 		offsetPlayer = SCREEN_RIGHT - 188;
+		if modeUsed == "5missmax" then
+			offsetPlayer = SCREEN_RIGHT - 194;
+			zoomBaseNum = 0.33
+		end;
 	end;
 
 	if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_OnePlayerTwoSides" then
-		offsetPlayer = SCREEN_CENTER_X + 396;
+		
+
+		local isHalf = GAMESTATE:GetCurrentStyle():GetName() == "halfdouble";
+		if isHalf then
+			if isUsingHalfDoublePositionLua == nil then
+				offsetPlayer = SCREEN_CENTER_X + 250;
+			elseif isUsingHalfDoublePositionLua then
+				offsetPlayer = SCREEN_CENTER_X + 250;
+			else				
+				offsetPlayer = SCREEN_CENTER_X + 396;
+			end;
+		else
+			offsetPlayer = SCREEN_CENTER_X + 396;
+		end;
+
 	end;	
 
-	return Def.ActorFrame{
+	local pathHeartFull = "ScreenGamePlay_ui/info/heart_full";
+	local pathHeartEmpty = "ScreenGamePlay_ui/info/heart_empty";
+
+	local STATE = GAMESTATE:GetPlayerState(player);
+	local failSetting = STATE:GetPlayerOptions('ModsLevel_Preferred' ):FailSetting();	
+	if failSetting == "FailType_Immediate" then
+		pathHeartFull = "ScreenGamePlay_ui/info/breakon_heart_full";
+	end;
+
+
+	if lifebarExtraSelected == "pfcmode" then
+		pathHeartFull = "ScreenGamePlay_ui/info/star_pfc";
+		pathHeartEmpty ="_blank";
+		zoomBaseNum = 0.6;
+		MedRateH = 0.7;
+	end;
+	if lifebarExtraSelected == "fcmode" then
+		pathHeartFull = "ScreenGamePlay_ui/info/star_fc";
+		pathHeartEmpty="_blank";
+		zoomBaseNum = 0.65;
+		MedRateH = 0.7;
+	end;
+	if lifebarExtraSelected == "efcmode" then
+		pathHeartFull = "ScreenGamePlay_ui/info/star_efc";
+		pathHeartEmpty="_blank";
+		zoomBaseNum = 0.65;
+		MedRateH = 0.7;
+	end;
+	--
+
+	local actorBaseFrame = Def.ActorFrame{};
+
+	for i=numHearts,1,-1 do
+		actorBaseFrame[#actorBaseFrame+1] = Def.ActorFrame{
 			OnCommand=function(self)
-				self:x(offsetPlayer);
+				self:x(offsetPlayer + (paddingMoreHearts * (i-1) ));
 				self:y(offsetTop);
 				self:zoom(zoomBaseNum);
 			end;
 
-			LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/heart_full"))..{
+			LoadActor(THEME:GetPathG("",pathHeartFull))..{
 				Name="heartPlayerBase";
 				OnCommand=function(self)
 					self:visible(true);
 				end;
 			};
 
-			LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/heart_full"))..{
+			LoadActor(THEME:GetPathG("",pathHeartFull))..{
 				Name="heartPlayerBaseGlow";
 				OnCommand=function(self)
 					self:visible(true);
@@ -519,8 +629,6 @@ function getBreakIconPlayer_StaticUI(player)
 						self:visible(false);
 					end;
 				end;
-
-
 			};
 
 			LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/heart_empty"))..{
@@ -532,88 +640,155 @@ function getBreakIconPlayer_StaticUI(player)
 
 			LifeChangedMessageCommand=function(self,params)
 				if params.Player ~= player then return end;
-				local this = self:GetChildren();
-				local iLife = params.RealLife;
-				if iLife <= 0 then
-					this.heartPlayerBase:visible(false);
-					this.heartPlayerBaseGlow:visible(false);
-					this.heartPlayerBaseEmpty:visible(true);
+
+				if usingHeartDecreaseMiss and modeUsed == "5missmax" then
+					--multiple heart
+					local this = self:GetChildren();
+					local miss= STATSMAN:GetCurStageStats():GetPlayerStageStats(player):GetTapNoteScores("TapNoteScore_Miss")+ STATSMAN:GetCurStageStats():GetPlayerStageStats(player):GetTapNoteScores("TapNoteScore_CheckpointMiss");
+					local depleteHeart = false;
+
+					if miss == 1 and i == 6 then
+						depleteHeart = true;
+					end;
+					if miss == 2 and i == 5 then
+						depleteHeart = true;	
+					end;
+					if miss == 3 and i == 4 then
+						depleteHeart = true;	
+						MedRateH = 0.4;
+					end;
+					if miss == 4 and i == 3 then
+						depleteHeart = true;	
+						MedRateH = 0.3;
+					end;
+					if miss == 5 and i == 2 then
+						depleteHeart = true;
+						MedRateH = 0.2;
+					end;
+					if miss == 6 and i == 1 then
+						depleteHeart = true;	
+					end;
+
+					if depleteHeart then
+						this.heartPlayerBase:visible(false);
+						this.heartPlayerBaseGlow:visible(false);
+						this.heartPlayerBaseEmpty:visible(true);
+					end;
+
+				else
+
+					--1 heart.
+					local this = self:GetChildren();
+					local iLife = params.RealLife;
+					if iLife <= 0 then
+						this.heartPlayerBase:visible(false);
+						this.heartPlayerBaseGlow:visible(false);
+						this.heartPlayerBaseEmpty:visible(true);
+					end;
 				end;
 			end;
-
-	};
-
---[[
-
-	return Def.ActorFrame{
-
-		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/heart 2x1"))..{
-			Name="heartPlayerBase";
-			OnCommand=cmd(animate,false;halign,1;valign,0;shadowlength,2;setstate,1);
 		};
+	end;
 
-		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/heart 2x1"))..{
-			Name="heartPlayerBaseGlow";
-			OnCommand=cmd(animate,false;shadowlength,2;setstate,1;queuecommand,"Ani";x,-30;y,24;diffusealpha,0;blend,"BlendMode_Add");
-			AniCommand=function(self)
-				self:linear(1.2);
-				self:diffusealpha(0.9);
-				self:zoom(1.02);
-				self:linear(1.2);
-				self:diffusealpha(0);
-				self:zoom(0.95);
-				self:queuecommand("Ani");
-			end;			
-		};		
-
-		OnCommand=function(self)
-			self:zoom(zoomBaseNum);
-			self:x(offsetPlayer);
-			self:y(offsetTop);
-
-		end;
-
-		LifeChangedMessageCommand=function(self,params)
-			if params.Player ~= player then return end;
-			local this = self:GetChildren();
-
-			local iLife = params.RealLife;
-			if iLife <= 0 then
-				this.heartPlayerBase:setstate(0);	
-				this.heartPlayerBaseGlow:visible(false);				
-			end;
-		end;
-	};
-
-]]
+	return actorBaseFrame;
 
 end;
 
-function getLevelSong_StaticUI(player)
 
-	local zoomBaseNum = 0.5;
+function getLevelSong_StaticUI(player)
+   
+	local zoomBaseNum = 0.65;
+	local zoomFont= 0.8;
 	local offsetPlayer = 0;
+
 	local offsetTop = SCREEN_TOP + 27;
 
 	local offsetPlayerX = {0,0,0};
 	if player == PLAYER_1 then
 		offsetPlayer = SCREEN_LEFT + 41;	
-		offsetPlayerX = {90,-18,30};	
+		offsetPlayerX = {66,-28,15};	
 	else
 		offsetPlayer = SCREEN_RIGHT - 41;
-		offsetPlayerX = {-90,-18,30};
+		offsetPlayerX = {-66,-18,25};
 	end;
 
-	return Def.ActorFrame{
 
-		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/lv_bg"))..{
+
+	return Def.ActorFrame{
+		
+		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/Level/base"))..{
 			Name="lvBase";
-			OnCommand=cmd(shadowlength,2;zoom,0.8;diffusealpha,0.8);
+			--OnCommand=cmd(shadowlength,2;zoom,0.8;diffusealpha,0.8);
+			OnCommand=function(self)
+				self:zoom(0.7);
+				self:diffuse(color("0,0,0,1"));
+				self:diffusealpha(1);
+				self:y(3);
+				if player == PLAYER_1 then
+					self:rotationy(180);
+					self:x(4);
+					
+				end;
+				if player == PLAYER_2 then
+					self:x(0);
+				end;
+			end;
 		};
 
-		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/lv_bg"))..{
+		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/Level/base"))..{
+			Name="lvBase";
+			--OnCommand=cmd(shadowlength,2;zoom,0.8;diffusealpha,0.8);
+			OnCommand=function(self)
+				self:zoom(0.7);
+				self:diffusealpha(0.8);
+				if player == PLAYER_1 then
+					self:rotationy(180);
+					self:x(1);
+				end;
+				if player == PLAYER_2 then
+					self:x(2);
+				end;
+			end;
+		};
+
+
+
+		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/Level/back_big"))..{
 			Name="lvBaseGlow";
-			OnCommand=cmd(shadowlength,2;zoom,0.8;blend,"BlendMode_Add");
+			--OnCommand=cmd(shadowlength,2;zoom,0.7;blend,"BlendMode_Add";diffusealpha,0.35);
+
+			OnCommand=function(self)
+				self:shadowlength(2);
+				self:zoom(0.7);
+				self:blend("BlendMode_Add");
+				self:diffusealpha(0.35);
+
+				if player == PLAYER_1 then
+					self:rotationy(180);
+				end;
+
+			end;
+
+		};
+
+		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/Level/mark"))..{
+			Name="lvBaseGlowLine";
+			--OnCommand=cmd(shadowlength,2;zoom,0.7;blend,"BlendMode_Add";x,-100;y,-2);
+			OnCommand=function(self)
+				self:shadowlength(2);
+				self:zoom(0.7);
+				self:blend("BlendMode_Add");
+				self:y(-2);
+
+				if player == PLAYER_1 then
+					self:x(100);
+					self:rotationy(180);
+				end;
+
+				if player == PLAYER_2 then
+					self:x(-100);
+				end;
+			end;
 		};
 
 		LoadFont("_TitleXolonium")..{
@@ -622,6 +797,7 @@ function getLevelSong_StaticUI(player)
 				self:shadowlength(2);
 				self:x(offsetPlayerX[1]);
 				self:y(-5);
+				self:zoom(zoomFont-0.15);
 			end;
 		};
 
@@ -631,7 +807,8 @@ function getLevelSong_StaticUI(player)
 				self:shadowlength(2);
 				self:settext("Lv");
 				self:x(offsetPlayerX[2]);
-				self:y(-5);				
+				self:y(-3);			
+				self:zoom(zoomFont);	
 
 			end;
 		};
@@ -641,19 +818,51 @@ function getLevelSong_StaticUI(player)
 			OnCommand=function(self)
 				self:shadowlength(2);
 				self:x(offsetPlayerX[3]);
-				self:y(-5);				
+				self:y(-3);	
+				self:zoom(zoomFont);			
+			end;
+		};
+
+		LoadFont("Level")..{
+			Name="fontLevelNumberCoop";
+			OnCommand=function(self)
+				self:shadowlength(2);
+				self:x(offsetPlayerX[3]);
+				self:y(-7);	
+				self:zoom(0.38);	
+
+				if player == PLAYER_1 then
+					self:addx(-10);
+				else
+					self:addx(-30);
+				end;
+
+			end;
+		};
+
+		
+
+		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/Level/back_big"))..{
+			Name="entryGlow";
+			OnCommand=cmd(shadowlength,2;zoom,0.8;blend,"BlendMode_Add";queuecommand,"Ani");
+			AniCommand=function(self)
+				self:linear(0.4);
+				self:zoom(1.03);
+				self:diffusealpha(0);
+
 			end;
 		};
 
 		OnCommand=function(self)
 			self:zoom(zoomBaseNum);
+			--self:x(offsetPlayer);
 			self:x(offsetPlayer);
 			self:y(offsetTop);
 			local this = self:GetChildren();
 			
-
 			local currentStep = GAMESTATE:GetCurrentSteps(player);
 			local meter = currentStep:GetMeter();
+
 			this.fontLevelNumber:settext(meter);
 
 			local STATE = GAMESTATE:GetPlayerState(player);
@@ -662,24 +871,36 @@ function getLevelSong_StaticUI(player)
 			if STATE:GetPlayerOptions('ModsLevel_Preferred'):VeryHardJudgement() then this.fontLevelJudge:settext("VJ"); end;			
 			if STATE:GetPlayerOptions('ModsLevel_Preferred'):ExtraJudgement() then this.fontLevelJudge:settext("XJ"); end;
 			if STATE:GetPlayerOptions('ModsLevel_Preferred'):UltraHardJudgement() then this.fontLevelJudge:settext("UJ"); end;
+			if STATE:GetPlayerOptions('ModsLevel_Preferred'):EasyJudgement() then this.fontLevelJudge:settext("EJ"); end;
 
 			if currentStep:GetStepsType() == 'StepsType_Pump_Single' then
 				this.lvBaseGlow:diffuse(color("#ff0000"));
+				this.lvBaseGlowLine:diffuse(color("#ff0000"));
 			end;
 			if currentStep:GetStepsType() == 'StepsType_Pump_Double' then
-				this.lvBaseGlow:diffuse(color("#00ff00"));						
+				this.lvBaseGlow:diffuse(color("#00ff00"));
+				this.lvBaseGlowLine:diffuse(color("#00ff00"));		
+
 			end;
 			if currentStep:GetStepsType() == 'StepsType_Pump_Single_P' then
 				this.lvBaseGlow:diffuse(color("#ff00ff"));	
+				this.lvBaseGlowLine:diffuse(color("#ff00ff"));	
 			end;
 			if currentStep:GetStepsType() == 'StepsType_Pump_Double_P' then
 				this.lvBaseGlow:diffuse(color("#0018cf"));	
+				this.lvBaseGlowLine:diffuse(color("#0018cf"));	
 			end;
 			if  currentStep:GetStepsType() == 'StepsType_Pump_Halfdouble' then
 				this.lvBaseGlow:diffuse(color("#00ffff"));	
+				this.lvBaseGlowLine:diffuse(color("#00ffff"));
 			end;			
 			if currentStep:GetPlayers() ~= 1 then
-				this.lvBaseGlow:diffuse(color("#ffff00"));					
+				this.lvBaseGlow:diffuse(color("#ffff00"));			
+				this.lvBaseGlowLine:diffuse(color("#ffff00"));
+				local xplayers = "x"..currentStep:GetPlayers();
+				this.fontLevelNumberCoop:settext(xplayers);
+				this.fontLevelNumber:visible(false);
+				this.fontLevelMode:visible(false);
 			end;
 
 		end;
@@ -688,6 +909,38 @@ function getLevelSong_StaticUI(player)
 	};
 
 end;
+
+-- COMPANION
+if GAMESTATE:IsHumanPlayer(PLAYER_1) then
+	local companionSelected = getCustomOptionValuePlayer(PLAYER_1,"companion");
+	local companionPath=GetCompanionExternalPath();
+
+	if companionSelected ~= false then
+		if companionSelected ~= nil and companionSelected ~= "none" then
+			--mm maybe another check if the player delete the companion meanwhile he is playing...
+			if FILEMAN:DoesFileExist(companionPath..companionSelected.."/companion.lua") then
+				local companionLoad = LoadActor(companionPath..companionSelected.."/companion.lua");
+				t[#t+1] = companionLoad(companionPath..companionSelected.."/",PLAYER_1);	
+			end;	
+		end;
+	end;
+end;
+
+if GAMESTATE:IsHumanPlayer(PLAYER_2) then
+	local companionSelected = getCustomOptionValuePlayer(PLAYER_2,"companion");
+
+	if companionSelected ~= false then
+		local companionPath=GetCompanionExternalPath();
+
+		if companionSelected ~= nil and companionSelected ~= "none" then
+			if FILEMAN:DoesFileExist(companionPath..companionSelected.."/companion.lua") then
+				local companionLoad = LoadActor(companionPath..companionSelected.."/companion.lua");
+				t[#t+1] = companionLoad(companionPath..companionSelected.."/",PLAYER_2);
+			end;	
+		end;
+	end;
+end;
+
 
 
 if GAMESTATE:IsHumanPlayer(PLAYER_1) then
@@ -709,7 +962,24 @@ if GAMESTATE:IsHumanPlayer(PLAYER_1) then
 	end;
 
 	if bShowSongLevel or levelDisplayP1 then 
-		t[#t+1] = getLevelSong_StaticUI(PLAYER_1);		
+
+		local schemePlayerSelected = getSkinSelectedInfoSchemePath(PLAYER_1);
+		if schemePlayerSelected["default"] == false then
+
+			local isValid = checkLuaSkinSelectedInfoScheme(schemePlayerSelected["pathLua"],"Level");
+			if isValid then
+				local actorFunc = LoadActor(schemePlayerSelected["pathLua"].."Level/default.lua");
+				t[#t+1] = actorFunc(schemePlayerSelected["pathLua"],PLAYER_1);
+			else
+				t[#t+1] = getLevelSong_StaticUI(PLAYER_1);		
+			end;
+
+		else
+			t[#t+1] = getLevelSong_StaticUI(PLAYER_1);	
+		end;
+
+
+		
 	end;
 
 end;
@@ -727,77 +997,157 @@ if GAMESTATE:IsHumanPlayer(PLAYER_2) then
 
 	--Lv display
 	local levelDisplayP2 = getCustomOptionValuePlayer(PLAYER_2,"gameplay_lv_ui");
+
 	if levelDisplayP2 == nil then
 		levelDisplayP2 = false;
 	end;
 
 	if bShowSongLevel or levelDisplayP2 then 
-		t[#t+1] = getLevelSong_StaticUI(PLAYER_2);		
+
+		local schemePlayerSelected = getSkinSelectedInfoSchemePath(PLAYER_2);
+		if schemePlayerSelected["default"] == false then
+
+			local isValid = checkLuaSkinSelectedInfoScheme(schemePlayerSelected["pathLua"],"Level");
+			if isValid then
+				local actorFunc = LoadActor(schemePlayerSelected["pathLua"].."Level/default.lua");
+				t[#t+1] = actorFunc(schemePlayerSelected["pathLua"],PLAYER_2);
+			else
+				t[#t+1] = getLevelSong_StaticUI(PLAYER_2);		
+			end;
+
+		else
+			t[#t+1] = getLevelSong_StaticUI(PLAYER_2);	
+		end;
+
+		
 	end;	
 end;
 
 
-
+if UI_display_songTimeTopBar then
+	t[#t+1] = songBar()..{InitCommand=cmd(x,SCREEN_CENTER_X;y,SCREEN_CENTER_Y-360);};
+end;
 
 --TIEMPO / TIME
 if bShowTime or UI_display_song_time then
 
-	local player = GAMESTATE:GetMasterPlayerNumber();
-	local songPosition = GAMESTATE:GetPlayerState(player):GetSongPosition();
-	local song = GAMESTATE:GetCurrentSong();	
+	--#### SCHEME MOD ###--
+	local useSchemeModMusicDuration = false;
+	local playerSchemeMusicDuration = nil;
+	local pathLuaSchemeMusicDuration = "";
 
-	local totalseconds = 0;
-	local lastSecondSong = song:GetLastSecond() or 0;
-	local SongTotalSeconds = song:MusicLengthSeconds() or 0;
+	if GAMESTATE:IsHumanPlayer(PLAYER_1) and GAMESTATE:IsHumanPlayer(PLAYER_2) then
+		-- two player
+		local sPSelectedMusicDurationP1 = getSkinSelectedInfoSchemePath(PLAYER_1);
+		local sPSelectedMusicDurationP2 = getSkinSelectedInfoSchemePath(PLAYER_2);
 
+		if sPSelectedMusicDurationP1["default"] == false and sPSelectedMusicDurationP2["default"] then
 
-	if lastSecondSong == 0 and SongTotalSeconds == 0 then -- no data for the time.
-		return;
-	elseif SongTotalSeconds > 0 then
-		totalseconds = SongTotalSeconds;
-	elseif lastSecondSong > 0 then 
-		totalseconds = lastSecondSong;
-	end;
+			useSchemeModMusicDuration = true;
+			playerSchemeMusicDuration = PLAYER_1;
+			pathLuaSchemeMusicDuration= sPSelectedMusicDurationP1["pathLua"];
 
-	if totalseconds == 0 then -- just in case lol
-		return;
-	end;
+		elseif sPSelectedMusicDurationP1["default"] and sPSelectedMusicDurationP2["default"] == false then
 
-	local lTimer;
-	local tFormat = nil
+			useSchemeModMusicDuration = true;
+			playerSchemeMusicDuration = PLAYER_2;
+			pathLuaSchemeMusicDuration = sPSelectedMusicDurationP2["pathLua"];
 
-	if totalseconds < 600 then
-		tFormat = SecondsToMSS;
-	elseif totalseconds >= 360 and totalseconds < 3600 then
-		tFormat = SecondsToMMSS;
-	elseif totalseconds >= 3600 and totalseconds < 36000 then
-		tFormat = SecondsToHMMSS;
+		elseif sPSelectedMusicDurationP1["default"] == false and sPSelectedMusicDurationP2["default"] == false then
+
+			if sPSelectedMusicDurationP1["name"] == sPSelectedMusicDurationP2["name"] then
+				useSchemeModMusicDuration = true;
+				playerSchemeMusicDuration = PLAYER_1;
+				pathLuaSchemeMusicDuration= sPSelectedMusicDurationP1["pathLua"];
+			else
+				useSchemeModMusicDuration = false;
+			end;
+		else
+			useSchemeModMusicDuration = false;
+		end;
 	else
-		tFormat = SecondsToHHMMSS;
+		--one player
+		local sPSelectedMusicDuration = getSkinSelectedInfoSchemePath(GAMESTATE:GetMasterPlayerNumber());
+		if sPSelectedMusicDuration["default"] == false then
+			useSchemeModMusicDuration = true;
+			playerSchemeMusicDuration = GAMESTATE:GetMasterPlayerNumber();
+			pathLuaSchemeMusicDuration= sPSelectedMusicDuration["pathLua"];
+		end;
 	end;
 
-	local function Update (self)
-		if songPosition:GetMusicSeconds() < 0 then
-			lTimer:settext(tFormat(totalseconds));
+	--Validate the mod.
+	local isValidSchemeMusicDuration = false;
+	if useSchemeModMusicDuration then
+		isValidSchemeMusicDuration = checkLuaSkinSelectedInfoScheme(pathLuaSchemeMusicDuration,"MusicDuration");
+	end;
+
+	if isValidSchemeMusicDuration then
+		--Load MOD
+
+		local actorFuncMusicDuration = LoadActor(pathLuaSchemeMusicDuration.."MusicDuration/default.lua");
+		t[#t+1] = actorFuncMusicDuration(pathLuaSchemeMusicDuration,playerSchemeMusicDuration);
+
+	else
+		--Load DEFAULT
+
+		local player = GAMESTATE:GetMasterPlayerNumber();
+		local songPosition = GAMESTATE:GetPlayerState(player):GetSongPosition();
+		local song = GAMESTATE:GetCurrentSong();	
+
+		local totalseconds = 0;
+		local lastSecondSong = song:GetLastSecond() or 0;
+		local SongTotalSeconds = song:MusicLengthSeconds() or 0;
+
+
+		if lastSecondSong == 0 and SongTotalSeconds == 0 then -- no data for the time.
 			return;
-		end
-		lTimer:settext(tFormat(clamp(totalseconds - (songPosition:GetMusicSeconds()), 0, totalseconds)));
-	end;
-	
-	t[#t+1] = LoadFont("_karnivore lite white 20px")..{
-		InitCommand=function(self)
-			lTimer = self;
-			self:xy(SCREEN_CENTER_X,SCREEN_BOTTOM - 40);
-			self:shadowlength(2);
+		elseif SongTotalSeconds > 0 then
+			totalseconds = SongTotalSeconds;
+		elseif lastSecondSong > 0 then 
+			totalseconds = lastSecondSong;
 		end;
-	};
 
-	t[#t+1] =  Def.ActorFrame
-	{
-		InitCommand=function(self)
-			self:SetUpdateFunction(Update);
+		if totalseconds == 0 then -- just in case lol
+			return;
 		end;
-	};
+
+		local lTimer;
+		local tFormat = nil
+
+		if totalseconds < 600 then
+			tFormat = SecondsToMSS;
+		elseif totalseconds >= 360 and totalseconds < 3600 then
+			tFormat = SecondsToMMSS;
+		elseif totalseconds >= 3600 and totalseconds < 36000 then
+			tFormat = SecondsToHMMSS;
+		else
+			tFormat = SecondsToHHMMSS;
+		end;
+
+		local function Update (self)
+			if songPosition:GetMusicSeconds() < 0 then
+				lTimer:settext(tFormat(totalseconds));
+				return;
+			end
+			lTimer:settext(tFormat(clamp(totalseconds - (songPosition:GetMusicSeconds()), 0, totalseconds)));
+		end;
+		
+		t[#t+1] = LoadFont("_karnivore lite white 20px")..{
+			InitCommand=function(self)
+				lTimer = self;
+				self:xy(SCREEN_CENTER_X,SCREEN_BOTTOM - 40);
+				self:shadowlength(2);
+			end;
+		};
+
+		t[#t+1] =  Def.ActorFrame
+		{
+			InitCommand=function(self)
+				self:SetUpdateFunction(Update);
+			end;
+		};
+
+	end;
 end;
 
 --### GAMEPLAY UI SLOT ITEMS ###---
@@ -811,6 +1161,15 @@ function getGameplayUiSlotItems(player)
 			{"score", 50},
 			{"fastslow", 67},
 	};
+
+	local extraJudgmentSetted = GAMESTATE:GetExtraJudgment();
+	if extraJudgmentSetted == false then
+		uiItemsListH = {	
+				{"judgdata", 143},
+				{"score", 50},
+				{"fastslow", 67},
+		};
+	end;
 
 	-- obtenemos si es que estan activos los items en el ui.
 	local judgDataUi = getCustomOptionValuePlayer(player,"gameplay_stats_ui");
@@ -865,11 +1224,25 @@ function createStatJudgmentUiPlayer(player,pos_height,zoomBasePanel)
 		offsetPlayer = 635;
 	end;
 
+	local extraJudgmentSetted = GAMESTATE:GetExtraJudgment();
+	local yPaddingNoex = 0;
+
+	local spriteJudg = "judg_b";
+	if extraJudgmentSetted == false then
+		spriteJudg = "judg_noex";
+		yPaddingNoex = -29;
+	end;
+
 	return Def.ActorFrame{
 
-		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/judg_b"))..{
+		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/"..spriteJudg))..{
 			OnCommand=cmd(halign,1;valign,0;shadowlength,2);					
 		};	
+
+		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/"..spriteJudg))..{
+			OnCommand=cmd(halign,1;valign,0;shadowlength,2);					
+		};	
+
 
 		LoadFont(fontJudg)..{
 			Name="perfectplus";
@@ -892,6 +1265,11 @@ function createStatJudgmentUiPlayer(player,pos_height,zoomBasePanel)
 					self:x(xBase);
 					self:settext("0");
 					self:horizalign("left");
+
+					if extraJudgmentSetted == false then
+						self:visible(false);
+					end;
+
 			end;
 		};
 
@@ -900,7 +1278,7 @@ function createStatJudgmentUiPlayer(player,pos_height,zoomBasePanel)
 			OnCommand=function(self)
 					self:draworder(99);
 					self:diffusealpha(1);
-					self:y(yBase+(yOffsetData*2));
+					self:y(yBase+(yOffsetData*2) + yPaddingNoex);
 					self:x(xBase);
 					self:settext("0");
 					self:horizalign("left");
@@ -913,7 +1291,7 @@ function createStatJudgmentUiPlayer(player,pos_height,zoomBasePanel)
 			OnCommand=function(self)
 					self:draworder(99);
 					self:diffusealpha(1);
-					self:y(yBase+(yOffsetData*3));
+					self:y(yBase+(yOffsetData*3) + yPaddingNoex);
 					self:x(xBase);
 					self:settext("0");
 					self:horizalign("left");
@@ -925,7 +1303,7 @@ function createStatJudgmentUiPlayer(player,pos_height,zoomBasePanel)
 			OnCommand=function(self)
 					self:draworder(99);
 					self:diffusealpha(1);
-					self:y(yBase+(yOffsetData*4));
+					self:y(yBase+(yOffsetData*4) + yPaddingNoex);
 					self:x(xBase);
 					self:settext("0");
 					self:horizalign("left");
@@ -938,12 +1316,22 @@ function createStatJudgmentUiPlayer(player,pos_height,zoomBasePanel)
 			OnCommand=function(self)
 					self:draworder(99);
 					self:diffusealpha(1);
-					self:y(yBase+(yOffsetData*5));
+					self:y(yBase+(yOffsetData*5) + yPaddingNoex);
 					self:x(xBase);
 					self:settext("0");
 					self:horizalign("left");
 			end;
 		};
+
+		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/"..spriteJudg))..{
+			OnCommand=cmd(halign,1;valign,0;shadowlength,2;blend,"BlendMode_Add";queuecommand,"Ani");
+			AniCommand=function(self)
+				self:linear(0.4);
+				self:zoom(1.03);
+				self:diffusealpha(0);
+			end;
+
+		};	
 
 		OnCommand=function(self)
 			self:zoom(zoomBaseNum);
@@ -1037,6 +1425,15 @@ function createScoreUiPlayer(player,pos_height,zoomBasePanel)
 			end;
 		};
 
+		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/scoredata"))..{
+			OnCommand=cmd(halign,1;valign,0;shadowlength,2;blend,"BlendMode_Add";queuecommand,"Ani");
+			AniCommand=function(self)
+				self:linear(0.4);
+				self:zoom(1.03);
+				self:diffusealpha(0);
+			end;
+		};	
+
 		OnCommand=function(self)
 			self:zoom(zoomBaseNum);
 			self:x(SCREEN_CENTER_X+offsetPlayer);
@@ -1051,7 +1448,21 @@ function createScoreUiPlayer(player,pos_height,zoomBasePanel)
 		DrawDataCommand=function(self)
 			local this = self:GetChildren();
 			local score = STATSMAN:GetCurStageStats():GetPlayerStageStats(player):GetPhoenixScore();
+			local percentaje = STATSMAN:GetCurStageStats():GetPlayerStageStats(player):GetPercentScore();
+			
+			if scorePercentaje then
+				local percData ="0"
+				if percentaje == 100 then
+					percData = "100";
+				else
+					percData = string.format("%.2f", truncateToTwoDecimals(percentaje));
+				end;
+				this.scorePlayer:settext(percData.."%");
+			else
+				this.scorePlayer:settext(formatNumberWithDots(score));
+			end;
 
+--[[
 			if scorePercentaje then
 				local percData ="0"
 				if score / 10000 == 100 then
@@ -1063,7 +1474,7 @@ function createScoreUiPlayer(player,pos_height,zoomBasePanel)
 			else
 				this.scorePlayer:settext(formatNumberWithDots(score));
 			end;
-
+]]
 			
 		end;
 	};
@@ -1080,6 +1491,7 @@ local function mapValue(value)
 end
 
 local dataJudgBox = {
+	{badzoom=228,badx=0,goodzoom=200,goodx=12,greatzoom=144,greatx=14,perfectzoom=97,perfectx=14,mperfectzoom=35,mperfectx=14},--ej
 	{badzoom=214,badx=7,goodzoom=180,goodx=12,greatzoom=130,greatx=14,perfectzoom=75,perfectx=14,mperfectzoom=35,mperfectx=14},--nj
 	{badzoom=205,badx=10,goodzoom=159,goodx=12,greatzoom=110,greatx=12,perfectzoom=52,perfectx=12,mperfectzoom=35,mperfectx=14},--hj
 	{badzoom=165,badx=12,goodzoom=120,goodx=12,greatzoom=77,greatx=14,perfectzoom=35,perfectx=14,mperfectzoom=25,mperfectx=14},--vj
@@ -1094,14 +1506,15 @@ function createTimingBarForPlayer(player)
 	local diffuseBase = 0.8;
 	local fbottom=0;
 	local ftop=0;
-	local dataJudgSelected = dataJudgBox[1];
+	local dataJudgSelected = dataJudgBox[2];
 
 
 	local STATE = GAMESTATE:GetPlayerState(player);
-	if STATE:GetPlayerOptions('ModsLevel_Preferred'):HardJudgement() then dataJudgSelected = dataJudgBox[2] end;
-	if STATE:GetPlayerOptions('ModsLevel_Preferred'):VeryHardJudgement() then dataJudgSelected = dataJudgBox[3] end;			
-	if STATE:GetPlayerOptions('ModsLevel_Preferred'):ExtraJudgement() then dataJudgSelected = dataJudgBox[4]  end;
-	if STATE:GetPlayerOptions('ModsLevel_Preferred'):UltraHardJudgement() then dataJudgSelected = dataJudgBox[5]  end;
+	if STATE:GetPlayerOptions('ModsLevel_Preferred'):EasyJudgement() then dataJudgSelected = dataJudgBox[1] end;
+	if STATE:GetPlayerOptions('ModsLevel_Preferred'):HardJudgement() then dataJudgSelected = dataJudgBox[3] end;
+	if STATE:GetPlayerOptions('ModsLevel_Preferred'):VeryHardJudgement() then dataJudgSelected = dataJudgBox[4] end;			
+	if STATE:GetPlayerOptions('ModsLevel_Preferred'):ExtraJudgement() then dataJudgSelected = dataJudgBox[5]  end;
+	if STATE:GetPlayerOptions('ModsLevel_Preferred'):UltraHardJudgement() then dataJudgSelected = dataJudgBox[6]  end;
 
 
 	if player == PLAYER_1 then
@@ -1122,6 +1535,15 @@ function createTimingBarForPlayer(player)
 		if GAMESTATE:GetQuestZoneChannel() then
 			posX = SCREEN_CENTER_X;
 		end;
+
+		if GAMESTATE:GetGameMode() == "WorldMax" then
+			posX = SCREEN_CENTER_X;
+		end;
+
+		if GAMESTATE:GetGameMode() == "QuestWorld" then
+			posX = SCREEN_CENTER_X;
+		end;
+
 	end;
 
 	return Def.ActorFrame{
@@ -1209,6 +1631,12 @@ function createTimingBarForPlayer(player)
 		            self:x(dataJudgSelected["mperfectx"]);
 		            self:fadebottom(fbottom);
 		            self:fadetop(ftop);
+		        end;
+		        OnCommand=function(self)
+					local extraJudgment = GAMESTATE:GetExtraJudgment();
+					if extraJudgment == false then
+						self:visible(false);
+					end;
 		        end;
 		    };
 		};
@@ -1302,6 +1730,16 @@ function createFastSlowUiPlayer(player,pos_height,zoomBasePanel)
 					self:horizalign("left");
 			end;
 		};
+
+		LoadActor(THEME:GetPathG("","ScreenGamePlay_ui/info/fastslowdata"))..{
+			OnCommand=cmd(halign,1;valign,0;shadowlength,2;blend,"BlendMode_Add";queuecommand,"Ani");
+			AniCommand=function(self)
+				self:linear(0.4);
+				self:zoom(1.03);
+				self:diffusealpha(0);
+			end;
+		};	
+
 
 		OnCommand=function(self)
 			self:zoom(zoomBaseNum);
@@ -1400,20 +1838,65 @@ if GAMESTATE:IsHumanPlayer(PLAYER_1) then
 	if #listaUiGameplayItems > 0 then	
 		for i = 1,#listaUiGameplayItems,1 do		
 
+			local schemePlayerSelected = getSkinSelectedInfoSchemePath(PLAYER_1);
+
 			if listaUiGameplayItems[i][1] == "judgdata" then
+				--here we check if the player has selected an external ui item, if so, we load that lua :P
 				local yItem = heightUsed;
-				t[#t+1] = createStatJudgmentUiPlayer(PLAYER_1,topBaseHeightUiItems + yItem,0.81);		
+				if schemePlayerSelected["default"] == false then
+
+					local isValid = checkLuaSkinSelectedInfoScheme(schemePlayerSelected["pathLua"],"Judgment");
+					if isValid then
+						local actorFunc = LoadActor(schemePlayerSelected["pathLua"].."Judgment/default.lua");
+						t[#t+1] = actorFunc(schemePlayerSelected["pathLua"],PLAYER_1);
+					else
+						t[#t+1] = createStatJudgmentUiPlayer(PLAYER_1,topBaseHeightUiItems + yItem,0.81);
+					end;
+				else					
+					t[#t+1] = createStatJudgmentUiPlayer(PLAYER_1,topBaseHeightUiItems + yItem,0.81);							
+				end;
 			end;
 
 			if listaUiGameplayItems[i][1] == "score" then
+
 				local yItem = heightUsed;
-				t[#t+1] = createScoreUiPlayer(PLAYER_1,topBaseHeightUiItems + yItem,0.81);			
+				if schemePlayerSelected["default"] == false then
+
+					local isValid = checkLuaSkinSelectedInfoScheme(schemePlayerSelected["pathLua"],"Score");					
+					if isValid then
+						local actorFunc = LoadActor(schemePlayerSelected["pathLua"].."Score/default.lua");
+						t[#t+1] = actorFunc(schemePlayerSelected["pathLua"],PLAYER_1);
+					else
+						t[#t+1] = createScoreUiPlayer(PLAYER_1,topBaseHeightUiItems + yItem,0.81);	
+					end;
+
+				else
+					
+					t[#t+1] = createScoreUiPlayer(PLAYER_1,topBaseHeightUiItems + yItem,0.81);
+				end;
+
+		
 			end;
 
-			if listaUiGameplayItems[i][1] == "fastslow" then				
+			if listaUiGameplayItems[i][1] == "fastslow" then	
+
 				local yItem = heightUsed;
-				t[#t+1] = createFastSlowUiPlayer(PLAYER_1,topBaseHeightUiItems + yItem,0.81);
+				if schemePlayerSelected["default"] == false then
+
+					local isValid = checkLuaSkinSelectedInfoScheme(schemePlayerSelected["pathLua"],"Timing");	
+					if isValid then
+						local actorFunc = LoadActor(schemePlayerSelected["pathLua"].."Timing/default.lua");
+						t[#t+1] = actorFunc(schemePlayerSelected["pathLua"],PLAYER_1);
+					else
+						t[#t+1] = createFastSlowUiPlayer(PLAYER_1,topBaseHeightUiItems + yItem,0.81);
+					end;
+
+				else
+					
+					t[#t+1] = createFastSlowUiPlayer(PLAYER_1,topBaseHeightUiItems + yItem,0.81);
+				end;
 			end;
+
 			heightUsed = heightUsed + (marginYBaseItems + listaUiGameplayItems[i][2]); 
 		end;
 	end;
@@ -1425,24 +1908,71 @@ if GAMESTATE:IsHumanPlayer(PLAYER_2) then
 	local heightUsed = 0;
 	if #listaUiGameplayItems > 0 then	
 
+	local schemePlayerSelected = getSkinSelectedInfoSchemePath(PLAYER_2);
+
 		for i = 1,#listaUiGameplayItems,1 do
+
 			if listaUiGameplayItems[i][1] == "judgdata" then
-				local yItem = heightUsed;
-				t[#t+1] = createStatJudgmentUiPlayer(PLAYER_2,topBaseHeightUiItems + yItem,0.81);		
+
+				local yItem = heightUsed; -- default
+				if schemePlayerSelected["default"] == false then
+
+					local isValid = checkLuaSkinSelectedInfoScheme(schemePlayerSelected["pathLua"],"Judgment");
+					if isValid then
+						local actorFunc = LoadActor(schemePlayerSelected["pathLua"].."Judgment/default.lua");
+						t[#t+1] = actorFunc(schemePlayerSelected["pathLua"],PLAYER_2);
+					else
+						t[#t+1] = createStatJudgmentUiPlayer(PLAYER_2,topBaseHeightUiItems + yItem,0.81);
+					end;
+
+				else
+					t[#t+1] = createStatJudgmentUiPlayer(PLAYER_2,topBaseHeightUiItems + yItem,0.81);
+				end;
+
 			end;
 
 			if listaUiGameplayItems[i][1] == "score" then
+
 				local yItem = heightUsed;
-				t[#t+1] = createScoreUiPlayer(PLAYER_2,topBaseHeightUiItems + yItem,0.81);			
+				if schemePlayerSelected["default"] == false then
+					local isValid = checkLuaSkinSelectedInfoScheme(schemePlayerSelected["pathLua"],"Score");					
+					if isValid then
+						local actorFunc = LoadActor(schemePlayerSelected["pathLua"].."Score/default.lua");
+						t[#t+1] = actorFunc(schemePlayerSelected["pathLua"],PLAYER_2);
+					else
+						t[#t+1] = createScoreUiPlayer(PLAYER_2,topBaseHeightUiItems + yItem,0.81);	
+					end;
+
+				else
+					
+					t[#t+1] = createScoreUiPlayer(PLAYER_2,topBaseHeightUiItems + yItem,0.81);					
+				end;
+	
 			end;
 
-			if listaUiGameplayItems[i][1] == "fastslow" then				
+			if listaUiGameplayItems[i][1] == "fastslow" then
+
 				local yItem = heightUsed;
-				t[#t+1] = createFastSlowUiPlayer(PLAYER_2,topBaseHeightUiItems + yItem,0.81);
+				if schemePlayerSelected["default"] == false then
+
+					local isValid = checkLuaSkinSelectedInfoScheme(schemePlayerSelected["pathLua"],"Timing");	
+					if isValid then
+						local actorFunc = LoadActor(schemePlayerSelected["pathLua"].."Timing/default.lua");
+						t[#t+1] = actorFunc(schemePlayerSelected["pathLua"],PLAYER_2);
+					else
+						t[#t+1] = createFastSlowUiPlayer(PLAYER_2,topBaseHeightUiItems + yItem,0.81);
+					end;
+
+				else
+					
+					t[#t+1] = createFastSlowUiPlayer(PLAYER_2,topBaseHeightUiItems + yItem,0.81);
+				end;
+
 			end;
 
 			heightUsed = heightUsed + (marginYBaseItems + listaUiGameplayItems[i][2]); 
 		end;
+
 	end;
 end;
 
@@ -1618,20 +2148,7 @@ t[#t+1] =Def.ActorFrame{
 			self:GetChild("GroupScroller"):visible(ispaused);
 			self:GetChild("Desc"):visible(ispaused);
 		elseif iMenuP == 1 then									--restart
-			if not GAMESTATE:IsEventMode() then
-			--	local Scost = GAMESTATE:IsCourseMode() and PREFSMAN:GetPreference("SongsPerPlay") or (GAMESTATE:GetCurrentSong():GetHearts() or 1);
-				Scost = GAMESTATE:GetCurrentSong():GetHearts() or 1;
-				for _, pn in ipairs(PlayerNumber) do
-					for i = 1, Scost do
-						GAMESTATE:AddStageToPlayer(pn);
-					end;
-				end;
-			end;
-			self:GetChild("Quad"):diffusealpha(.95);
-			self:GetChild("sPaused"):visible(not ispaused);
-			self:GetChild("GroupScroller"):visible(not ispaused);
-			self:GetChild("Desc"):visible(not ispaused);
-			SCREENMAN:SetNewScreen("ScreenStageInformation");
+			local ret = SCREENMAN:GetTopScreen():restart_gameplay();
 		elseif iMenuP == 2 then									--return
 			self:GetChild("Quad"):diffusealpha(.95);
 			self:GetChild("sPaused"):visible(not ispaused);
@@ -1695,5 +2212,9 @@ if GAMESTATE:GetNumSidesJoined() == 2 and checkVsMode() then
 
 
 end;
+
+
+t[#t+1] = LoadActor(THEME:GetPathB("","ReactsOverlay")) .. { };
+
 
 return t

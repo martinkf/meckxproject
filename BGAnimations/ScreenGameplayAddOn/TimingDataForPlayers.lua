@@ -3,10 +3,13 @@
 --restart env
 GAMESTATE:Env()["timingP1"] = {};
 GAMESTATE:Env()["timingP2"] = {};
+GAMESTATE:Env()["lifeP1"] = {};
+GAMESTATE:Env()["lifeP2"] = {};
 
 local timingPlayer1={};
 local timingPlayer2={};
-
+local lifePlayer1={{life=0.5,sec=0}};
+local lifePlayer2={{life=0.5,sec=0}};
 
 
 
@@ -96,13 +99,6 @@ local t = Def.ActorFrame
 		end
 
 		noteOffset = param.TapNoteOffset and math.floor(param.TapNoteOffset * 1000 + 0.5) or nil;
-		--[[
-		Trace("Judg--");
-		Trace("Tns: "..tnsName);
-		Trace("Real OffsetNote: "..param.TapNoteOffset);
-		Trace("OffsetNote: "..noteOffset);
-		]]
-
 
 		if iTns > 0 and iTns < 5 then
 			if param.Early then
@@ -132,6 +128,7 @@ local t = Def.ActorFrame
 		      tns_raw   = tnsRaw,
 		      tns_name	= tnsName,
 		      offset_ms = noteOffset,        -- timing (+late / -early)
+		      rawOffset_ms = param.TapNoteOffset,
 		      isHoldNote = isHoldNote,
 		      isEarly	= isEarly
 		    });	
@@ -146,14 +143,51 @@ local t = Def.ActorFrame
 		      tns_name	= tnsName,
 		      tns_raw   = tnsRaw,
 		      offset_ms = noteOffset,        -- timing (+late / -early)
+		      rawOffset_ms = param.TapNoteOffset,
 		      isHoldNote = isHoldNote,
 		      isEarly	= isEarly
 		    });		
+
+
+
 			--save on array for player 2
 			GAMESTATE:Env()["timingP2"] = timingPlayer2;
 		end;
 
 	end;
+
+    LifeChangedMessageCommand=function(self,params)        	
+            local life = params.LifeMeter:GetLife();
+		    local sp = GAMESTATE:GetPlayerState(params.Player):GetSongPosition();
+		    local sec  = math.max(0, sp:GetMusicSeconds());
+		    local beat = sp:GetSongBeat();
+		    if params.Player == PLAYER_1 then
+		    	if #lifePlayer1 > 0 then
+		    		if lifePlayer1[#lifePlayer1]["life"] < 1 then
+		    			table.insert(lifePlayer1,{life=life,sec=beat,realSec=sec});
+		    		else
+		    			if lifePlayer1[#lifePlayer1]["life"] >= 1 then
+		    				table.insert(lifePlayer1,{life=1,sec=beat,realSec=sec});
+		    			end;
+		    		end;
+		    	end;
+		    	GAMESTATE:Env()["lifeP1"] = lifePlayer1;
+		    else
+		    	if #lifePlayer2 > 0 then
+		    		if lifePlayer2[#lifePlayer2]["life"] < 1 then
+		    			table.insert(lifePlayer2,{life=life,sec=beat,realSec=sec});
+		    		else
+		    			if lifePlayer2[#lifePlayer2]["life"] >= 1 and life >= 1 then
+		    				table.insert(lifePlayer2,{life=1,sec=beat,realSec=sec});
+		    			else
+		    				table.insert(lifePlayer2,{life=life,sec=beat,realSec=sec});
+		    			end;
+		    		end;
+		    	end;		    
+		     	GAMESTATE:Env()["lifeP2"] = lifePlayer2;
+		    end;
+    end;
+
 };
 
 return t;

@@ -18,6 +18,7 @@ local function GetBannerSong(song)
 	local dataBannerSong = {generic=0,bpath=""};
 	if (song ~= nil) then
 		local sbackground = song:GetBannerPath();
+		--local sbackground = song:GetBackgroundPath();
 		if (sbackground ~= nil) then
 			if FILEMAN:DoesFileExist( sbackground ) then
 				--self:LoadFromCachedBanner( sbackground );
@@ -86,8 +87,6 @@ end
 
 local t = Def.ActorFrame { };
 
---PERFORMANCE MODE
-
 t[#t+1] =  Def.ActorFrame{
 	InitCommand=cmd(Center);
 	VisibleCommand=cmd(visible,true);
@@ -119,29 +118,11 @@ t[#t+1] =  Def.ActorFrame{
 
 					self:GetChild("gBanner"):stoptweening():Load(BannerPath):scaletoclipped(SCREEN_WIDTH,SCREEN_HEIGHT);
 					
-					-- PERFORMANCE MODE --
-					-- WHEN IS ACTIVE IN ANY PLAYER IT WILL NOT LOAD VIDEOS, ONLY IMAGES.
-					local perfp1 = false;
-					local perfp2 = false;
-
-					if GAMESTATE:IsHumanPlayer(PLAYER_1) and GAMESTATE:IsHumanPlayer(PLAYER_2) then
-						perfp1 = getCustomOptionValuePlayer(PLAYER_1,"performance_mode");
-						perfp2 = getCustomOptionValuePlayer(PLAYER_2,"performance_mode");
-					else
-						if GAMESTATE:IsHumanPlayer(PLAYER_1) then
-							perfp1 = getCustomOptionValuePlayer(PLAYER_1,"performance_mode");
-						elseif GAMESTATE:IsHumanPlayer(PLAYER_2) then
-							perfp2 = getCustomOptionValuePlayer(PLAYER_2,"performance_mode");
-						end;
-					end;
-
-					if perfp1 == nil then perfp1 = false; end;
-					if perfp2 == nil then perfp2 = false; end;
-
-					if perfp1 or perfp2 then
+					-- PERFORMANCE MODE--
+					local performanceType = getPerformanceModeType();
+					if performanceType >= 2 then
 						PreviewPath["novideo"] = true;
 					end;
-
 					-- END PERFORMANCE MODE--
 
 					if PreviewPath["novideo"] then
@@ -152,12 +133,24 @@ t[#t+1] =  Def.ActorFrame{
 						self:GetChild("Preview"):zoomto(SCREEN_WIDTH-4-2,SCREEN_HEIGHT-4-2):accelerate(0.4):diffusealpha(1);						
 						self:GetChild("nBanner"):stoptweening():diffusealpha(0);
 					end;
+
 					self:diffusealpha(1);
 				end;
 			end;
-			InitCommand=cmd(playcommand,"Update");
+			--InitCommand=cmd(playcommand,"Update");
+			InitCommand=function(self)
+				self:sleep(1);
+				self:queuecommand("Update");
+			end;
+
 			CurrentSongChangedMessageCommand=function(self)
 				self:stoptweening():diffusealpha(0):sleep(0.38):queuecommand("Update");
+			end;
+
+			OffCommand=function(self)
+				self:stoptweening();
+				self:linear(0.15);
+				self:diffusealpha(0);
 			end;
 
 			
@@ -182,10 +175,7 @@ t[#t+1] =  Def.ActorFrame{
 			Def.Banner {	Name="nBanner";	--banner standard,
 				InitCommand=cmd(setsize,SCREEN_WIDTH-4-2,SCREEN_HEIGHT-4-2;xy,0,0;);
 				OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
-			};
-
-
-						
+			};						
 		};
 
 
@@ -217,9 +207,13 @@ t[#t+1] =  Def.ActorFrame{
 			Def.Banner {	Name="nBanner";	--banner standard,
 				InitCommand=cmd(setsize,SCREEN_WIDTH-4-2,SCREEN_HEIGHT-4-2;xy,0,0;);
 			};
-						
+			
+			OffCommand=function(self)
+				self:stoptweening();
+				self:linear(0.15);
+				self:diffusealpha(0);
+			end;		
 		};
-
 	};
 };
 
@@ -242,39 +236,52 @@ t[#t+1] =  Def.ActorFrame{
 };
 
 
--- COMMON BACKGROUND
---header.
-t[#t+1] = Def.ActorFrame {
+t[#t+1] = Def.Quad {		
+	OnCommand=function(self)
+		self:x(SCREEN_CENTER_X);
+		self:y(SCREEN_CENTER_Y);
+		self:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT);
+		self:diffuse(color("#000000"));
+		self:diffusealpha(1);	
+		--self:sleep(0.);	
+		self:decelerate(0.6);
+		self:diffusealpha(0);
+	end;
+};
 
+--CHECK IF IS SELECTED A CUSTOM FRAME SKIN
+local luaFrameSkinSelected = getFrameSkinForPlayers("underlay","ScreenSelectMusic");
+if luaFrameSkinSelected["isDefault"] then
+	-- COMMON BACKGROUND
+	--header.
 
-	LoadActor(THEME:GetPathG("","commonBackground/backch"))..{
-		OnCommand=cmd(zoom,0.8;x,SCREEN_CENTER_X;y,SCREEN_CENTER_Y;diffusealpha,0);
-		SelectChannelMessageCommand=function(self)
-			self:diffusealpha(1);
-		end;
+	local backgroundActor = Def.ActorFrame{};
+	backgroundActor[#backgroundActor+1] =  LoadActor(THEME:GetPathG("","commonBackground/backch"))..{
+			OnCommand=cmd(zoom,0.8;x,SCREEN_CENTER_X ;y,SCREEN_CENTER_Y;diffusealpha,0);
+			SelectChannelMessageCommand=function(self)
+				self:diffusealpha(1);
+			end;
 
-		ChannelChosenMessageCommand=function(self)
-			self:diffusealpha(0);
-		end;
+			ChannelChosenMessageCommand=function(self)
+				self:diffusealpha(0);
+			end;
 
 	};
 
-
-	LoadActor( THEME:GetPathG("","commonBackground/bbluesm") )..{
+	backgroundActor[#backgroundActor+1] = LoadActor( THEME:GetPathG("","commonBackground/bbluesm") )..{
 		InitCommand=cmd(y,SCREEN_CENTER_Y;x,SCREEN_CENTER_X;zoomto,SCREEN_WIDTH,SCREEN_HEIGHT;diffusealpha,0;visible,false);
 		OnCommand=function(self)
 		end;
 
 			SelectChannelMessageCommand=function(self)
-				local performanceStatus = checkPerformanceModeState();
-				if performanceStatus then
-					self:stoptweening();
-					self:visible(false);
-					return;
-				else
+				if getPerformanceModeType() == 0 then
 					self:visible(true);
 					self:diffusealpha(0.4);
+				else
+					self:stoptweening();
+					self:visible(false);
 				end;
+
 			end;
 
 			ChannelChosenMessageCommand=function(self)
@@ -283,9 +290,9 @@ t[#t+1] = Def.ActorFrame {
 				self:diffusealpha(0);
 			end;	
 			OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);		
-	};	
+	};
 
-	LoadActor( THEME:GetPathG("","commonBackground/bredsm.mp4") )..{
+	backgroundActor[#backgroundActor+1] = LoadActor( THEME:GetPathG("","commonBackground/bredsm.mp4") )..{		
 			InitCommand=cmd(y,SCREEN_CENTER_Y;x,SCREEN_CENTER_X;zoomto,SCREEN_WIDTH,SCREEN_HEIGHT;diffusealpha,0;visible,false);
 			AniCommand=function(self)
 				self:linear(12);
@@ -296,14 +303,13 @@ t[#t+1] = Def.ActorFrame {
 			end;
 			SelectChannelMessageCommand=function(self)
 
-				local performanceStatus = checkPerformanceModeState();
-				if performanceStatus then
-					self:stoptweening();
-					self:visible(false);
-				else
+				if getPerformanceModeType() == 0 then
 					self:stoptweening();
 					self:visible(true);
 					self:queuecommand("Ani");
+				else
+					self:stoptweening();
+					self:visible(false);
 				end;
 
 			end;
@@ -314,13 +320,25 @@ t[#t+1] = Def.ActorFrame {
 				self:diffusealpha(0);
 			end;			
 			OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
-	};	
+	};
 
+--[[
+if getPerformanceModeType() == 0 then
 
-	LoadActor("MainLogo/bg_matrix")..{
+	backgroundActor[#backgroundActor+1] = LoadActor("MainLogo/bg_matrix")..{
 		OnCommand=cmd(diffusealpha,0);
 		SelectChannelMessageCommand=function(self)
-			self:diffusealpha(1);
+
+			if getPerformanceModeType() == 0 then
+				self:visible(true);
+				--self:hibernate(0);
+				self:diffusealpha(1);
+			else
+				self:stoptweening();
+				self:visible(false);
+				self:diffusealpha(0);
+				--self:hibernate(math.huge);
+			end;
 		end;
 
 		ChannelChosenMessageCommand=function(self)
@@ -329,9 +347,20 @@ t[#t+1] = Def.ActorFrame {
 
 	};
 
+end;
+]]
+	backgroundActor[#backgroundActor+1] = LoadActor(THEME:GetPathG("","commonBackground/back3"))..{
+		OnCommand=function(self)
+			self:zoom(0.8);
+			self:x(SCREEN_CENTER_X);
+			self:y(SCREEN_CENTER_Y);
+			self:diffusealpha(0);
 
-	LoadActor(THEME:GetPathG("","commonBackground/back3"))..{
-		OnCommand=cmd(zoom,0.8;x,SCREEN_CENTER_X;y,SCREEN_CENTER_Y;diffusealpha,0);
+			if isAspectRatio43() then
+				self:zoom(1.1);
+			end;
+		end;
+
 		SelectChannelMessageCommand=function(self)
 			self:diffusealpha(1);
 		end;
@@ -339,48 +368,29 @@ t[#t+1] = Def.ActorFrame {
 		ChannelChosenMessageCommand=function(self)
 			self:diffusealpha(0);
 		end;
-	};	
+	};
 
+	t[#t+1] = backgroundActor;
 
-};
-
-
-
---FRAME
-local frameSelected = "simple";
-if frameSelected == nil then
-	frameSelected = "simple";
 end;
-t[#t+1] = LoadActor(THEME:GetPathG("","ScreenSelectMusic/frames/"..frameSelected.."/underlay"))..{
-};
+
+if luaFrameSkinSelected["isDefault"] then
+	local frameSelected = "simple";
+	t[#t+1] = LoadActor(THEME:GetPathG("","ScreenSelectMusic/frames/"..frameSelected.."/underlay"))..{
+	};
+else
+	local frameSkinFunc = LoadActor(luaFrameSkinSelected["lua"]);
+	t[#t+1] = frameSkinFunc(luaFrameSkinSelected["path"]);
+end;
+
+
+
 
 
 --FILTER STEP TYPE MESSAGE (only for 1 player, because with 2 players you can't pick double............. lol)
 --if GAMESTATE:GetNumSidesJoined() == 1 then
 	t[#t+1] = LoadActor("ScreenSelectMusicLua/filterMessages")..{};
 --end;
-
-
--- Exit message.
-if PREFSMAN:GetPreference("AllowUnjoinShortcut") then
-	local langMsgExit = PREFSMAN:GetPreference('Language');
-	local imgExitLang = langMsgExit.."_exit";
-
-	t[#t+1] =  Def.ActorFrame
-	{
-		OnCommand=cmd(x,SCREEN_CENTER_X;y,SCREEN_CENTER_Y-250;;visible,false;zoom,0.7);
-
-		SelectChannelMessageCommand=function(self)
-			self:visible(true);
-		end;
-		ChannelChosenMessageCommand=function(self)
-			self:visible(false);
-		end;
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/ChannelMessage/"..imgExitLang))..{
-			InitCommand=cmd();
-		};
-	}
-end;
 
 
 --because why not

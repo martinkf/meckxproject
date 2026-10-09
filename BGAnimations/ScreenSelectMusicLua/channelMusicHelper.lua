@@ -111,7 +111,6 @@ function formatTextMaxLengh(text)
 end;
 
 function getMusicForChannelPlayer()
-	Trace("###################################----------------> music");
 	registerAllMusicAvailableForChannels();
 	--we check what player is playing, if there is 1 player, we only choose that song
 	--if there are 2 players we alternate the song, because both players needs love
@@ -133,23 +132,45 @@ function getMusicForChannelPlayer()
 		musicChannelMusic = getCustomOptionValuePlayer(playerActive,"channelMusic");
 		musicChannelMusicType = getCustomOptionValuePlayer(playerActive,"channelMusic_type");
 	else
+		--we check if one of the player is guest
+		local p1Guest=false;
+		local p2Guest=false;
 
-		if GAMESTATE:Env()["lastChannelMusic2players"] == "" then
+		if PROFILEMAN:IsPersistentProfile(PLAYER_1) == false then
+			p1Guest = true;
+		end;
+		if PROFILEMAN:IsPersistentProfile(PLAYER_2) == false then
+			p2Guest = true;
+		end;
+
+		if p1Guest and p2Guest == false then
+			--p1 guest, loading music fromr p2.
+			musicChannelMusic = getCustomOptionValuePlayer(PLAYER_2,"channelMusic");
+			musicChannelMusicType = getCustomOptionValuePlayer(PLAYER_2,"channelMusic_type");
+		elseif p1Guest == false and p2Guest then
+			--P2 GUEST, loading music from p1
 			musicChannelMusic = getCustomOptionValuePlayer(PLAYER_1,"channelMusic");
 			musicChannelMusicType = getCustomOptionValuePlayer(PLAYER_1,"channelMusic_type");
-			GAMESTATE:Env()["lastChannelMusic2players"] = "p1";
-		else
-			if GAMESTATE:Env()["lastChannelMusic2players"] == "p1" then
-				musicChannelMusic = getCustomOptionValuePlayer(PLAYER_2,"channelMusic");
-				musicChannelMusicType = getCustomOptionValuePlayer(PLAYER_2,"channelMusic_type");
-				GAMESTATE:Env()["lastChannelMusic2players"] = "p2";
-			elseif GAMESTATE:Env()["lastChannelMusic2players"] == "p2" then
+		else 
+			if GAMESTATE:Env()["lastChannelMusic2players"] == "" then
 				musicChannelMusic = getCustomOptionValuePlayer(PLAYER_1,"channelMusic");
 				musicChannelMusicType = getCustomOptionValuePlayer(PLAYER_1,"channelMusic_type");
 				GAMESTATE:Env()["lastChannelMusic2players"] = "p1";
-			end;
+			else
+				if GAMESTATE:Env()["lastChannelMusic2players"] == "p1" then
+					musicChannelMusic = getCustomOptionValuePlayer(PLAYER_2,"channelMusic");
+					musicChannelMusicType = getCustomOptionValuePlayer(PLAYER_2,"channelMusic_type");
+					GAMESTATE:Env()["lastChannelMusic2players"] = "p2";
+				elseif GAMESTATE:Env()["lastChannelMusic2players"] == "p2" then
+					musicChannelMusic = getCustomOptionValuePlayer(PLAYER_1,"channelMusic");
+					musicChannelMusicType = getCustomOptionValuePlayer(PLAYER_1,"channelMusic_type");
+					GAMESTATE:Env()["lastChannelMusic2players"] = "p1";
+				end;
 
+			end;
 		end;
+
+
 
 	end;
 

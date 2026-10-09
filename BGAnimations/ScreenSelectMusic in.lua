@@ -1,7 +1,14 @@
 local t = Def.ActorFrame 
 {
-	OnCommand=cmd(queuecommand,"ProfileUpdate";sleep,1);
+	OnCommand=cmd(queuecommand,"ProfileUpdate";sleep,0.5);
 	ProfileUpdateCommand=function(self)
+		--we check if any companion are installed.
+		--checkIfCompanionInstalled();
+		--checkAndSetTimingProfile();
+		
+		-- we reset the nonstop center.
+		resetPlayerStatsNonstopCenter();
+
 		if GAMESTATE:IsHumanPlayer(PLAYER_1) then
 			--creamos las variables de entorno
 			if GAMESTATE:Env()["inGameP1"] == false or GAMESTATE:Env()["inGameP1"] == nil then
@@ -11,7 +18,10 @@ local t = Def.ActorFrame
 
 			if PROFILEMAN:IsPersistentProfile(PLAYER_1) then
 				PROFILEMAN:SaveProfile(PLAYER_1);
+
+				checkIfCompanionInstalledByPlayer(PLAYER_1);
 				checkPlayerEvaluationSkinExist(PLAYER_1);
+				checkAndSetTimingProfileByPlayer(PLAYER_1);
 			end;						
 		end;
 		if GAMESTATE:IsHumanPlayer(PLAYER_2) then
@@ -24,7 +34,10 @@ local t = Def.ActorFrame
 
 			if PROFILEMAN:IsPersistentProfile(PLAYER_2) then
 				PROFILEMAN:SaveProfile(PLAYER_2);
+
+				checkIfCompanionInstalledByPlayer(PLAYER_2);
 				checkPlayerEvaluationSkinExist(PLAYER_2);
+				checkAndSetTimingProfileByPlayer(PLAYER_2);
 			end;
 				
 		end;

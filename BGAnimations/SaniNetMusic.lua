@@ -1261,8 +1261,7 @@ t[#t+1] = Def.ActorFrame {
 		SaniNetMainMenuMessageCommand=function(self,params)
 
 			if params.RoomInfo ~= nil then
-				--Trace("########:::::::"..params.RoomInfo);
-
+				
 				if #params.RoomInfo == 0 then
 					return;
 				end;
@@ -1276,7 +1275,6 @@ t[#t+1] = Def.ActorFrame {
 					local playersName = split("|", params.RoomInfo[i]["players"]);
 
 					for x=1,#playersName do
-						--Trace("---------> PLAYER "..x..":"..playersName[x]);
 						items1v1Info[i]:GetChild("playerpos"..x):settext(playersName[x]);
 					end;
 
@@ -1682,6 +1680,7 @@ t[#t+1] =  Def.ActorFrame {
 				recordItems[1]:GetChild("wrRanking"):stoptweening():visible(false);
 				recordItems[1]:GetChild("lampRankingGlow"):stoptweening():visible(false);
 				recordItems[1]:GetChild("fcomboTag"):stoptweening():visible(false);
+				recordItems[1]:GetChild("nmcomboTag"):stoptweening():visible(false);
 				recordItems[1]:GetChild("pfcTag"):stoptweening():visible(false);
 				recordItems[1]:GetChild("typeClientRank"):visible(false);
 				recordItems[1]:GetChild("judgPlayerRank"):visible(false);
@@ -1693,8 +1692,11 @@ t[#t+1] =  Def.ActorFrame {
 			else
 				recordItems[1]:GetChild("nodata"):visible(false);
 				for i=1,6 do
+
 					if params.SongRanking[i] == nil then
+						--recordItems[i]:visible(false);						
 						recordItems[i]:visible(false);
+						recordItems[i]:stoptweening():queuecommand("AniRecord");
 					else
 						local place = params.SongRanking[i]["place"];
 						local instanceType = params.SongRanking[i]["player_type"];
@@ -1707,6 +1709,15 @@ t[#t+1] =  Def.ActorFrame {
 						local diffScore = params.SongRanking[i]["diff"];
 						local itsMe = params.SongRanking[i]["me"];
 
+						local itsNoMiss = false;
+
+						if params.SongRanking[i]["nomiss"] ~= nil then
+							itsNoMiss = params.SongRanking[i]["nomiss"];
+						end;
+
+						recordItems[i]:GetChild("fcomboTag"):stoptweening():visible(false);
+						recordItems[i]:GetChild("pfcTag"):stoptweening():visible(false);
+						recordItems[i]:GetChild("nmcomboTag"):stoptweening():visible(false);
 						
 						local stateLamp = 4;
 						if tonumber(itsPfc) == 1 then
@@ -1714,16 +1725,43 @@ t[#t+1] =  Def.ActorFrame {
 							recordItems[i]:GetChild("lampRankingGlow"):stoptweening():glowshift():effectcolor1(color("0.549,0.894,1,0")):effectcolor2(color("0.549,0.894,1,0.5")):effectperiod(0.1):visible(true):diffusealpha(0.25);
 							recordItems[i]:GetChild("pfcTag"):stoptweening():visible(true);
 							recordItems[i]:GetChild("backr_1"):stoptweening():setstate(3);
+
+							if judgRecord == "ej" then
+								recordItems[i]:GetChild("backr_1"):stoptweening():setstate(5);
+							else
+								recordItems[i]:GetChild("backr_1"):stoptweening():setstate(3);
+							end;
+
 						elseif tonumber(itsFc) == 1 then
 							stateLamp = 1;
 							recordItems[i]:GetChild("lampRankingGlow"):stoptweening():glowshift():effectcolor1(color("#FFA23900")):effectcolor2(color("#FFA239FF")):effectperiod(0.1):visible(true):diffusealpha(0.25);
 							recordItems[i]:GetChild("fcomboTag"):stoptweening():visible(true);
 							recordItems[i]:GetChild("backr_1"):stoptweening():setstate(2);
+
+							if judgRecord == "ej" then
+								recordItems[i]:GetChild("backr_1"):stoptweening():setstate(5);
+							else
+								recordItems[i]:GetChild("backr_1"):stoptweening():setstate(2);
+							end;
+
+						elseif tonumber(itsNoMiss) == 1 then
+							stateLamp = 4;
+							recordItems[i]:GetChild("lampRankingGlow"):stoptweening():glowshift():effectcolor1(color("#11ff0000")):effectcolor2(color("#0afa36FF")):effectperiod(0.1):visible(true):diffusealpha(0.25);
+							recordItems[i]:GetChild("nmcomboTag"):stoptweening():visible(true);
+							recordItems[i]:GetChild("backr_1"):stoptweening():setstate(1);
+
+							if judgRecord == "ej" then
+								recordItems[i]:GetChild("backr_1"):stoptweening():setstate(5);
+							else
+								recordItems[i]:GetChild("backr_1"):stoptweening():setstate(1);
+							end;
+
 						else
 							stateLamp = 4;
 							recordItems[i]:GetChild("lampRankingGlow"):stoptweening():visible(false);
 							recordItems[i]:GetChild("fcomboTag"):stoptweening():visible(false);
 							recordItems[i]:GetChild("pfcTag"):stoptweening():visible(false);
+							recordItems[i]:GetChild("nmcomboTag"):stoptweening():visible(false);
 							recordItems[i]:GetChild("backr_1"):stoptweening():setstate(1);
 						end;
 
@@ -1731,9 +1769,17 @@ t[#t+1] =  Def.ActorFrame {
 
 						-- i = 1 WR
 						if i == 1 then
+
 							recordItems[i]:GetChild("wrRanking"):stoptweening():visible(true);
 							recordItems[i]:GetChild("placeRanking"):stoptweening():settext("");
-							recordItems[i]:GetChild("backr_1"):stoptweening():setstate(0);
+							--recordItems[i]:GetChild("backr_1"):stoptweening():setstate(0);
+
+							if judgRecord == "ej" then
+								recordItems[i]:GetChild("backr_1"):stoptweening():setstate(5);
+							else
+								recordItems[i]:GetChild("backr_1"):stoptweening():setstate(0);
+							end;
+
 						else
 							recordItems[i]:GetChild("wrRanking"):stoptweening():visible(false);
 							recordItems[i]:GetChild("placeRanking"):stoptweening():settext(place);
@@ -1760,6 +1806,8 @@ t[#t+1] =  Def.ActorFrame {
 							recordItems[i]:GetChild("judgPlayerRank"):setstate(3);
 						elseif judgRecord == "uj" then
 							recordItems[i]:GetChild("judgPlayerRank"):setstate(4);
+						elseif judgRecord == "ej" then
+							recordItems[i]:GetChild("judgPlayerRank"):setstate(5);
 						else
 							recordItems[i]:GetChild("judgPlayerRank"):setstate(0);
 						end;
@@ -1962,7 +2010,7 @@ for i=1,6 do
 					self:zoom(0.9);
 					self:horizalign("left");
 					self:x(-295);
-					self:settext("ANOTHERA");
+					self:settext("-");
 					self:shadowlength(2);
 					self:shadowcolor(color("#191919"));
 
@@ -2071,8 +2119,8 @@ for i=1,6 do
 				self:visible(false);
 				self:diffusealpha(1);
 				self:x(310);
-				self:y(96 + (90 * (i-1) ));
-				self:zoom(0.7);
+				self:y(93 + (90 * (i-1) ));
+				self:zoom(0.82);
 			end;
 
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);			
@@ -2084,8 +2132,20 @@ for i=1,6 do
 				self:visible(false);
 				self:diffusealpha(1);
 				self:x(310);
-				self:y(100 + (90 * (i-1) ));
-				self:zoom(0.7);
+				self:y(97 + (90 * (i-1) ));
+				self:zoom(0.95);
+			end;		
+			FinalizedMessageCommand=cmd(finishtweening;visible,false);			
+		};
+
+		LoadActor(THEME:GetPathG("","SaniNet/eval/nomiss"))..{
+			Name="nmcomboTag";
+			OnCommand=function(self)
+				self:visible(false);
+				self:diffusealpha(1);
+				self:x(310);
+				self:y(95 + (90 * (i-1) ));
+				self:zoom(1);
 			end;		
 			FinalizedMessageCommand=cmd(finishtweening;visible,false);			
 		};
@@ -2105,6 +2165,62 @@ for i=1,6 do
 
 end;
 
+--online record message
+t[#t+1] =  Def.ActorFrame {
+	LoadActor(THEME:GetPathG("","SaniNet/noteligiblerecord"))..{
+		Name="noRecord";
+		OnCommand=function(self)
+			self:x(0);
+			self:y(SCREEN_CENTER_Y+130);
+			self:queuecommand("checkStatusEligible");
+
+		end;
+
+		CWCloseMessageCommand=function(self,params)
+			self:queuecommand("checkStatusEligible");
+		end;
+
+		CommandWindowSelectModMessageCommand=function(self,params)
+			self:queuecommand("checkStatusEligible");
+		end;
+
+		checkStatusEligibleCommand=function(self)
+			local playerActive = nil;
+			if GAMESTATE:IsSideJoined(PLAYER_1) then
+				playerActive = PLAYER_1;
+			else
+				playerActive = PLAYER_2;
+			end;
+
+			local showMessage = false;
+
+			local STATE = GAMESTATE:GetPlayerState(playerActive);			
+			local ejudgment = STATE:GetPlayerOptions('ModsLevel_Preferred' ):EasyJudgement();
+			local rush = GAMESTATE:GetSongOptionsObject("ModsLevel_Preferred"):MusicRate();
+			local cmod = STATE:GetPlayerOptions("ModsLevel_Preferred"):CMod();
+
+			if rush ~= 1 then
+				showMessage = true;
+			end;
+
+			if ejudgment then
+				showMessage = true;
+			end;
+
+			if cmod ~= nil then
+				showMessage = true;
+			end;
+
+			if showMessage then
+				self:visible(true);
+			else
+				self:visible(false);
+			end;
+
+		end;
+
+	};
+};
 
 
 return t;

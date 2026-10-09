@@ -2,6 +2,10 @@ function GetFileExtension(url)
 	return url:match("^.+(%..+)$")
 end;
 
+function escape_lua_pattern(s)
+    return s:gsub("([^%w])", "%%%1")
+end
+
 function FolderExists(path)
     local success, result = pcall(function()
         local listing = FILEMAN:GetDirListing(path, false, true)
@@ -9,6 +13,67 @@ function FolderExists(path)
     end)
     return success and result
 end
+
+function translateOldeGadeToNewGrade(grade)
+	local gradeArray = {
+		sss = 1,
+		ss = 3,
+		s = 5,
+		a = 11,
+		b = 12,
+		c = 13,
+		d = 14,
+		f = 15,
+	};
+
+	if grade == "Grade_Tier01" then
+		return gradeArray["sss"];
+	elseif grade == "Grade_Tier02" then
+		return gradeArray["ss"];
+	elseif grade == "Grade_Tier03" then
+		return gradeArray["s"];
+	elseif grade == "Grade_Tier04" then
+		return gradeArray["a"];
+	elseif grade == "Grade_Tier05" then
+		return gradeArray["b"];
+	elseif grade == "Grade_Tier06" then
+		return gradeArray["c"];
+	elseif grade == "Grade_Tier07" then
+		return gradeArray["d"];
+	elseif grade == "Grade_Tier08" then
+		return gradeArray["f"];
+	end;
+end;
+
+function GetBannerFromSong(song)		
+	local dataBannerSong = {generic=0,bpath=""};
+	if (song ~= nil) then
+		local sbackground = song:GetBannerPath();
+		--local sbackground = song:GetBackgroundPath();
+		if (sbackground ~= nil) then
+			if FILEMAN:DoesFileExist( sbackground ) then
+				--self:LoadFromCachedBanner( sbackground );
+				dataBannerSong["generic"]=0;
+				dataBannerSong["bpath"]=sbackground;
+				return dataBannerSong;
+			else
+				dataBannerSong["generic"]=1;
+				dataBannerSong["bpath"]=PREFSMAN:GetPreference("GenericPreview") and THEME:GetPathG("", "GenericPreview") or THEME:GetPathG("", "Common nopreview");
+				return dataBannerSong;					
+			end;
+		else
+				dataBannerSong["generic"]=1;
+				dataBannerSong["bpath"]=PREFSMAN:GetPreference("GenericPreview") and THEME:GetPathG("", "GenericPreview") or THEME:GetPathG("", "Common nopreview");
+				return dataBannerSong;					
+		end;	
+	end;	
+
+    if not song then
+		dataBannerSong["generic"]=1;
+		dataBannerSong["bpath"]=PREFSMAN:GetPreference("GenericPreview") and THEME:GetPathG("", "GenericPreview") or THEME:GetPathG("", "Common nopreview");
+		return dataBannerSong;					
+    end;
+end;
 
 function getColorByStepType(stepType,numPlayers)
 	if numPlayers > 1 then
@@ -34,6 +99,99 @@ function getColorByStepType(stepType,numPlayers)
 	end;
 end;
 
+--This functions will return the level of the chart
+--chart: songchart, tryDisplayMeter: if this is true, we will check if there is data on the
+--#DISPLAYMETER tag, this is a string try to mind that, meanwhile GetMeter is an int.
+--if there is no data, getMeter() will be returned.
+function DisplayLV_New(chart)
+
+	if chart == nil then
+		return 0;
+	end;
+
+	local displayMeter = chart:GetDisplayMeter();
+	if displayMeter == nil or displayMeter == "" then
+		--same as always
+		local chartLv = chart:GetMeter();
+
+		if chartLv == 51 then
+			return "!!";
+		end;
+
+		return chartLv >= 35 and "??" or string.format("%02i",chartLv);
+	else
+		return displayMeter;
+	end;
+
+
+end;
+
+--*******MOD FOLDER********--
+local modsFolderGame = "/Mods";
+--*************************--
+
+local pathModList = {
+	commandwindow = modsFolderGame.."/CommandWindow/",
+	difficultyList = modsFolderGame.."/DifficultyList/",
+	frameSkin = modsFolderGame.."/FrameSkins/",
+	judgmentSkin = modsFolderGame.."/JudgmentSkins/",
+}
+
+function removeExternalInternalTagPlugin(name)
+	local procName = string.gsub(name, "e_", "");
+	local procName = string.gsub(procName, "i_", "");
+	return procName;
+end;
+
+-- Command window Mod
+function getCommandWindowModPath()
+	return pathModList["commandwindow"];
+end;
+
+function getCommandWindowModList()	
+    local commandWindowModPath = getCommandWindowModPath();
+    local entriesMods = FILEMAN:GetDirListing(commandWindowModPath, true, false);
+    local folders = {};
+    
+    table.insert(folders,"default");
+
+    for _, entry in ipairs(entriesMods) do
+        table.insert(folders,entry);
+    end;
+    return folders;
+end;
+
+function getPathCommandWindowModSelected(player)
+	local name = getCustomOptionValuePlayer(player,"commandWindowMod");
+	if name =="default" then
+		return "";
+	end;
+	return getCommandWindowModPath()..name.."/";
+end;
+
+function getDataCommandWindowMod(name)
+	local basePath = getCommandWindowModPath()..name.."/";
+	local data = {
+		lua = basePath.."default.lua",
+		preview = basePath.."preview.png",
+		basePath = basePath,
+		name = name
+	}
+	return data;
+end;
+
+--
+
+function getDifficultyListModPath()
+	return modsFolderGame.."/DifficultyList/";
+end;
+
+function getPathDifficultyListPlugins()
+    local themeName = THEME:GetCurThemeName();
+    local directory = "/Themes/" .. themeName .. "/Graphics/ScreenSelectMusic/DifficultyList/";
+    return directory;
+end;
+
 function getDificultyListPlugins()
 	local lista = {};
     local themeName = THEME:GetCurThemeName();
@@ -45,13 +203,54 @@ function getDificultyListPlugins()
         table.insert(folders, entry);
     end;
 
+    --here we search for the external plugin list.
+    local frameSkinExternalPath = getDifficultyListModPath();
+    local entriesMods = FILEMAN:GetDirListing(frameSkinExternalPath, true, false);
+    for _, entry in ipairs(entriesMods) do
+        table.insert(folders, "e_"..entry);
+    end;
+
     return folders;
 end;
 
-function getPathDifficultyListPlugins()
-    local themeName = THEME:GetCurThemeName();
-    local directory = "/Themes/" .. themeName .. "/Graphics/ScreenSelectMusic/DifficultyList/";
-    return directory;
+function getDificultyListFullPath(name)
+	local isExternal = string.find(name, "e_");
+	local fullPath = "";	
+	if isExternal then
+		local procName = string.gsub(name, "e_", "");
+		fullPath = getDifficultyListModPath()..procName.."/";
+	else
+		local directoryBase = "/Themes/" .. THEME:GetCurThemeName() .. "/BGAnimations/ScreenSelectMusicLua/Interface_Full_DifficultyList/";
+		fullPath = directoryBase..name.."/";
+	end;
+
+	return {path=fullPath,isExternal=isExternal};
+end;
+
+function getDificultyListFullPathByPlayer(player)
+	local name = getCustomOptionValuePlayer(player,"difficultyListMode");
+	local isExternal = string.find(name, "e_");
+	local procName="";
+	local fullPath = "";	
+	if isExternal then
+		procName = string.gsub(name, "e_", "");
+		fullPath = getDifficultyListModPath()..procName.."/";
+	else
+		procName = name;
+		local directoryBase = "/Themes/" .. THEME:GetCurThemeName() .. "/BGAnimations/ScreenSelectMusicLua/Interface_Full_DifficultyList/";
+		fullPath = directoryBase..name.."/";
+	end;
+	return {path=fullPath,isExternal=isExternal,name=procName};
+end;
+
+--this shit is only for the external xD 
+--they need the path for easy access lol
+--this is just crap code but im to tired lol
+function setDifficultyListPathSelected(path)
+	GAMESTATE:Env()["difficultyListSelectedPath"] = path;
+end;
+function getDifficultyListPathSelected()
+	return GAMESTATE:Env()["difficultyListSelectedPath"];
 end;
 
 function getPathEvaluationSkinTheme()
@@ -109,40 +308,158 @@ function counterformat(n)			-- administra numeros y los formatea: < 1000 --> 001
 return 0;
 end;
 
+function getPerformanceModeType()
+		if GAMESTATE:IsHumanPlayer(PLAYER_1) and GAMESTATE:IsHumanPlayer(PLAYER_2) then
+			local perfp1 = 0;
+			local perfp2 = 0;
+
+			if PROFILEMAN:IsPersistentProfile(PLAYER_1) then
+				perfp1 = getCustomOptionValuePlayer(PLAYER_1,"performance_mode_type");
+			end;
+
+			if PROFILEMAN:IsPersistentProfile(PLAYER_2) then
+				perfp2 = getCustomOptionValuePlayer(PLAYER_2,"performance_mode_type");
+			end;
+			
+			if perfp1 == nil or perfp1 > 3 then
+				perfp1 = 0;				
+			end;
+
+			if perfp2 == nil or perfp2 > 3 then
+				perfp2 = 0;
+			end;
+
+			if perfp1 == perfp2 then
+				return perfp1;
+
+			end;
+
+			if perfp1 > perfp2 then
+				return perfp1;
+			end;
+
+			if perfp2 > perfp1 then
+				return perfp2;
+			end;
+
+		else
+			if PROFILEMAN:IsPersistentProfile(GAMESTATE:GetMasterPlayerNumber()) then
+				performanceTypeSelected = getCustomOptionValuePlayer(GAMESTATE:GetMasterPlayerNumber(),"performance_mode_type");
+				if performanceTypeSelected == nil or performanceTypeSelected > 3 then
+					performanceTypeSelected = 0;
+				end;
+				return performanceTypeSelected;
+			else
+				return 0;
+			end;
+
+		end;
+
+		return 0;
+end;
+
+function changePerformanceModeType()
+	if GAMESTATE:IsHumanPlayer(PLAYER_1) and GAMESTATE:IsHumanPlayer(PLAYER_2) then
+		local performanceSelected = 0;
+		local perfp1 = 0;
+		local perfp2 = 0;
+
+		if PROFILEMAN:IsPersistentProfile(PLAYER_1) then
+			perfp1 = getCustomOptionValuePlayer(PLAYER_1,"performance_mode_type");
+		end;
+
+		if PROFILEMAN:IsPersistentProfile(PLAYER_2) then
+			perfp2 = getCustomOptionValuePlayer(PLAYER_2,"performance_mode_type");
+		end;
+
+		if perfp1 == nil or perfp1 > 3 then
+			perfp1 = 0;				
+		end;
+
+		if perfp2 == nil or perfp2 > 3 then
+			perfp2 = 0;
+		end;
+
+		if perfp1 == perfp2 then
+			performanceSelected = perfp1;
+
+		end;
+
+		if perfp1 > perfp2 then
+			performanceSelected = perfp1;
+		end;
+
+		if perfp2 > perfp1 then
+			
+			performanceSelected = perfp2;
+		end;
+
+		performanceSelected = performanceSelected + 1;
+		if performanceSelected > 3 then
+			performanceSelected = 0;
+		end;
+
+		if PROFILEMAN:IsPersistentProfile(PLAYER_1) then
+			setCustomOptionValuePlayer(PLAYER_1,"performance_mode_type",performanceSelected);
+		end;
+
+		if PROFILEMAN:IsPersistentProfile(PLAYER_2) then
+			setCustomOptionValuePlayer(PLAYER_2,"performance_mode_type",performanceSelected);
+		end;
+
+	else
+		local performanceTypeSelected = 0;
+		if PROFILEMAN:IsPersistentProfile(GAMESTATE:GetMasterPlayerNumber()) then
+			performanceTypeSelected = getCustomOptionValuePlayer(GAMESTATE:GetMasterPlayerNumber(),"performance_mode_type");
+		end;
+
+		if performanceTypeSelected == nil or performanceTypeSelected > 3 then
+			performanceTypeSelected = 0;
+		end;
+
+		performanceTypeSelected = performanceTypeSelected + 1;
+		if performanceTypeSelected > 3 then
+			performanceTypeSelected = 0;
+		end;
+
+		setCustomOptionValuePlayer(GAMESTATE:GetMasterPlayerNumber(),"performance_mode_type",performanceTypeSelected);
+	end;
+end;
+
 --***** MISSION AND OTHER THINGS FROM PIU ORIG - OBJ FILES *****--
 function checkForObjFilesPiuContent()
-	local checkPass = 3;
 	local actualCheck = 0;
 
 	local fileLua = FindFileWithPatternOnDirectory("/GameData/","INDT.obj");
-	Trace(":::FILE LUA:::-> "..fileLua);
 	if fileLua ~= "-" then
 		actualCheck = actualCheck + 1;
 	end;
 
 	fileLua = FindFileWithPatternOnDirectory("/GameData/","WMDT.obj");
-	Trace(":::FILE LUA:::-> "..fileLua);
 	if fileLua ~= "-" then
 		actualCheck = actualCheck + 1;
 	end;
 
 	fileLua = FindFileWithPatternOnDirectory("/GameData/","WMSF.obj");
-	Trace(":::FILE LUA:::-> "..fileLua);
 	if fileLua ~= "-" then
 		actualCheck = actualCheck + 1;
 	end;
 
-	if checkPass == actualCheck then
+	if actualCheck > 1 then
 		return true;
 	else
 		return false;
 	end;
-
 end;
 
 --******** mod info ********--
 function getModInfo(pathFolderMod)
 	local modInfo = {};
+
+	if pathFolderMod == nil or #pathFolderMod == 0 then
+		return nil;
+	end;
+
 	if FILEMAN:DoesFileExist(pathFolderMod.."mod_info.lua") then
 		local modInfoFunction = LoadActor(pathFolderMod.."mod_info.lua");
 		modInfo = modInfoFunction();
@@ -173,13 +490,562 @@ function getModInfo(pathFolderMod)
 	end;
 end;
 
+--****** ProfileSkins******---
+local profileSkinExternalPath = modsFolderGame.."/ProfileSkins/";
+local defaultProfileSkin = "default";
+function getProfileSkinExternalPath()
+	return profileSkinExternalPath;
+end;
+
+function getDefaultProfileSkin()
+	return defaultProfileSkin;
+end;
+
+function getProfileSkinsInstalled()
+    local directoryExternal = getProfileSkinExternalPath();
+    local entriesExternal = FILEMAN:GetDirListing(directoryExternal, true, false);
+    local folders = {};
+    table.insert(folders, "default");
+    for _, entry in ipairs(entriesExternal) do
+        table.insert(folders, entry);
+    end;
+    return folders;
+end;
+
+function getProfileSkinPlayer(player)
+	local skinData = {
+		isDefault = true,
+		luaPath = "",
+		basePathSkin = ""
+	};
+
+	local skinSelected=getCustomOptionValuePlayer(player,"profileSkin");
+	if skinSelected == nil or skinSelected == "" then
+		return skinData;
+	end;
+
+	if skinSelected == "default" then
+		return skinData;
+	end;
+
+	if FILEMAN:DoesFileExist(getProfileSkinExternalPath()..skinSelected.."/default.lua") then
+		skinData["isDefault"] = false;
+		skinData["luaPath"] = getProfileSkinExternalPath()..skinSelected.."/default.lua";
+		skinData["basePathSkin"] = getProfileSkinExternalPath()..skinSelected.."/";
+		return skinData;
+	else
+		return skinData;
+	end;
+end;
+
+function getDataFromProfileSkin(skinSelected)
+
+	local skinData = {
+		isDefault = true,
+		luaPath = "",
+		basePathSkin = "",
+		hasPreview = false,
+		previewPath = "",
+		hasModInfo = false,
+		modInfoPath =""
+	};
+
+	if skinSelected == "default" then
+		return skinData;
+	end;
+
+	if FILEMAN:DoesFileExist(getProfileSkinExternalPath()..skinSelected.."/default.lua") then
+		skinData["isDefault"] = false;
+		skinData["luaPath"] = getProfileSkinExternalPath()..skinSelected.."/default.lua";
+		skinData["basePathSkin"] = getProfileSkinExternalPath()..skinSelected.."/";
+
+		if FILEMAN:DoesFileExist(getProfileSkinExternalPath()..skinSelected.."/preview.png") then
+			skinData["hasPreview"] = true;
+			skinData["previewPath"] = getProfileSkinExternalPath()..skinSelected.."/preview.png";
+		end;
+
+		if FILEMAN:DoesFileExist(getProfileSkinExternalPath()..skinSelected.."/mod_info.lua") then
+			skinData["hasModInfo"] = true;
+			skinData["modInfoPath"] = getProfileSkinExternalPath()..skinSelected.."/mod_info.lua";
+		end;
+		return skinData;
+	else
+		return skinData;
+	end;
+end;
+
+--****** Profile Titles *****--
+local profileTitlesExternalPath = modsFolderGame.."/ProfileTitles/";
+
+function getProfileTitlesExternalPath()
+	return profileTitlesExternalPath;
+end;
+
+function getProfileTitlesModInstalled()
+	local folders = {};
+	local foldersReorder = {};
+    local directoryExternal = getProfileTitlesExternalPath();
+    local entriesExternal = FILEMAN:GetDirListing(directoryExternal, true, false);
+
+    for _, entry in ipairs(entriesExternal) do       
+        if entry == "Xsanity" or entry == "xsanity" or entry == "XSanity" then
+        	table.insert(foldersReorder,entry);
+        else
+        	table.insert(folders,entry);
+        end;
+    end;
+
+    for i=1,#folders do
+    	table.insert(foldersReorder,folders[i]);
+    end;
+
+    return foldersReorder;
+end;
+
+--here we return every mod with titles because we will need this for the profile editor
+function getAllTitlesRegistered(player)
+	local arrayTitlesRegistered = {};
+	--here we will create all the list available
+	local titlesInstalled = getProfileTitlesModInstalled();
+
+	--check if we have mods installed
+	if #titlesInstalled == 0 then
+		return arrayTitlesRegistered;
+	end;
+
+	--there are mods, we get the list
+	for i=1,#titlesInstalled do
+		if FILEMAN:DoesFileExist(getProfileTitlesExternalPath()..titlesInstalled[i].."/default.lua") then
+			local pathMod = getProfileTitlesExternalPath()..titlesInstalled[i].."/";
+			local modTitles = dofile(getProfileTitlesExternalPath()..titlesInstalled[i].."/default.lua");
+			local titlesData = modTitles(player,0);
+
+			--a little extraction of data here.
+			local unlocked = 0;
+			local total = #titlesData;
+
+			for x=1,#titlesData do
+
+				if titlesData[x]["usable"] then
+					unlocked = unlocked + 1;
+				end;
+				--we create the img path correctly here
+				if titlesData[x]["img"] ~= nil and #titlesData[x]["img"] > 0 then
+					local imgData = pathMod..titlesData[x]["img"];
+					--check if exists.
+					if FILEMAN:DoesFileExist(imgData) then
+						titlesData[x]["img"] = imgData;
+					else
+						titlesData[x]["img"] = "";
+					end;
+				end;
+				if titlesData[x]["frame_img"] ~= nil and #titlesData[x]["frame_img"] > 0 then
+					local imgDataFrame = pathMod..titlesData[x]["frame_img"];
+					if FILEMAN:DoesFileExist(imgDataFrame) then
+						titlesData[x]["frame_img"] = imgDataFrame;
+					else
+						titlesData[x]["frame_img"] = "";
+					end;
+				end;
+
+
+			end;
+
+			table.insert(arrayTitlesRegistered,{mod=titlesInstalled[i],data=titlesData,total=total,unlocked=unlocked});
+		end;
+	end;
+
+	return arrayTitlesRegistered;
+end;
+
+--nil if no exists.
+function getTitleFromPlayer(player)
+
+	local profileTitleMod = getCustomOptionValuePlayer(player,"profileTitleMod");
+	local profileTitleId = getCustomOptionValuePlayer(player,"profileTitleModId");
+
+	-- check if we have a profileTitleMod.
+	if profileTitleMod == nil or #profileTitleMod == 0 then
+		return nil;
+	end;
+	
+	if profileTitleMod == "none" then
+		return nil;
+	end;
+
+	-- do exist, now we check if the ID exists, if not. we return null.
+	if profileTitleId == nil or profileTitleId == 0 then
+		return nil;
+	end;
+
+	local titlesInstalled = getProfileTitlesModInstalled();
+
+	--check if we have mods installed
+	if #titlesInstalled == 0 then
+		return nil;
+	end;
+
+	--search for the mod, if not, return null.
+	local modReady = false;
+
+	for i=1,#titlesInstalled do
+		if titlesInstalled[i] == profileTitleMod then
+			modReady = true;
+			break;
+		end;
+	end;
+
+	--we don't have the title installed. please select one installed :P
+	if modReady == false then
+		return nil;
+	end;
+
+
+	if FILEMAN:DoesFileExist(getProfileTitlesExternalPath()..profileTitleMod.."/default.lua") then
+		local imgTitle = "";
+		local frameTitle = "";
+		local nomTitle = "";
+
+		local modTitles = dofile(getProfileTitlesExternalPath()..profileTitleMod.."/default.lua");
+		local titlesData = modTitles(player,profileTitleId);
+
+		if titlesData ~= nil and titlesData.title ~= nil then
+			if titlesData.img ~= nil and #titlesData.img > 0 then
+				imgTitle = getProfileTitlesExternalPath()..profileTitleMod.."/"..titlesData.img;
+			end;
+
+			if titlesData.frame_img ~= nil and #titlesData.frame_img > 0 then
+				frameTitle = getProfileTitlesExternalPath()..profileTitleMod.."/"..titlesData.frame_img;
+			end;
+
+			if #titlesData.title > 0 then
+				nomTitle = titlesData.title;
+			end;
+		else
+			return nil;
+		end;
+
+		return {title=nomTitle,img=imgTitle,img_frame=frameTitle};
+	else
+		return nil;
+	end;
+
+end;
+
+
+--****** FrameSkins *****--
+local defaultFrameSkin = "i_simple";
+local frameSkinExternalPath = modsFolderGame.."/FrameSkins/";
+
+function GetFrameSkinExternalPath()
+	return frameSkinExternalPath;
+end;
+function getDefaultFrameSkin()
+	return defaultFrameSkin;
+end;
+
+function GetFrameSkinsInstalled()
+	local folders = {};
+    local themeName = THEME:GetCurThemeName();
+    local directory = "/Themes/" .. themeName .. "/Graphics/ScreenSelectMusic/frames/";
+    local entries = FILEMAN:GetDirListing(directory, true, false);
+
+    for _, entry in ipairs(entries) do
+        table.insert(folders, "i_"..entry);
+    end;
+
+    local directoryExternal = GetFrameSkinExternalPath();
+    local entriesExternal = FILEMAN:GetDirListing(directoryExternal, true, false);
+
+    for _, entry in ipairs(entriesExternal) do
+        table.insert(folders, "e_"..entry);
+    end;
+
+    return folders;
+end;
+
+function getFrameSkinForPlayers(type,screenName)
+
+	local localframeSkinSelected = getDefaultFrameSkin();
+	if GAMESTATE:GetNumSidesJoined() == 2 then
+
+		--if one player is a guest, we will treat this like if there is 1 player
+		local p1IsProfile=false;
+		local p2IsProfile=false;
+		if PROFILEMAN:IsPersistentProfile(PLAYER_1) then
+			p1IsProfile = true;
+		end;
+		if PROFILEMAN:IsPersistentProfile(PLAYER_2) then
+			p2IsProfile = true;
+		end;
+
+		-- get data
+		local p1Selected=getCustomOptionValuePlayer(PLAYER_1,"frameSkin");
+		local p2Selected=getCustomOptionValuePlayer(PLAYER_2,"frameSkin");
+
+		if p1Selected == nil then
+			p1Selected = localframeSkinSelected;
+		end;
+		if p2Selected == nil then
+			p2Selected = localframeSkinSelected;
+		end;
+
+		if p1IsProfile and p2IsProfile == false then
+			localframeSkinSelected = p1Selected;
+		elseif p2IsProfile and p1IsProfile == false then
+			localframeSkinSelected = p2Selected;
+		elseif p2IsProfile and p1IsProfile then
+			--if both are profiles and have the same skin.
+			if p1Selected == p2Selected then
+				localframeSkinSelected = p1Selected;
+			end;			
+		end;
+
+	else
+		if GAMESTATE:IsHumanPlayer(PLAYER_1) then
+			local p1Selected=getCustomOptionValuePlayer(PLAYER_1,"frameSkin");
+			if p1Selected == nil or p1Selected == false then
+				p1Selected = localframeSkinSelected;
+			end;
+
+			localframeSkinSelected = p1Selected;
+		end;
+		if GAMESTATE:IsHumanPlayer(PLAYER_2) then
+			local p2Selected=getCustomOptionValuePlayer(PLAYER_2,"frameSkin");
+			if p2Selected == nil or p2Selected == false then
+				p2Selected = localframeSkinSelected;
+			end;
+
+			localframeSkinSelected = p2Selected;
+		end;
+	end;
+
+	if localframeSkinSelected == getDefaultFrameSkin() then
+		return {isDefault = true,lua = "--", path="--"};
+	end;
+
+
+	if screenName == "ScreenSelectMusic" then
+		local luaPathRequired = getFrameSkinLuaData(type,localframeSkinSelected);
+		return {isDefault = luaPathRequired["defaultSkin"],lua = luaPathRequired["lua"],path=luaPathRequired["path"]};	
+	end;
+
+	if screenName == "ScreenStageBreak" then
+		local luaPathRequired = getFrameSkinStageBreakScreen(type,localframeSkinSelected);
+		return {isDefault = luaPathRequired["defaultSkin"],lua = luaPathRequired["lua"],path=luaPathRequired["path"]};
+	end;
+
+	if screenName == "ScreenGamePlay" then
+		local luaPathRequired = getFrameSkinGamePlayScreen(type,localframeSkinSelected);
+		return {isDefault = luaPathRequired["defaultSkin"],lua = luaPathRequired["lua"],path=luaPathRequired["path"]};
+	end;
+
+	return {isDefault = true,lua = "-",path="-"};
+
+end;
+
+function getFrameSkinLuaData(type,skinName)
+    local themeName = THEME:GetCurThemeName();
+	local internalPath="/Themes/" .. themeName .. "/Graphics/ScreenSelectMusic/frames/";
+	local externalPath = GetFrameSkinExternalPath();
+	local finalPathSkin = "";
+	local luaPathSkin = "";
+	local defaultPathSkin ="";
+	local usingDefaultSkin = false;
+
+	local isExternal = string.find(skinName, "e_");
+	local isInternal = string.find(skinName, "i_");
+
+	-- we generate the default full path.
+		procSkinNameDefault = string.gsub(getDefaultFrameSkin(), "i_", "");
+		defaultPathSkin = internalPath..procSkinNameDefault.."/";
+
+	if isExternal == nil and isInternal == nil then
+		finalPathSkin = defaultPathSkin;
+	else
+		if isExternal ~= nil then
+			procSkinName = string.gsub(skinName, "e_", "");
+			finalPathSkin = externalPath..procSkinName.."/";		
+		end;
+
+		if isInternal ~= nil then
+			procSkinName = string.gsub(skinName, "i_", "");
+			finalPathSkin = internalPath..procSkinName.."/";		
+		end;
+	end;
+
+
+	if type == "overlay" then
+		-- we check if exists, if not we return the default.
+		if FILEMAN:DoesFileExist(finalPathSkin.."overlay.lua") then
+			luaPathSkin = finalPathSkin.."overlay.lua";
+		elseif FILEMAN:DoesFileExist(finalPathSkin.."ScreenSelectMusic/overlay.lua") then
+			luaPathSkin = finalPathSkin.."ScreenSelectMusic/overlay.lua";
+			finalPathSkin = finalPathSkin.."ScreenSelectMusic/";
+		else
+			finalPathSkin = defaultPathSkin;
+			luaPathSkin = finalPathSkin.."overlay.lua";
+			usingDefaultSkin = true;
+		end;
+
+	elseif type =="underlay" then
+		if FILEMAN:DoesFileExist(finalPathSkin.."underlay.lua") then
+			luaPathSkin = finalPathSkin.."underlay.lua";
+		elseif FILEMAN:DoesFileExist(finalPathSkin.."ScreenSelectMusic/underlay.lua") then
+			luaPathSkin = finalPathSkin.."ScreenSelectMusic/underlay.lua";
+			finalPathSkin = finalPathSkin.."ScreenSelectMusic/";
+		else
+			finalPathSkin = defaultPathSkin;
+			luaPathSkin = finalPathSkin.."underlay.lua";
+			usingDefaultSkin = true;
+		end;
+	end;
+
+	return {lua =luaPathSkin , path = finalPathSkin, defaultSkin = usingDefaultSkin};
+
+end;
+
+function getFrameSkinStageBreakScreen(type,skinName)
+    local themeName = THEME:GetCurThemeName();
+	local externalPath = GetFrameSkinExternalPath();
+	local finalPathSkin = "";
+
+	local luaPathSkin = "";
+
+	local isExternal = string.find(skinName, "e_");
+
+	if isExternal ~= nil then
+		procSkinName = string.gsub(skinName, "e_", "");
+		finalPathSkin = externalPath..procSkinName.."/ScreenStageBreak/";
+	else
+		return {lua ="", path = "", defaultSkin=true};
+	end;
+
+	--we check if the folder /ScreenStageBreak and file overlay.lua
+	if type == "overlay" then
+		if FILEMAN:DoesFileExist(finalPathSkin.."overlay.lua") then
+			luaPathSkin = finalPathSkin.."overlay.lua";
+		else
+			return {lua ="", path = "", defaultSkin=true};
+		end;
+	elseif type == "underlay" then
+		if FILEMAN:DoesFileExist(finalPathSkin.."underlay.lua") then
+			luaPathSkin = finalPathSkin.."underlay.lua";
+		else
+			return {lua ="", path = "", defaultSkin=true};
+		end;
+	else
+		return {lua ="", path = "", defaultSkin=true};
+	end;
+
+	return {lua=luaPathSkin, path = finalPathSkin, defaultSkin=false};
+end;
+
+function getFrameSkinGamePlayScreen(type,skinName)
+    local themeName = THEME:GetCurThemeName();
+	local externalPath = GetFrameSkinExternalPath();
+	local finalPathSkin = "";
+
+	local luaPathSkin = "";
+
+	local isExternal = string.find(skinName, "e_");
+
+	if isExternal ~= nil then
+		procSkinName = string.gsub(skinName, "e_", "");
+		finalPathSkin = externalPath..procSkinName.."/ScreenGamePlay/";
+	else
+		return {lua ="", path = "", defaultSkin=true};
+	end;
+
+	--we check if the folder /ScreenGamePlay and file overlay.lua
+	if type == "overlay" then
+		if FILEMAN:DoesFileExist(finalPathSkin.."overlay.lua") then
+			luaPathSkin = finalPathSkin.."overlay.lua";
+		else
+			return {lua ="", path = "", defaultSkin=true};
+		end;
+	elseif type == "underlay" then
+		if FILEMAN:DoesFileExist(finalPathSkin.."underlay.lua") then
+			luaPathSkin = finalPathSkin.."underlay.lua";
+		else
+			return {lua ="", path = "", defaultSkin=true};
+		end;
+	else
+		return {lua ="", path = "", defaultSkin=true};
+	end;
+
+	return {lua=luaPathSkin, path = finalPathSkin, defaultSkin=false};
+end;
+
+
+function getPreviewImageFrameSkin(skinName)
+    local themeName = THEME:GetCurThemeName();
+	local internalPath="/Themes/" .. themeName .. "/Graphics/ScreenSelectMusic/frames/";
+	local externalPath = GetFrameSkinExternalPath();
+	local skinBasePath = "";
+	local returnPath = "";
+	local procSkinName ="";
+
+	local isExternal = string.find(skinName, "e_");
+	local isInternal = string.find(skinName, "i_");
+
+	if isExternal == nil and isInternal == nil then 
+		 returnPath = internalPath.."preview.png";
+	else
+		if isExternal ~= nil then
+			procSkinName = string.gsub(skinName, "e_", "");
+			finalPathSkin = externalPath..procSkinName.."/preview.png";	
+			if FILEMAN:DoesFileExist(finalPathSkin) then
+				returnPath = finalPathSkin;
+				skinBasePath = externalPath..procSkinName.."/";
+			else
+				returnPath = internalPath.."preview.png";
+			end;
+		end;
+
+		if isInternal ~= nil then
+			procSkinName = string.gsub(skinName, "i_", "");
+			finalPathSkin = internalPath..procSkinName.."/preview.png";
+			if FILEMAN:DoesFileExist(finalPathSkin) then
+				returnPath = finalPathSkin;
+				skinBasePath = internalPath..procSkinName.."/";
+			else
+				returnPath = internalPath.."preview.png";
+			end;
+		end;		
+	end;
+
+	return {name=procSkinName,preview=returnPath,path=skinBasePath};
+
+end;
+
+function checkTypeStepData(pndata)
+	local cur_song = GAMESTATE:GetCurrentSong();
+	local cur_steps = GAMESTATE:GetCurrentSteps(pndata);
+
+	style = cur_steps:GetStepsType();
+	if style=='StepsType_Pump_Single' --[[and string.find( description,"SP" )]] then 
+		return 1;
+	elseif style=='StepsType_Pump_Single' then 
+		return 1;
+	elseif style=='StepsType_Pump_Couple' then 
+		return 2;
+	elseif ( style=='StepsType_Pump_Double' --[[ and string.find( description,"DP" ) ]] ) or style=='StepsType_Pump_Routine'  then 
+		return 2;
+	elseif style=='StepsType_Pump_Double' or style=='StepsType_Pump_Halfdouble' or style == "StepsType_Pump_Double_P" then 
+		return 2;
+	end;
+
+	return 0;
+end;
+
 --****** Announcer ******--
 function getExternalAnnouncerPath()
 	--we check if there is a folder to select from the Mod/Announcers
 	local announcerSelected = "piu";
 
 	--we check if the folder exist
-	local announcerModsPath = "/Mods/announcers/"..announcerSelected;
+	local announcerModsPath = modsFolderGame.."/announcers/"..announcerSelected;
 	if FolderExists(announcerModsPath) then
 		return announcerModsPath.."/"
 	else		
@@ -202,14 +1068,224 @@ function checkIfAnnouncerSoundExists(path,sound)
 	return "";
 end;
 
+--****** Companions *****---
+local CompanionExternalPath = modsFolderGame.."/Companions/";
+function GetCompanionExternalPath()
+	return CompanionExternalPath;
+end;
+
+function getCompanionsInstalled()
+	local folders = {};
+    local entriesExternal = FILEMAN:GetDirListing(CompanionExternalPath, true, false);
+
+    for _, entry in ipairs(entriesExternal) do
+    	--here we only add those companions with the companion.lua.
+    	if FILEMAN:DoesFileExist(CompanionExternalPath..entry.."/companion.lua") then
+        	table.insert(folders, entry);
+        end;
+    end;
+
+    local numMinItems = 7;
+    if #folders == 2 or #folders == 4 then
+    	numMinItems = 8;
+    elseif #folders == 3 then
+    	numMinItems = 9;
+    elseif #folders == 5 then
+    	numMinItems = 10;
+    elseif #folders == 6 then
+    	numMinItems = 12;
+    end;
+
+    --here i can fix the thing that if there is less than 5 items
+  	local finish=false;
+  	if #folders > 0 and #folders < numMinItems then
+
+	    while #folders < numMinItems do
+
+	    	for i=1, #folders do
+	    		if finish == false then
+		    		table.insert(folders,folders[i]);
+		    		if #folders >= numMinItems then
+		    			finish = true;
+		    		end;
+	    		end;
+	    	end;    	
+	    end;
+
+	end;
+
+    return folders;
+end;
+
+function getNumberOfCompanionInstalled()
+	local companionsInstalled = getCompanionsInstalled();
+	return #companionsInstalled;
+end;
+
+function GetPNGICompanion(skinName)
+	local pathIcon = "";
+	pathIcon = CompanionExternalPath..skinName.."/Icon.";	
+	if FILEMAN:DoesFileExist(pathIcon.."png") then
+		return pathIcon.."*";
+	else
+		return THEME:GetPathG("","companion_default_icon");
+	end;		
+end;
+
+function getCompanionIconData(player)
+		local companionData = getCustomOptionValuePlayer(player,"companion");
+		if companionData == nil or companionData == false or companionData == "none" or companionData == "" then
+			return THEME:GetPathG("","companion_none_icon");
+		end;
+
+		local companionPath = GetCompanionExternalPath()..companionData.."/";
+
+		--we check if the icon exist.
+		if FILEMAN:DoesFileExist(companionPath.."icon.png") then
+			return companionPath.."icon.png";
+		elseif FILEMAN:DoesFileExist(companionPath.."Icon.png") then
+			return companionPath.."Icon.png";
+		else
+			return THEME:GetPathG("","companion_default_icon");
+		end;
+end;
+
+function getCompanionPreviewData(player)
+		local companionData = getCustomOptionValuePlayer(player,"companion");
+		if companionData == nil or companionData == false or companionData == "none" or companionData == "" then
+			return THEME:GetPathG("","_blank");
+		end;
+
+		local companionPath = GetCompanionExternalPath()..companionData.."/";
+
+		--we check if the icon exist.
+		if FILEMAN:DoesFileExist(companionPath.."preview.png") then
+			return companionPath.."preview.png";
+		elseif FILEMAN:DoesFileExist(companionPath.."Preview.png") then
+			return companionPath.."Preview.png";
+		else
+			return THEME:GetPathG("","_blank");
+		end;
+end;
+
+function getCompanionPreviewDataByName(companionData)
+		if companionData == nil or companionData == false or companionData == "none" or companionData == "" then
+			return THEME:GetPathG("","_blank");
+		end;
+
+		local companionPath = GetCompanionExternalPath()..companionData.."/";
+
+		--we check if the icon exist.
+		if FILEMAN:DoesFileExist(companionPath.."preview.png") then
+			return companionPath.."preview.png";
+		elseif FILEMAN:DoesFileExist(companionPath.."Preview.png") then
+			return companionPath.."Preview.png";
+		else
+			return THEME:GetPathG("","_blank");
+		end;
+end;
+
+
+function checkIfCompanionInstalled()
+	--if no companion is installed, we reset the state of that entry to the players.
+	local numInstalled = getNumberOfCompanionInstalled();
+	if numInstalled == 0 then
+
+		if GAMESTATE:IsHumanPlayer(PLAYER_1) then
+			if PROFILEMAN:IsPersistentProfile(PLAYER_1) then
+				local companionSelected = getCustomOptionValuePlayer(PLAYER_1,"companion");
+
+				if companionSelected == nil or companionSelected ~= "none" then
+					setCustomOptionValuePlayer(PLAYER_1,"companion","none");	
+				end;
+			end;
+		end;
+
+		if GAMESTATE:IsHumanPlayer(PLAYER_2) then
+			if PROFILEMAN:IsPersistentProfile(PLAYER_2) then
+
+				local companionSelected = getCustomOptionValuePlayer(PLAYER_2,"companion");
+				if companionSelected == nil or companionSelected ~= "none" then
+					setCustomOptionValuePlayer(PLAYER_2,"companion","none");	
+				end;
+
+			end;
+		end;	
+	else
+		local companionsInstalled = getCompanionsInstalled();
+		if GAMESTATE:IsHumanPlayer(PLAYER_1) then
+			local companionSelected = getCustomOptionValuePlayer(PLAYER_1,"companion");
+			local isInstalled=false;
+			for i=1,#companionsInstalled do
+				if companionsInstalled[i] == companionSelected then
+					isInstalled = true;
+					break;
+				end;
+			end;
+
+			if isInstalled == false then
+				setCustomOptionValuePlayer(PLAYER_1,"companion","none");
+			end;
+		end;
+
+		if GAMESTATE:IsHumanPlayer(PLAYER_2) then
+			local companionSelected = getCustomOptionValuePlayer(PLAYER_2,"companion");
+			local isInstalled=false;
+			for i=1,#companionsInstalled do
+				if companionsInstalled[i] == companionSelected then
+					isInstalled = true;
+					break;
+				end;
+			end;
+
+			if isInstalled == false then
+				setCustomOptionValuePlayer(PLAYER_2,"companion","none");
+			end;
+		end;
+
+	end;
+end;
+
+function checkIfCompanionInstalledByPlayer(player)
+	--if no companion is installed, we reset the state of that entry to the players.
+	local numInstalled = getNumberOfCompanionInstalled();
+	if numInstalled == 0 then
+			local companionSelected = getCustomOptionValuePlayer(player,"companion");
+			if companionSelected == nil or companionSelected ~= "none" then
+				setCustomOptionValuePlayer(player,"companion","none");	
+			end;	
+	else
+		local companionsInstalled = getCompanionsInstalled();
+		
+		local companionSelected = getCustomOptionValuePlayer(player,"companion");
+		if companionSelected == nil then
+			setCustomOptionValuePlayer(player,"companion","none");	
+			return;
+		end;	
+
+		local isInstalled=false;
+		for i=1,#companionsInstalled do
+			if companionsInstalled[i] == companionSelected then
+				isInstalled = true;
+				break;
+			end;
+		end;
+
+		if isInstalled == false then
+			setCustomOptionValuePlayer(player,"companion","none");
+		end;
+	end;
+end;
+
+
 --****** Channel music ******--
-local ChannelMusicExternalPath = "/Mods/ChannelMusic/";
+local ChannelMusicExternalPath = modsFolderGame.."/ChannelMusic/";
 function GetChannelMusicExternalPath()
 	return ChannelMusicExternalPath;
 end;
 
 --****** LIFEBARSKIN *****--
-local lifebarSkinExternal = "/Mods/LifebarSkins/";
+local lifebarSkinExternal = modsFolderGame.."/LifebarSkins/";
 function GetLifebarSkinExternalPath()
 	return lifebarSkinExternal;
 end;
@@ -219,7 +1295,7 @@ local defaultEvaluationSkin = "i_xsanity";
 local gradePassImgName = "pass_res 1x16.png";
 local gradeFailImgName = "fail_pass_res 1x16.png";
 
-local evaluationSkinExternal = "/Mods/EvaluationSkins/";
+local evaluationSkinExternal = modsFolderGame.."/EvaluationSkins/";
 function GetEvaluationSkinExternalPath()
 	return evaluationSkinExternal;
 end;
@@ -242,6 +1318,36 @@ function GetEvaluationSkinInstalled()
     end;
 
     return folders;
+end;
+
+-- return the sprite of the evaluation skin
+function GetGradeSpriteFromEvaluationSkin(failed,player)
+		local dataSkinEvaluation = GetEvaluationSkinDataFromPlayer(player);
+		local defaultData = CheckAndGetLuaEvaluationSkin(defaultEvaluationSkin);
+		local spriteGrade = "";
+		
+		--we get the gradeSprite
+		if failed then
+			spriteGrade = dataSkinEvaluation["path_skin"]..gradeFailImgName;
+			--we check if exists, if not, select the default of the theme.
+			if FILEMAN:DoesFileExist(spriteGrade) then
+				return spriteGrade;
+			else
+				--default
+				return defaultData["path_skin"]..gradeFailImgName;
+			end;
+
+
+		else
+			spriteGrade = dataSkinEvaluation["path_skin"]..gradePassImgName;
+			--we check if exists, if not, select the default of the theme.
+			if FILEMAN:DoesFileExist(spriteGrade) then
+				return spriteGrade;
+			else
+				--default
+				return defaultData["path_skin"]..gradePassImgName;
+			end;
+		end;
 end;
 
 --skinName: skinName to proc, default: skinName default if the skinName fails to exists.
@@ -363,6 +1469,30 @@ end;
 
 
 --** skin lifebar **--
+function isHalfDoubleSkinPositionItemsLua()
+
+	--THEME LIFEBAR
+	--CAMBIAR AL QUE SE QUIERA AGREGANDO LA CARPETA CORRESPONDIENTE CON LOS ARCHIVOS CORRESPONDIENTES
+	local profileLifeBar = getCustomOptionValuePlayer(GAMESTATE:GetMasterPlayerNumber(),"lifebarSkin");
+
+	if profileLifeBar == nil then
+		profileLifeBar = "none";
+	end;
+
+	local themeLifeBar = getPathSkinLifeBar(profileLifeBar);
+	local luaFileSkin = FindFileWithPatternOnDirectory(themeLifeBar.."/","default_half.lua");
+	if luaFileSkin ~= "-" then
+		return true;
+	else
+		--if this skin doesn't have half, select the double file.
+		local luaFileSkin = FindFileWithPatternOnDirectory(themeLifeBar.."/","default_double.lua");
+		if luaFileSkin ~= "-" then
+			return false;
+		else
+			return nil;
+		end;
+	end;
+end;
 
 function getPathSkinLifeBar(skinName)
 	local activeTheme = THEME:GetCurThemeName();
@@ -395,7 +1525,7 @@ function getPathSkinLifeBar(skinName)
 end;
 
 --****** JUDGMENT *****--
-local judgmentSkinExternal = "/Mods/JudgmentSkins/";
+local judgmentSkinExternal = modsFolderGame.."/JudgmentSkins/";
 
 function GetJudgSkinExternalPath()
 	return judgmentSkinExternal;
@@ -551,6 +1681,99 @@ function getSkinJudgmentTemplateNew(type,name,external)
 	end;
 end;
 
+--**********************
+--**** InfoScheme SKINS
+--**********************
+function getInfoSchemeModPath()
+	return modsFolderGame.."/InfoSchemes/";
+end;
+
+function getInfoSchemeModList()	
+    local commandWindowModPath = getInfoSchemeModPath();
+    local entriesMods = FILEMAN:GetDirListing(commandWindowModPath, true, false);
+    local folders = {};
+    
+    table.insert(folders,"default");
+
+    for _, entry in ipairs(entriesMods) do
+        table.insert(folders,entry);
+    end;
+    return folders;
+end;
+
+function getSkinSelectedInfoSchemePath(player)
+	local respuesta={
+		default=false,
+		pathLua="",
+		name=""
+	};
+	--CUSTOM SKINS FOR THIS THING 
+	local infoSchemeName="default";
+
+	local iSchemeSelected = getCustomOptionValuePlayer(player,"infoSchemeSkin");
+	if iSchemeSelected ~= nil and iSchemeSelected ~= "" then
+		infoSchemeName = iSchemeSelected;
+	end;
+
+	if infoSchemeName == "default" then
+		respuesta["default"] = true;
+		respuesta["name"] = "default";
+		return respuesta;
+	end;
+
+	respuesta["pathLua"] = getInfoSchemeModPath()..infoSchemeName.."/";
+	respuesta["name"] = infoSchemeName;
+	
+	return respuesta;
+end;
+
+function getInfoSchemePreviewFromName(name)
+	local respuesta={
+		hasPreview=false,
+		pathPreview="",
+		pathBase=getInfoSchemeModPath()..name.."/"
+	};
+
+	if FILEMAN:DoesFileExist(getInfoSchemeModPath()..name.."/preview.png") then
+		respuesta["hasPreview"] = true;
+		respuesta["pathPreview"] = getInfoSchemeModPath()..name.."/preview.png";
+	end;
+
+	return respuesta;
+end;
+
+function checkLuaSkinSelectedInfoScheme(skinPath,folderName)
+	--default.lua is the entry point of any of this skins.
+	if FILEMAN:DoesFileExist(skinPath..folderName.."/default.lua") then
+		return true;
+	else
+		return false;
+	end;
+end;
+
+function checkPreviewImgSkinSelectedInfoScheme(skinPath,folderName,player)
+	--default.lua is the entry point of any of this skins.
+	local response = {
+		valid=false,
+		path=""
+	};
+
+	local nameImage = "";
+
+	if player == PLAYER_1 then
+		nameImage = "preview_p1.png";
+	else
+		nameImage = "preview_p2.png";
+	end;
+
+	if FILEMAN:DoesFileExist(skinPath..folderName.."/"..nameImage) then		
+		response["valid"]=true;
+		response["path"]=skinPath..folderName.."/"..nameImage;
+		return response;
+	else
+		return response;
+	end;
+end;
 
 
 
@@ -779,61 +2002,7 @@ function TierToState(grade)
 	
 end;
 
-
-function debugearTabla(tbl, indentLevel, visited, asString)	
-    indentLevel = indentLevel or 0
-    visited = visited or {}
-    asString = asString or false
-
-    local indent = string.rep("  ", indentLevel)
-    local result = ""
-
-    Trace("####### DEBUG TABLA #######");
-    if visited[tbl] then
-        local line = indent .. "*circular reference*"
-        if asString then
-            result = result .. line .. "\n"
-        else
-            Trace(line)
-        end
-        return result
-    end
-
-    visited[tbl] = true
-
-    for k, v in pairs(tbl) do
-        local keyStr = tostring(k)
-        local valueType = type(v)
-
-        if valueType == "table" then
-            local line = indent .. keyStr .. " = {"
-            if asString then
-                result = result .. line .. "\n"
-            else
-                Trace(line)
-            end
-
-            result = result .. DumpTable(v, indentLevel + 1, visited, asString)
-
-            local closeLine = indent .. "}"
-            if asString then
-                result = result .. closeLine .. "\n"
-            else
-                Trace(closeLine)
-            end
-        else
-            local line = indent .. keyStr .. " = " .. tostring(v)
-            if asString then
-                result = result .. line .. "\n"
-            else
-                Trace(line)
-            end
-        end
-    end
-	  Trace("####### FIN DEBUG TABLA #######");
-    return result
-end
-
+--[DEBUG] PRINT TABLE
 function printInLogParamsData(title,params)
 	    Trace("=== "..title.." Param debug ===")
 	    if not params then Trace("(nil)"); return end
@@ -870,47 +2039,64 @@ function shortTextHelper(text, maxLength)
     end
 end
 
+function formatSecondsFull(totalSeconds)
+    local h = math.floor(totalSeconds / 3600)
+    local m = math.floor((totalSeconds % 3600) / 60)
+    local s = totalSeconds % 60
+
+    return string.format("%02d:%02d:%02d", h, m, s)
+end
+
 function basicModeLevelStateAndColor(level,stepType)
 
-local listLevelBasic = {
-	["easy"] = 0;
-	["normal"] = 1;
-	["hard"] = 2;
-	["veryhard"] =4;
-	["double"] = 3;
-}
+	local listLevelBasic = {
+		["easy"] = 0;
+		["normal"] = 1;
+		["hard"] = 2;
+		["veryhard"] =4;
+		["double"] = 3;
+	}
 
-local listLevelBasicColor = {
-	["easy"] = "#04bbc2";
-	["normal"] = "#f5b402";
-	["hard"] = "#ff0000";
-	["veryhard"] ="#cb0098";
-	["double"] = "#21a305";
-}
+	local listLevelBasicColor = {
+		["easy"] = "#04bbc2";
+		["normal"] = "#f5b402";
+		["hard"] = "#ff0000";
+		["veryhard"] ="#cb0098";
+		["double"] = "#21a305";
+	}
 
-local resp = {state = 0,color = ""};
+	local resp = {state = 0,color = ""};
 
-if stepType == "StepsType_Pump_Double" then
-	resp["state"] = listLevelBasic["double"];
-	resp["color"] = listLevelBasicColor["double"];
+	if stepType == "StepsType_Pump_Double" then
+		resp["state"] = listLevelBasic["double"];
+		resp["color"] = listLevelBasicColor["double"];
+		return resp;
+	end;
+
+	if level >= 0 and level <= 2 then
+		resp["state"] = listLevelBasic["easy"];
+		resp["color"] = listLevelBasicColor["easy"];
+	elseif level >= 3 and level <= 4 then
+		resp["state"] = listLevelBasic["normal"];
+		resp["color"] = listLevelBasicColor["normal"];
+	elseif level >= 5 and level <=7 then
+		resp["state"] = listLevelBasic["hard"];
+		resp["color"] = listLevelBasicColor["hard"];	
+	elseif level >= 8 then
+		resp["state"] = listLevelBasic["veryhard"];
+		resp["color"] = listLevelBasicColor["veryhard"];
+	end;
+
+
 	return resp;
+
 end;
 
-if level >= 0 and level <= 2 then
-	resp["state"] = listLevelBasic["easy"];
-	resp["color"] = listLevelBasicColor["easy"];
-elseif level >= 3 and level <= 4 then
-	resp["state"] = listLevelBasic["normal"];
-	resp["color"] = listLevelBasicColor["normal"];
-elseif level >= 5 and level <=7 then
-	resp["state"] = listLevelBasic["hard"];
-	resp["color"] = listLevelBasicColor["hard"];	
-elseif level >= 8 then
-	resp["state"] = listLevelBasic["veryhard"];
-	resp["color"] = listLevelBasicColor["veryhard"];
-end;
-
-
-return resp;
-
+--//This BS, for some reaseon i need to reapply the mod if not, it's fucked on the next song if the player doesn't change anything on the CW, weird.
+function reApplyCVOption(player)
+	local STATE = GAMESTATE:GetPlayerState(player);
+	local cvModData = STATE:GetPlayerOptions('ModsLevel_Preferred'):CMod();
+	if cvModData ~= nil then
+		STATE:GetPlayerOptions('ModsLevel_Preferred' ):CMod(cvModData);
+	end;
 end;

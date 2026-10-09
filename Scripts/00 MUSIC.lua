@@ -160,6 +160,98 @@ local sChanDescription = {
 	["EN-COOPPLAY"] = 		"In this channel, you can play song\nthat require co-op of two or more players.";
 	["EN-SURVIVALMODE"] = 	"In this channel, you can play random several songs consecutively";
 	
+
+	-- Korean
+	["KO-G3N3R1C"] =  		"In this channel, there are typical songs of ";	-- TODO: 한국어 번역 입력
+	["KO-LEVEL_01_D"] = 		"난이도 1 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_02_D"] = 		"난이도 2 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_03_D"] = 		"난이도 3 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_04_D"] = 		"난이도 4 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_05_D"] = 		"난이도 5 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_06_D"] = 		"난이도 6 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_07_D"] = 		"난이도 7 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_08_D"] = 		"난이도 8 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_09_D"] = 		"난이도 9 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_10_D"] = 		"난이도 10 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_11_D"] = 		"난이도 11 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_12_D"] = 		"난이도 12 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_13_D"] = 		"난이도 13 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_14_D"] = 		"난이도 14 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_15_D"] = 		"난이도 15 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_16_D"] = 		"난이도 16 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_17_D"] = 		"난이도 17 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_18_D"] = 		"난이도 18 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_19_D"] = 		"난이도 19 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_20_D"] = 		"난이도 20 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_21_D"] = 		"난이도 21 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_22_D"] = 		"난이도 22 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_23_D"] = 		"난이도 23 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_24_D"] = 		"난이도 24 이상 더블 스텝만 모아놓은 채널";
+	["KO-LEVEL_01_S"] = 		"난이도 1 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_02_S"] = 		"난이도 2 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_03_S"] = 		"난이도 3 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_04_S"] = 		"난이도 4 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_05_S"] = 		"난이도 5 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_06_S"] = 		"난이도 6 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_07_S"] = 		"난이도 7 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_08_S"] = 		"난이도 8 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_09_S"] = 		"난이도 9 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_10_S"] = 		"난이도 10 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_11_S"] = 		"난이도 11 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_12_S"] = 		"난이도 12 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_13_S"] = 		"난이도 13 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_14_S"] = 		"난이도 14 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_15_S"] = 		"난이도 15 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_16_S"] = 		"난이도 16 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_17_S"] = 		"난이도 17 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_18_S"] = 		"난이도 18 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_19_S"] = 		"난이도 19 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_20_S"] = 		"난이도 20 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_21_S"] = 		"난이도 21 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_22_S"] = 		"난이도 22 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_23_S"] = 		"난이도 23 싱글 스텝만 모아놓은 채널";
+	["KO-LEVEL_24_S"] = 		"난이도 24 이상 싱글 스텝만 모아놓은 채널";
+	["KO-SHORTCUT"] = 		"1분 내외로 짧게 편집된 곡들을 모아놓은 채널";
+	["KO-FULLSONGS"] = 		"편집되지 않은 원곡들을 모아놓은 채널";
+	["KO-MUSICTRAIN"] = 	"세트로 구성된 곡을 플레이할 수 있는 채널.";
+	["KO-PROGRESSIVEMODE"] = 	"세트로 구성된 곡을 플레이할 수 있는 채널";
+	["KO-REMIX"] = 			"리믹스 곡들을 모아놓은 채널";
+	["KO-XROSS"] = 			"크로스 라이선스의 곡을 모아놓은 채널";
+	["KO-JMUSIC"] =	 		"일본 곡들을 모아놓은 채널";
+	["KO-WORLDMUSIC"] = 	"전 세계의 다양한 곡들을 모아놓은 채널";
+	["KO-ORIGINAL"] = 		"PUMP IT UP 전용 곡들을 모아놓은 채널";
+	["KO-KPOP"] = 			"한국의 대중가요들을 모아놓은 채널";
+	["KO-ALLTUNES"] = 		"모든 곡들을 모아놓은 채널";
+	["KO-RANDOM"] = 		"무작위로 구성된 곡을 플레이할 수 있는 채널";
+	["KO-UCS"] = 			"사용자 커스텀 스텝들을 모아놓은 채널";
+	["KO-XXQUESTZONE"] = 	"XX 버전의 퀘스트 곡들을 모아놓은 채널";
+	["KO-1ST~PERFECT"] = 	"1ST ~ Perfect Collection 버전의 등장곡들을 모아놓은 채널";
+	["KO-EXTRA~PREX 3"] = 	"EXTRA to PIU PREX3 버전의 등장곡들을 모아놓은 채널";
+	["KO-EXCEED~ZERO"] = 	"EXCEED to ZERO 버전의 등장곡들을 모아놓은 채널";
+	["KO-NX~NXA"] = 		"NX to PIU NX ABSOLUTE 버전의 등장곡들을 모아놓은 채널";
+	["KO-PRIME"] =			"PRIME 버전의 등장곡들을 모아놓은 채널";
+	["KO-PRIME 2"] =		"PRIME2 버전의 등장곡들을 모아놓은 채널";
+	["KO-XX"] =  			"XX 버전의 등장곡들을 모아놓은 채널";
+	["KO-SKILLUPZONE"]	=	"기술을 연습할 수 있는 곡들을 모아놓은 채널";
+	["KO-QUESTWORLD"]	=	"퀘스트 곡들을 모아놓은 채널";
+	["KO-RANDOMTRAIN"]	=	"무작위로 구성된 여러 곡을 이어서 플레이할 수 있는 채널";
+	["KO-MOBILE"] = 		"모바일 버전의 등장곡들을 모아놓은 채널";
+	["KO-FAVORITES"]	=	"즐겨찾는 곡들을 모아놓은 채널";
+	["KO-SERIESZONE"] = 	"시리즈별로 곡을 구분한 채널";
+	["KO-SINGLEZONE"] = 	"싱글 스텝의 곡을 난이도별로 구분한 채널";
+	["KO-DOUBLEZONE"] = 	"더블 스텝의 곡을 난이도별로 구분한 채널";
+	["KO-QUESTSZONE"] = 	"퀘스트 곡들을 모아놓은 채널";
+	["KO-PROSERIES"] = 		"PRO 버전의 등장곡들을 모아놓은 채널";
+	["KO-FIESTASERIES"] = 	"FIESTA TO FIESTA 2 채널의 곡들을 모아놓은 채널";
+	["KO-COOPPLAY"] = 		"두 명 이상 협동 플레이를 요구하는 난이도를 모아놓은 채널";
+	["KO-SURVIVALMODE"] = 	"스테이지 브레이크가 될 때까지 무작위로 구성된 여러 곡을 이어서 플레이할 수 있는 채널";
+	["KO-OGM_HS"] = 	"고득점 온라인 배틀";
+	["KO-OGM_LS"] = 	"라이프바 체력이 바닥난 이후 판정에 기준한 저득점 온라인 배틀";
+	["KO-OGM_HC"] = 	"최대 콤보 온라인 배틀";
+	["KO-OGM_LC"] = 	"라이프바 체력이 바닥난 이후 판정에 기준한 저득점 온라인 배틀";
+	["KO-OGM_RD"] = 	"랜덤 화면 효과 온라인 배틀";
+
+
 	-- Spanish	Below :3
 	["G3N3R1C"] =  			"En este canal se encuentran las canciones de ";
 	["LEVEL_01_S"] = 		"En este canal puedes jugar canciones en single de nivel 1.";
@@ -500,6 +592,10 @@ function CHGetDescription()
 end
 
 function ProcessBPM(_bpm)
+	if _bpm == nil then
+		return "-";
+	end;
+
     local part1, part2 = _bpm:match("([^%-]+)%-([^%-]+)");
 		if part1 and part2 then
 			local retA, retB = math.floor(tonumber(part1) or 0), math.floor(tonumber(part2) or 0)

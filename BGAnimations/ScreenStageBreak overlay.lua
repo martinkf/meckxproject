@@ -1,14 +1,17 @@
-local t = Def.ActorFrame
+local t = Def.ActorFrame{};
+
+local luaFrameSkinSelectedStageBreak = getFrameSkinForPlayers("overlay","ScreenStageBreak");
+if luaFrameSkinSelectedStageBreak["isDefault"] == false then
+	-- we load the external lua :)
+	local sbScreenFunction = LoadActor(luaFrameSkinSelectedStageBreak["lua"]);
+	t[#t+1] = sbScreenFunction(luaFrameSkinSelectedStageBreak["path"]);
+	return t;
+end;
+
+
+t[#t+1] = Def.ActorFrame
 {
-
 	LoadActor("ScreenBreak/breakAni")..{};
-
-	--[[
-	LoadActor(THEME:GetPathG("","VIDEO/STAGEBREAK"))..
-	{
-		OnCommand=cmd(Center;loop,false);
-	};
-	]]
 
 	Def.Sound {	--BGM
 		OnCommand=cmd(queuecommand,"Lot");
@@ -24,7 +27,6 @@ local t = Def.ActorFrame
 			else
 				SOUND:PlayOnce(THEME:GetPathS("","STAGEBREAK"));
 			end;
-			
 		end;
 	};
 };

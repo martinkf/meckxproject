@@ -68,23 +68,27 @@ Def.ActorFrame {
 
 
 
+
 local function CreateUsbForPlayer(player)
 	
+	local bufferXp2=-120;
+	local bufferXp1=-50;
+
 	local x={};
 	
-	x[0] = player == PLAYER_1 and -300 or 300;
-	x[1] = player == PLAYER_1 and -365 or 363;
-	x[2] = player == PLAYER_1 and -500 or 308;
-	x[3] = player == PLAYER_1 and -450 or 358;
-	x[4] = player == PLAYER_1 and -155 or 270;
+	x[0] = player == PLAYER_1 and -300+bufferXp1 or 200+bufferXp2;
+	x[1] = player == PLAYER_1 and -365+bufferXp1 or 263+bufferXp2;
+	x[2] = player == PLAYER_1 and -500+bufferXp1 or 208+bufferXp2;
+	x[3] = player == PLAYER_1 and -450+bufferXp1 or 258+bufferXp2;
+	x[4] = player == PLAYER_1 and -155+bufferXp1 or 170+bufferXp2;
 	
-	x[5] = player == PLAYER_1 and -427 or 172;
-	x[6] = player == PLAYER_1 and -396 or 204;
+	x[5] = player == PLAYER_1 and -427+bufferXp1 or 72+bufferXp2;
+	x[6] = player == PLAYER_1 and -396+bufferXp1 or 104+bufferXp2;
 
 	local xWidth = 100;
 	t[#t+1] =  Def.ActorFrame{			
 		OnCommand=function(self)
-			self:zoom(1.2);
+			self:zoom(1.5);
 			self:y(80);
 			self:x(-120);
 		end;	
@@ -92,7 +96,7 @@ local function CreateUsbForPlayer(player)
 		CodeMessageCommand=function(self, params)
 			
 		end;			
-
+		--[[
 		LoadActor(THEME:GetPathG("","profiles/th_base_perfil")) .. {
 			OnCommand=cmd(zoom,0.65;xy,SCREEN_CENTER_X+x[0],27;);
 			ProfileMessageCommand=function(self,params)
@@ -110,6 +114,7 @@ local function CreateUsbForPlayer(player)
 			FinalizedMessageCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
 			OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
 		};
+		]]
 		
 
 		LoadActor(THEME:GetPathG("","_blank"))..{
@@ -135,20 +140,20 @@ local function CreateUsbForPlayer(player)
 													--self:diffusebottomedge(.4,1,1,1);
 							]]
 							local usbskinplayer = profile:GetSkinUsbFile();
-							if usbskinplayer == "0_blank.png" then
+							if usbskinplayer == "0_blank.png" or string.find(usbskinplayer, "0_blank.png") then
 								self:Load(THEME:GetPathG("","profiles/b_guest_1.png"));
 							else								
 								if string.find(usbskinplayer, "_video%.png") then
-									local videoFile = string.gsub(usbskinplayer, ".png", ".mp4")			
-									if FILEMAN:DoesFileExist("/UsbSkins/" .. videoFile) then
-										self:Load("/UsbSkins/" .. videoFile);
+									local videoFile = string.gsub(usbskinplayer, ".png", ".mp4")
+									if FILEMAN:DoesFileExist(videoFile) then
+										self:Load(videoFile);
 										self:play();
 									else
 										self:Load(THEME:GetPathG("","_blank"));
 									end;
 								else
-									if FILEMAN:DoesFileExist("/UsbSkins/" .. usbskinplayer) then
-										self:Load("/UsbSkins/" .. usbskinplayer);
+									if FILEMAN:DoesFileExist(usbskinplayer) then
+										self:Load( usbskinplayer);
 									else
 										self:Load(THEME:GetPathG("","_blank"));
 									end;
@@ -189,8 +194,8 @@ local function CreateUsbForPlayer(player)
 						self:Load(THEME:GetPathG("","profiles/base_profile.png"));
 					else
 						local sFile = profile:GetAvatarFile();
-						if (FILEMAN:DoesFileExist("/Avatars/" .. sFile)) then
-							self:Load("/Avatars/" .. sFile);
+						if (FILEMAN:DoesFileExist(sFile)) then
+							self:Load(sFile);
 						else
 							self:Load(THEME:GetPathG("","profiles/base_profile.png"));
 						end;
@@ -206,6 +211,24 @@ local function CreateUsbForPlayer(player)
 			CardDisconnectedMessageCommand=function(self,params)
 				if params.Player == player then
 					self:y(-31);
+				end;
+			end;
+			FinalizedMessageCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
+			OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
+		};
+
+		LoadActor(THEME:GetPathG("","profiles/topth_base_perfil")) .. {
+			OnCommand=cmd(zoom,0.65;xy,SCREEN_CENTER_X+x[0],27;);
+			ProfileMessageCommand=function(self,params)
+				if params.Player == player then
+					self:finishtweening();
+					self:y(27);
+					self:diffusealpha(1);
+				end;
+			end;
+			CardDisconnectedMessageCommand=function(self,params)
+				if params.Player == player then
+					self:y(-26);
 				end;
 			end;
 			FinalizedMessageCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
@@ -361,7 +384,11 @@ local function CreateUsbForPlayer(player)
 					if params.Index < 0 then
 						self:settext("GUEST PLAYER");
 					else
-						self:settext("LV");
+						if PROFILEMAN:IsUsbProfile(params.Index) then
+							self:settext("USB");
+						else
+							self:settext("LV");
+						end;
 					end;
 
 					self:diffusealpha(0);
@@ -396,7 +423,7 @@ local function CreateUsbForPlayer(player)
 					profile = PROFILEMAN:GetLocalProfileFromIndex(params.Index);
 					self:diffusealpha(0);
 
-					if params.Index < 0 then
+					if params.Index < 0 or PROFILEMAN:IsUsbProfile(params.Index) then
 						self:visible(false);
 					else
 						self:visible(true);
@@ -452,8 +479,42 @@ local function CreateUsbForPlayer(player)
 				self:diffusealpha(0);
 			end;
 		};
-		
-	};		
+
+		--LoadFont("_XoloPlayer")..{
+		--	OnCommand=cmd(xy,SCREEN_CENTER_X+x[6],55;zoom,0.6;horizalign,left;diffuse,color("#FFD200");shadowlength,1;shadowcolor,0,0,0,1;queuecommand,"UsbRefresh");
+		--	UsbRefreshCommand=function(self)
+		--		if MEMCARDMAN:GetCardState(player) == "MemoryCardState_Ready" then
+		--			local label;
+		--			if PROFILEMAN:ProfileWasLoadedFromMemoryCard(player) then
+		--				label = PROFILEMAN:GetProfile(player):GetDisplayName();
+		--			end;
+		--			if label == nil or label == "" then label = MEMCARDMAN:GetName(player); end;
+		--			if label == nil or label == "" then label = "USB"; end;
+		--			self:settext("USB: "..string.upper(label));
+		--			self:visible(true);
+		--		else
+		--			self:visible(false);
+		--		end;
+		--	end;
+		--	StorageDevicesChangedMessageCommand=cmd(queuecommand,"UsbRefresh");
+		--	ProfileMessageCommand=function(self,params)
+		--		if params.Player == player then
+		--			self:queuecommand("UsbRefresh");
+		--		end;
+		--	end;
+		--	FinalizedMessageCommand=function(self)
+		--		self:stoptweening();
+		--		self:linear(0.15);
+		--		self:diffusealpha(0);
+		--	end;
+		--	OffCommand=function(self)
+		--		self:stoptweening();
+		--		self:linear(0.15);
+		--		self:diffusealpha(0);
+		--	end;
+		--};
+
+	};
 end;
 
 
@@ -461,5 +522,33 @@ end;
 CreateUsbForPlayer(PLAYER_1);
 CreateUsbForPlayer(PLAYER_2);
 
+t[#t+1] = Def.ActorFrame{
+		LoadActor(THEME:GetPathG("","ScreenJoin/s1"))..{
+		OnCommand=function(self)
+			self:x(SCREEN_LEFT+50);
+			self:y(SCREEN_CENTER_Y+190);
+			self:zoom(0.4);
+
+			if isAspectRatio43() then
+				self:zoom(0.6);
+				self:y(SCREEN_CENTER_Y+220);
+			end;
+
+		end;
+	};	
+
+	LoadActor(THEME:GetPathG("","ScreenJoin/s2"))..{
+		OnCommand=function(self)
+			self:x(SCREEN_RIGHT-50);
+			self:y(SCREEN_CENTER_Y+190);
+			self:zoom(0.4);
+
+			if isAspectRatio43() then
+				self:zoom(0.6);
+				self:y(SCREEN_CENTER_Y+220);
+			end;
+		end;
+	};	
+}
 	
 return t;

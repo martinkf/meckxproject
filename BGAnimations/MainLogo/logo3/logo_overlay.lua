@@ -1,327 +1,5 @@
 local t = Def.ActorFrame {};
 local initTimeStart = 60;
---info
-
-
-local function generarEstrellaBoom(sleepStart,sleepWait,xInit,yInit)
-	return Def.ActorFrame{
-
-		LoadActor( THEME:GetPathG("","LOGO/nlogo3/effect_star2.png") )..{
-			InitCommand=cmd(zoom,0.1;diffusealpha,0;y,yInit;x,xInit);	
-			OnCommand=function(self)
-				self:sleep(sleepStart);
-				self:queuecommand("AniSec");				
-			end;
-			AniSecCommand=function(self)
-				self:zoom(0.1);
-				self:diffusealpha(0);				
-
-				self:sleep(1.3); --1.3
-				self:zoom(0.1);
-				self:diffusealpha(1);
-				self:linear(0.21); --1.51
-				self:zoom(0.35);
-				self:linear(0.7); -- 2.21
-				self:zoom(0.4);
-				self:linear(0);
-				self:diffusealpha(0);
-				self:sleep(0.05); -- 2.26
-				self:diffusealpha(1);
-				self:sleep(0.05); -- 2.31
-				self:diffusealpha(0); 
-				self:sleep(0.05); -- 2.36
-				self:diffusealpha(1);
-				self:sleep(0.05); -- 2.41
-				self:diffusealpha(0);
-				self:sleep(0.59); -- 3 segundos animación
-
-				self:sleep(sleepWait);
-				self:queuecommand("AniSec");
-			end;
-		};
-
-		LoadActor( THEME:GetPathG("","LOGO/nlogo3/effect_star2.png") )..{
-			InitCommand=cmd(zoom,0.12;diffusealpha,0;y,yInit+1;x,xInit+5;rotationz,20);	
-			OnCommand=function(self)
-				self:sleep(sleepStart);
-				self:queuecommand("AniSec");				
-			end;
-
-			AniSecCommand=function(self)
-				self:zoom(0.12);
-				self:diffusealpha(0);	
-				self:x(xInit+5);
-				self:y(yInit+1);
-				self:rotationz(20);
-
-				self:sleep(1.3);   --1.3
-				self:diffusealpha(1);
-				self:rotationz(20);
-				self:zoom(0.13);
-				self:sleep(0.05);  -- 1.35
-				self:linear(0.3);  -- 1.65
-				self:zoom(0.35);
-				self:linear(0.5);  -- 2.15
-				self:zoom(0.45);
-				self:linear(0);
-				self:diffusealpha(0);
-				self:sleep(0.05); -- 2.2
-				self:diffusealpha(1);
-				self:sleep(0.05); -- 2.25
-				self:diffusealpha(0);
-				self:sleep(0.05); -- 2.3
-				self:diffusealpha(1);
-				self:sleep(0.05); -- 2.35
-				self:diffusealpha(0);
-				self:sleep(0.65); -- 3 segundos animación
-
-				self:sleep(sleepWait);
-				self:queuecommand("AniSec");							
-			end;
-		};		
-
-
-		--estrella principal
-		LoadActor( THEME:GetPathG("","LOGO/nlogo3/effect_star0.png") )..{
-			InitCommand=cmd(zoom,0.35;diffusealpha,0;y,yInit;x,xInit;rotationz,325);	
-			OnCommand=function(self)
-				self:sleep(sleepStart);
-				self:queuecommand("AniSec");
-			end;
-
-			AniSecCommand=function(self)
-				self:rotationz(325);
-				self:zoom(0.35);
-				self:diffusealpha(1);
-				self:accelerate(0.1); -- 0.1
-				self:rotationz(335);
-				self:zoom(0.4);
-				self:decelerate(0.3); -- 0.4
-				self:zoom(0.35);
-				self:rotationz(380);
-				self:linear(0.95); -- 1.15 
-				self:zoom(0.4);
-				self:rotationz(400);
-				self:sleep(0);
-				self:diffusealpha(0);
-				self:sleep(1.65); -- 3 segundos de animación.
-
-				self:sleep(sleepWait); -- 
-				self:queuecommand("AniSec");
-			end;
-		};
-
-		LoadActor( THEME:GetPathG("","LOGO/nlogo3/effect_star3a.png") )..{
-			InitCommand=cmd(zoom,0.3;diffusealpha,0;y,yInit-25;x,xInit-25;diffusealpha,0;rotationz,345);
-
-			OnCommand=function(self)
-				self:sleep(sleepStart);
-				self:queuecommand("AniSec");
-			end;
-
-
-			AniSecCommand=function(self)
-				self:zoom(0.3);
-				self:y(yInit-25);
-				self:x(xInit-25);
-				self:rotationz(345);
-
-				self:sleep(0.1);     -- 0.1
-				self:diffusealpha(1);
-				self:linear(0.2);   -- 0.3
-				self:rotationz(355);
-				self:addx(-25);
-				self:addy(-15);
-				self:zoom(0.55);
-
-				self:linear(0.5);   -- 0.8
-				self:rotationz(365);
-				self:addx(-5);
-				self:addy(-5);
-
-				self:sleep(0);
-				self:diffusealpha(0);
-				self:sleep(0.02); -- 0.82
-				self:diffusealpha(1);
-
-				self:linear(0.1); -- 0.92
-				self:rotationz(368); 
-				self:addx(-2);
-				self:addy(-2);	
-
-				self:sleep(0);
-				self:diffusealpha(0);
-				self:sleep(0.02); -- 0.94
-				self:diffusealpha(1);
-
-				self:linear(0.2); -- 1.14
-				self:rotationz(372);
-				self:addx(-2);
-				self:addy(-2);	
-
-				self:sleep(0);
-				self:diffusealpha(0);
-				self:sleep(0.02); -- 1.16
-				self:diffusealpha(1);
-
-				self:linear(0.2); -- 1.36
-				self:rotationz(376);
-				self:addx(-2);
-				self:addy(-2);	
-
-				self:sleep(0);
-				self:diffusealpha(0);
-				self:sleep(1.64); -- 3 segundos de animación.
-
-				self:sleep(sleepWait);
-				self:queuecommand("AniSec");								
-			end;
-		};
-
-
-
-		LoadActor( THEME:GetPathG("","LOGO/nlogo3/effect_star3a.png") )..{
-			InitCommand=cmd(zoom,0.3;diffusealpha,1;y,yInit+25;x,xInit;diffusealpha,0;rotationz,345);	
-
-			OnCommand=function(self)
-				self:sleep(sleepStart);
-				self:queuecommand("AniSec");
-			end;
-
-			AniSecCommand=function(self)
-				self:zoom(0.3);
-				self:y(yInit+25);
-				self:x(xInit);
-				self:rotationz(345);
-
-				self:sleep(0.1);     --0.1
-				self:diffusealpha(1);
-				self:linear(0.2);    -- 0.3
-				self:rotationz(355);
-				self:addx(-25);
-				self:addy(15);
-				self:zoom(0.55);
-
-				self:linear(0.5);   -- 0.8
-				self:rotationz(365);
-				self:addx(-5);
-				self:addy(5);
-
-				self:sleep(0);
-				self:diffusealpha(0);
-				self:sleep(0.02);   -- 0.82
-				self:diffusealpha(1);
-
-				self:linear(0.1);  -- 0.92
-				self:rotationz(368);
-				self:addx(-2);
-				self:addy(2);	
-
-				self:sleep(0);
-				self:diffusealpha(0);
-				self:sleep(0.02); -- 0.94
-				self:diffusealpha(1);
-
-				self:linear(0.2); -- 1.14
-				self:rotationz(372);
-				self:addx(-2);
-				self:addy(2);	
-
-				self:sleep(0);
-				self:diffusealpha(0);
-				self:sleep(0.02); --1.16
-				self:diffusealpha(1);
-
-				self:linear(0.2); -- 1.36
-				self:rotationz(376);
-				self:addx(-2);
-				self:addy(2);	
-
-				self:sleep(0);
-				self:diffusealpha(0);
-				self:sleep(1.64); -- 3 segundos de animación.
-
-				self:sleep(sleepWait);
-				self:queuecommand("AniSec");	
-			end;
-		};		
-
-
-		LoadActor( THEME:GetPathG("","LOGO/nlogo3/effect_star3a.png") )..{
-			InitCommand=cmd(zoom,0.3;diffusealpha,1;y,yInit;x,xInit+25;diffusealpha,0;rotationz,345);
-
-			OnCommand=function(self)
-				self:sleep(sleepStart);
-				self:queuecommand("AniSec");
-			end;
-
-			AniSecCommand=function(self)
-				self:zoom(0.3);
-				self:y(yInit);
-				self:x(xInit+25);
-				self:rotationz(345);
-
-				self:sleep(0.1);    --0.1
-				self:diffusealpha(1);
-				self:linear(0.2);  --0.3
-				self:rotationz(355);
-				self:addx(25);
-				self:addy(-15);
-				self:zoom(0.55);
-
-				self:linear(0.5); -- 0.8
-				self:rotationz(365);
-				self:addx(5);
-				self:addy(-5);
-
-				self:sleep(0);
-				self:diffusealpha(0);
-				self:sleep(0.02); -- 0.82
-				self:diffusealpha(1);
-
-				self:linear(0.1); -- 0.92
-				self:rotationz(368);
-				self:addx(2);
-				self:addy(-2);	
-
-				self:sleep(0);
-				self:diffusealpha(0);
-				self:sleep(0.02); -- 0.94
-				self:diffusealpha(1);
-
-				self:linear(0.2); -- 1.14
-				self:rotationz(372);
-				self:addx(2);
-				self:addy(-2);	
-
-				self:sleep(0);
-				self:diffusealpha(0);
-				self:sleep(0.02); -- 1.16
-				self:diffusealpha(1);
-
-				self:linear(0.2); -- 1.36
-				self:rotationz(376);
-				self:addx(2);
-				self:addy(-2);	
-
-				self:sleep(0);
-				self:diffusealpha(0);
-				self:sleep(1.64); -- 3 segundos de animación.
-
-				self:sleep(sleepWait);
-				self:queuecommand("AniSec");	
-			end;
-		};	
-
-
-
-
-
-	};
-
-end;
-
-
 
 t[#t+1] = LoadActor( THEME:GetPathG("","LOGO/nlogo3/logo_base_clear.png") )..{
 	InitCommand=cmd(diffusealpha,0;y,SCREEN_CENTER_Y-20;x,SCREEN_CENTER_X;sleep,0.5;diffusealpha,1;zoom,0.55;);
@@ -488,48 +166,50 @@ t[#t+1] = LoadActor( THEME:GetPathG("","LOGO/nlogo3/nlogo_bw.png") )..{
 }
 
 
-t[#t+1] = generarEstrellaBoom(2.4,5.2,SCREEN_CENTER_X-165,SCREEN_CENTER_Y-180)..{
+t[#t+1] = generarEstrellaBoom(2.4,5.2,SCREEN_CENTER_X-165,SCREEN_CENTER_Y-180,"default")..{
 	InitCommand=function(self)	
 
 	end;
 };
 
 
-t[#t+1] = generarEstrellaBoom(1.2,6.9,SCREEN_CENTER_X-410,SCREEN_CENTER_Y-120)..{
+t[#t+1] = generarEstrellaBoom(1.2,6.9,SCREEN_CENTER_X-410,SCREEN_CENTER_Y-120,"default")..{
 	InitCommand=function(self)		
 		self:zoom(0.8);
 	end;
 };
 
-t[#t+1] = generarEstrellaBoom(3,7,SCREEN_CENTER_X+710,SCREEN_CENTER_Y+200)..{
+t[#t+1] = generarEstrellaBoom(3,7,SCREEN_CENTER_X+710,SCREEN_CENTER_Y+200,"default")..{
 	InitCommand=function(self)		
 		self:zoom(0.5);
 	end;
 };
 
 
-t[#t+1] = generarEstrellaBoom(2.7,6.8,SCREEN_CENTER_X-300,SCREEN_CENTER_Y+210)..{
+t[#t+1] = generarEstrellaBoom(2.7,6.8,SCREEN_CENTER_X-300,SCREEN_CENTER_Y+210,"default")..{
 	InitCommand=function(self)		
 		self:zoom(0.65);
 	end;
 };
 
-t[#t+1] = generarEstrellaBoom(1.8,4.2,SCREEN_CENTER_X+480,SCREEN_CENTER_Y-210)..{
+t[#t+1] = generarEstrellaBoom(1.8,4.2,SCREEN_CENTER_X+480,SCREEN_CENTER_Y-210,"default")..{
 	InitCommand=function(self)		
 	end;
 };
 
 
-t[#t+1] = generarEstrellaBoom(1.8,9.5,SCREEN_CENTER_X+340,SCREEN_CENTER_Y+140)..{
+t[#t+1] = generarEstrellaBoom(1.8,9.5,SCREEN_CENTER_X+340,SCREEN_CENTER_Y+140,"default")..{
 	InitCommand=function(self)		
 	end;
 };
+
+
 
 
 t[#t+1] = LoadFont("xolonium 20px")..{
 	InitCommand=function(self)
 		self:x(14);
-		self:y(SCREEN_TOP + 110);
+		self:y(SCREEN_TOP + 85);
         local vsyncEnabled = PREFSMAN:GetPreference("Vsync");
         local vsyncState = vsyncEnabled and "ON" or "OFF";
         local visualDelay = PREFSMAN:GetPreference("VisualDelaySeconds");
@@ -554,14 +234,14 @@ t[#t+1] = LoadFont("xolonium 20px")..{
 			tipoRes = "4K "
 		end;		
 
-		self:vertspacing(5);
+		self:vertspacing(2);
 		--self:settext("PIUMOD - V"..vActual.."\nREV-01112024-00-ARKA\nVSYNC: "..vsyncState.."\n"..tipoRes..gwidth.." X "..gheight.."\nVISUAL DELAY: "..visualDelayTruncated);
 		self:settext(vActual.."\nVSYNC: "..vsyncState.."\n"..tipoRes..gwidth.." X "..gheight);
 		--self:skewx(-.12);
 		self:horizalign("HorizAlign_Left");
-		self:zoom(.65);
+		self:zoom(.55);
 		self:shadowlength(0.8)  -- Define la longitud de la sombra
-        self:shadowcolor(color("0,0,0,1"))  -- Color negro para la sombra
+        self:shadowcolor(color("0,0,0,0.6"))  -- Color negro para la sombra
 	end;
 	OffCommand=function(self)
 		SCREENMAN:GetTopScreen():lockinput(.5);	-- para que cualquier entrada no interrumpa la transici�n de ventanas

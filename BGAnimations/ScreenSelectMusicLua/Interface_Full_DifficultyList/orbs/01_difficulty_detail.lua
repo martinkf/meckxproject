@@ -65,7 +65,18 @@ local function GRAY(STEP,player)
 	
 	return false;
 end;
+
+local ratio43offset = 0;
+if isAspectRatio43() then
+	ratio43offset = -120;
+end;
+
 for p=-1,1,2 do
+
+	local gradeSpriteEvSkin = GetGradeSpriteFromEvaluationSkin(false,ARRAY[p]);
+	local gradeFailSpriteEvSkin = GetGradeSpriteFromEvaluationSkin(true,ARRAY[p]);
+
+
 	t[#t+1] = Def.ActorFrame{
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/THEME-HIGHSCOREPANEL"))..{
@@ -78,8 +89,9 @@ for p=-1,1,2 do
 				end;
 			end;
 			
-			SongChosenMessageCommand=cmd(stoptweening;diffusealpha,GAMESTATE:GetQuestZoneChannel() and 0 or 1;linear,0.1;zoom,0.65;y,SCREEN_CENTER_Y-140);
-			SongUnchosenMessageCommand=cmd(stoptweening;linear,0.1;zoom,1.2;y,SCREEN_CENTER_Y+125;zoom,1;diffusealpha,0);
+			SongChosenMessageCommand=cmd(stoptweening;diffusealpha,GAMESTATE:GetQuestZoneChannel() and 0 or 1;linear,0.1;zoom,0.65;y,SCREEN_CENTER_Y-140 + ratio43offset);
+
+			SongUnchosenMessageCommand=cmd(stoptweening;linear,0.1;zoom,1.2;y,SCREEN_CENTER_Y+125 + ratio43offset;zoom,1;diffusealpha,0);
 		};
 
 		--*********************************
@@ -87,14 +99,22 @@ for p=-1,1,2 do
 		--*********************************
 	Def.ActorFrame{
 		OnCommand=cmd(xy,(p == -1 and -568 or 556),-70;zoom,0.8;animate,false;visible,false);
+		OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+
+		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/big_stepartistsprite"))..{
+			Name="big_stepartistbase";
+			OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
+		};
 
 		LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/list/stepartistsprite"))..{
 			Name="stepartistbase";
+			OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
 		};
 
 		LoadFont("_century gothic")..{
-			OnCommand=cmd(x,55;y,-4;settext,"";horizalign,center;queuecommand,"artistStep");
+			OnCommand=cmd(x,55;y,-4;settext,"";horizalign,center;queuecommand,"artistStep";maxwidth,210);
 			Name="stepartisttext";
+			OffCommand=cmd(finishtweening;linear,0.2;diffusealpha,0);
 		};	
 
 
@@ -104,7 +124,7 @@ for p=-1,1,2 do
 
 		ChangeStepsMessageCommand=function(self,params)
 			if params.Player == ARRAY[p] then
-				self:stoptweening();
+				self:finishtweening();
 				self:queuecommand("artistStep");
 			end;
 		end;
@@ -115,7 +135,7 @@ for p=-1,1,2 do
 				self:queuecommand("artistStep");
 			else
 				if params.Player == ARRAY[p] then
-					self:stoptweening();
+					self:finishtweening();
 					self:queuecommand("artistStep");
 				end;				
 			end;
@@ -125,17 +145,49 @@ for p=-1,1,2 do
 
 		StepsUnchosenMessageCommand=function(self,params)
 			if params.Player == ARRAY[p] then
-				self:stoptweening();
+				self:finishtweening();
 			end;
 		end;	
 
-		artistStepCommand=function(self)
+		artistStepCommand=function(self)				
 				local steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);
 				local stepArtist = steps:GetAuthorCredit();
+				
+
+				self:GetChild("stepartisttext"):maxwidth(210);
+				self:GetChild("stepartistbase"):finishtweening();
+				self:GetChild("big_stepartistbase"):finishtweening();
+				self:GetChild("stepartisttext"):finishtweening();
+
 				if #stepArtist > 0 then
 					self:visible(true);
-					self:GetChild("stepartisttext"):settext(stepArtist);
+
+					if #stepArtist < 13 then
+						self:GetChild("stepartisttext"):settext(stepArtist);
+						self:GetChild("stepartistbase"):visible(true);
+						self:GetChild("big_stepartistbase"):visible(false);
+						self:GetChild("stepartisttext"):x(60);
+						if p == -1 then
+							self:x(-568);
+						else
+							self:x(556);
+						end;
+					else
+						self:GetChild("stepartisttext"):x(60);
+						self:GetChild("stepartisttext"):settext(stepArtist);
+						self:GetChild("big_stepartistbase"):visible(true);
+						self:GetChild("stepartistbase"):visible(false);
+						if p == -1 then
+							self:x(-568);
+						else
+							self:x(565);
+						end;
+					end;
+
+
+
 				else
+					self:finishtweening();
 					self:visible(false);
 					self:GetChild("stepartisttext"):settext("");
 				end;			
@@ -152,7 +204,8 @@ for p=-1,1,2 do
 
 					OnCommand=cmd(xy,(p == -1 and -423 or 418),252;animate,false;visible,false);
 
-					LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+					--LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+					LoadActor(gradeSpriteEvSkin)..{
 						Name="LetterMyBest";
 						OnCommand=cmd(y,0;x,0;animate,false;setstate,0;queuecommand,"SetLetter");
 						SetLetterCommand=function(self)
@@ -171,7 +224,8 @@ for p=-1,1,2 do
 					};
 
 					--letra my best
-					LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+					--LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+					LoadActor(gradeFailSpriteEvSkin)..{
 						Name="LetterMyBestFail";
 						OnCommand=cmd(y,0;x,0;animate,false;setstate,0;queuecommand,"SetLetter");
 						SetLetterCommand=function(self)
@@ -263,6 +317,12 @@ for p=-1,1,2 do
 					self:zoom(0.5);
 				end;
 			};
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/nomiss"))..{
+				Name="nomiss";
+				OnCommand=function(self)
+					self:zoom(0.5);
+				end;
+			};
 
 			SongChosenMessageCommand=cmd(stoptweening;queuecommand,"Set");
 			SongUnchosenMessageCommand=cmd(stoptweening;visible,false);
@@ -281,6 +341,7 @@ for p=-1,1,2 do
 			SetCommand=function(self)
 				self:GetChild("pfc"):visible(false);
 				self:GetChild("fullcombo"):visible(false);
+				self:GetChild("nomiss"):visible(false);
 
 				local song, steps;
 				song = GAMESTATE:GetCurrentSong();
@@ -300,11 +361,16 @@ for p=-1,1,2 do
 							
 						else
 							--full combo
+							local tnsgood = scores[1]:GetTapNoteScore('TapNoteScore_W4');
 							local tnsbadmiss 	= scores[1]:GetTapNoteScore('TapNoteScore_W5') +
 											  scores[1]:GetTapNoteScore("TapNoteScore_Miss") +
 											  scores[1]:GetTapNoteScore("TapNoteScore_CheckpointMiss");
-							if tnsbadmiss == 0 then
+							if tnsbadmiss == 0 and tnsgood== 0 then
 								self:GetChild("fullcombo"):visible(true);
+							end;
+
+							if tnsbadmiss == 0 and tnsgood > 0 then
+								self:GetChild("nomiss"):visible(true);
 							end;
 
 						end;
@@ -453,7 +519,22 @@ for p=-1,1,2 do
 					song = GAMESTATE:GetCurrentSong();
 					steps = GAMESTATE:GetCurrentSteps(ARRAY[p]);			
 					local scorelist;
+					local newScoreList;
 					if song and steps and not GAMESTATE:GetQuestZoneChannel() and not GAMESTATE:GetRandomTrainChannel()  then
+
+						newScoreList = getAllRankingFromSong(ARRAY[p]);
+						if newScoreList and #newScoreList > 0 then
+							self:visible(false);
+							local iScore = newScoreList[1]["score"];
+							if (iScore > 0) then self:visible(true); end;
+							self:settext(string.upper(newScoreList[1]["name"]));
+						else
+							self:settext("");
+							self:visible(false);
+						end;
+
+
+						--[[
 						scorelist = PROFILEMAN:GetMachineProfile():GetHighScoreList(song,steps);
 						local scores = scorelist:GetHighScores();
 						local topscore = scores[1];
@@ -461,12 +542,14 @@ for p=-1,1,2 do
 							self:visible(false);
 							local iScore = topscore:GetPhoenixScore();
 							if (iScore > 0) then self:visible(true); end;
-							self:settext(string.upper(topscore:GetPhoenixScoreName()));
-						else
-							self:settext("");
-							self:visible(false);
+							local topScoreData = topscore:GetPhoenixScoreName();
+							if topScoreData == nil then
+								topScoreData = "-";
+							end;
+							self:settext(string.upper(topScoreData));
+						]]
 
-						end;
+
 					else
 						self:settext("");
 						self:visible(false);
@@ -482,7 +565,8 @@ for p=-1,1,2 do
 
 					OnCommand=cmd(xy,(p == -1 and -423 or 418),175;animate,false;visible,false);
 
-					LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+					--LoadActor(THEME:GetPathG("","ScreenEvaluation/pass_res"))..{
+					LoadActor(gradeSpriteEvSkin)..{
 						Name="LetterMyBest";
 						OnCommand=cmd(y,0;x,0;animate,false;setstate,0;queuecommand,"SetLetter");
 						SetLetterCommand=function(self)
@@ -501,7 +585,8 @@ for p=-1,1,2 do
 					};
 
 					--letra my best
-					LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+					--LoadActor(THEME:GetPathG("","ScreenEvaluation/fail_pass_res"))..{
+					LoadActor(gradeFailSpriteEvSkin)..{
 						Name="LetterMyBestFail";
 						OnCommand=cmd(y,0;x,0;animate,false;setstate,0;queuecommand,"SetLetter");
 						SetLetterCommand=function(self)
@@ -591,6 +676,12 @@ for p=-1,1,2 do
 					self:zoom(0.5);
 				end;
 			};
+			LoadActor(THEME:GetPathG("","ScreenSelectMusic/DifficultyList/orbs/nomiss"))..{
+				Name="nomiss";
+				OnCommand=function(self)
+					self:zoom(0.5);
+				end;
+			};
 
 			SongChosenMessageCommand=cmd(stoptweening;queuecommand,"Set");
 			SongUnchosenMessageCommand=cmd(stoptweening;visible,false);
@@ -609,6 +700,7 @@ for p=-1,1,2 do
 			SetCommand=function(self)
 				self:GetChild("pfc"):visible(false);
 				self:GetChild("fullcombo"):visible(false);
+				self:GetChild("nomiss"):visible(false);
 
 				local song, steps;
 				song = GAMESTATE:GetCurrentSong();
@@ -628,9 +720,14 @@ for p=-1,1,2 do
 							
 						else
 							--full combo
+							local tnsgood = scores[1]:GetTapNoteScore('TapNoteScore_W4');
 							local tnsbadmiss 	= scores[1]:GetTapNoteScore('TapNoteScore_W5') + scores[1]:GetTapNoteScore("TapNoteScore_Miss") + scores[1]:GetTapNoteScore("TapNoteScore_CheckpointMiss");
-							if tnsbadmiss == 0 then
+							if tnsbadmiss == 0 and tnsgood == 0 then
 								self:GetChild("fullcombo"):visible(true);
+							end;
+
+							if tnsbadmiss == 0 and tnsgood > 0 then
+								self:GetChild("nomiss"):visible(true);
 							end;
 
 						end;
@@ -1126,6 +1223,7 @@ for p=-1,1,2 do
 				if GAMESTATE:IsHumanPlayer(ARRAY[p]) then
 					self:visible(true);
 					local CurrentStep = GAMESTATE:GetCurrentSteps(ARRAY[p]);
+					--[[
 					local meter = CurrentStep:GetMeter();
 					meter = FixMeter(meter);
 					if (meter == "49" or meter == "50" or meter == "99") then
@@ -1133,11 +1231,14 @@ for p=-1,1,2 do
 					end;
 					if meter == "51" then
 						meter = "!!";
-					end;
+					end;]]
+
+					local meter = DisplayLV_New(CurrentStep);
+
 					if CurrentStep:GetPlayers() ~= 1 then
 						meter = "x"..CurrentStep:GetPlayers();
 					end;
-
+										
 					self:settext(meter);
 					
 				end;
@@ -1177,7 +1278,7 @@ for p=-1,1,2 do
 					if  CurrentStep:GetStepsType() == 'StepsType_Pump_Halfdouble' then
 						self:diffuse(color("#007272"));
 					end;
-
+					--[[
 					local meter = CurrentStep:GetMeter();
 					meter = FixMeter(meter);
 					if (meter == "49" or meter == "50" or meter == "99") then
@@ -1186,8 +1287,9 @@ for p=-1,1,2 do
 					if meter == "51" then
 						meter = "!!";
 					end;
+					]]
 					
-					
+					local meter = DisplayLV_New(CurrentStep);
 					if CurrentStep:GetPlayers() ~= 1 then
 						meter = "x"..CurrentStep:GetPlayers();
 						self:diffuse(color("#8f752e"));

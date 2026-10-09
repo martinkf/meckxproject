@@ -384,7 +384,7 @@ end;
 	-- };
 -- end;
 
-CreateUsbForPlayer(PLAYER_1);
-CreateUsbForPlayer(PLAYER_2);	
+--CreateUsbForPlayer(PLAYER_1);
+--CreateUsbForPlayer(PLAYER_2);	
 
 return t;

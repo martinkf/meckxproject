@@ -465,6 +465,10 @@ for i = 1, FullCDLElements, 1 do
 					self:xy(SCREEN_CENTER_X-(xajs*CDLEx)+(CDLEx*(i-1)),SCREEN_CENTER_Y*1.63-116);
 				end;
 
+				if isAspectRatio43() then
+					self:addy(-30);
+				end;
+
 			end;
 		end;
 

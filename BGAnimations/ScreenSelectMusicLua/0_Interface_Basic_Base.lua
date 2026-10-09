@@ -296,27 +296,6 @@ function PaneDisplay(player)
 	};
 end;
 
-local function checkTypeStepData(pndata)
-	local cur_song = GAMESTATE:GetCurrentSong();
-	local cur_steps = GAMESTATE:GetCurrentSteps(pndata);
-
-	style = cur_steps:GetStepsType();
-
-	if style=='StepsType_Pump_Single' --[[and string.find( description,"SP" )]] then 
-		return 1;
-	elseif style=='StepsType_Pump_Single' then 
-		return 1;
-	elseif style=='StepsType_Pump_Couple' then 
-		return 2;
-	elseif ( style=='StepsType_Pump_Double' --[[ and string.find( description,"DP" ) ]] ) or style=='StepsType_Pump_Routine'  then 
-		return 2;
-	elseif style=='StepsType_Pump_Double' or style=='StepsType_Pump_Halfdouble' then 
-		return 2;
-	end;
-
-	return 0;
-end;
-
 collectgarbage();
 
 
@@ -577,7 +556,10 @@ t[#t+1] = LoadActor("0_Interface_Basic_Level_Selected")..
 	checkPlaceCommand=function(self)
 		if GAMESTATE:GetNumPlayersEnabled() == 1 then
 			self:x(SCREEN_CENTER_X);
-			self:addy(-40);
+			if isAspectRatio43() == false then
+				self:addy(-40);
+			end;
+			
 		else
 			self:x(SCREEN_CENTER_X + 350);
 		end;

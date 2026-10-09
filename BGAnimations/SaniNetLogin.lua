@@ -6,8 +6,32 @@ local t = Def.ActorFrame{
 	end;
 
 	SaniNetAliveMessageCommand=function(self,params)
-		self:visible(params.Alive);
+--		self:visible(params.Alive);
+		if params.Alive then
+			self:queuecommand("recheck");
+		end;
 	end;
+
+	recheckCommand=function(self)
+			self:visible(true);
+	end;
+
+--[[
+
+	SaniNetLoginScreenMessageCommand=function(self, params)
+		self:visible(true);
+		if params.Status == 1 then
+			self:stoptweening():linear(0.1):diffusealpha(1);
+		elseif params.Status == 2 then	--success
+			self:stoptweening():sleep(0.9):decelerate(0.1):diffusealpha(0);
+		elseif params.Status == 3 then	--failed
+			self:stoptweening():sleep(1):decelerate(0.1):diffusealpha(0);
+		elseif params.Status == 0 then
+			self:stoptweening():sleep(0.1):linear(0.2):diffusealpha(0);
+		end;
+	end;
+
+]]
 
 	Def.Quad {
 		InitCommand=cmd(x,SCREEN_CENTER_X;y,SCREEN_CENTER_Y-30;zoomto,SCREEN_WIDTH,SCREEN_HEIGHT;diffuse,0,0,0,1;diffusealpha,0);	
@@ -18,38 +42,12 @@ local t = Def.ActorFrame{
 			elseif params.Status == 2 then	--success
 				self:stoptweening():sleep(0.9):decelerate(0.1):diffusealpha(0);
 			elseif params.Status == 3 then	--failed
-				-- self:stoptweening():diffuse(color('1,0,0,1'));
+				self:stoptweening():sleep(1):decelerate(0.25):diffusealpha(0);
 			elseif params.Status == 0 then
 				self:stoptweening():sleep(0.1):linear(0.2):diffusealpha(0);
 			end;
 		end;
 	};
---[[
-	LoadActor( THEME:GetPathG("","SaniNet/login/background_login") )..{
-		Name="backgroundImg";
-		OnCommand=function(self)
-			self:x(SCREEN_CENTER_X);
-			self:y(SCREEN_CENTER_Y);			
-			self:scaletoclipped(SCREEN_WIDTH,SCREEN_HEIGHT);
-			self:diffusealpha(0);
-			self:stop();
-		end;
-
-		SaniNetLoginScreenMessageCommand=function(self, params)
-			self:visible(true);
-			if params.Status == 1 then
-				self:stoptweening():play():diffusealpha(0.5);
-			elseif params.Status == 2 then	--success
-				self:stoptweening():linear(0.2):diffusealpha(0):stop();
-			elseif params.Status == 3 then	--failed
-				-- self:stoptweening():diffuse(color('1,0,0,1'));
-			elseif params.Status == 0 then
-				self:stoptweening():linear(0.2):diffusealpha(0):stop();
-			end;
-		end;
-
-	};
-]]
 
 	LoadActor(THEME:GetPathG("","SaniNet/login/loginframe"))..
 	{
@@ -61,7 +59,7 @@ local t = Def.ActorFrame{
 			elseif params.Status == 2 then	--success
 				self:stoptweening():sleep(0.9):decelerate(0.1):zoomy(0);
 			elseif params.Status == 3 then	--failed
-				-- self:stoptweening():diffuse(color('1,0,0,1'));
+				self:stoptweening():sleep(1):decelerate(0.1):zoomy(0);
 			elseif params.Status == 0 then
 				self:stoptweening():decelerate(0.1):zoomy(0);
 			end;
@@ -76,7 +74,9 @@ local t = Def.ActorFrame{
 			if params.Status == 1 then
 				self:stoptweening():zoomy(0):accelerate(0.1):zoomy(1);
 			elseif params.Status == 2 then	--success
-				self:stoptweening():sleep(0.9):decelerate(0.1):zoomy(0);				
+				self:stoptweening():sleep(0.9):decelerate(0.1):zoomy(0);	
+			elseif params.Status == 3 then	--failed
+				self:stoptweening():sleep(1):decelerate(0.1):zoomy(0);
 			elseif params.Status == 0 then
 				self:stoptweening():decelerate(0.1):zoomy(0);
 			end;
@@ -93,7 +93,7 @@ local t = Def.ActorFrame{
 			elseif params.Status == 2 then	--success
 				self:stoptweening():sleep(0.9):decelerate(0.1):zoomy(0);
 			elseif params.Status == 3 then	--failed
-				-- self:stoptweening():diffuse(color('1,0,0,1'));
+				self:stoptweening():sleep(1):decelerate(0.1):zoomy(0);
 			elseif params.Status == 0 then
 				self:stoptweening():decelerate(0.1):zoomy(0);
 			end;
@@ -109,7 +109,7 @@ local t = Def.ActorFrame{
 			elseif params.Status == 2 then
 				self:stoptweening():diffusealpha(1):sleep(0.025):diffusealpha(0):sleep(0.025):diffusealpha(1):sleep(0.025):diffusealpha(0):sleep(0.025):diffusealpha(1):sleep(0.8):diffusealpha(0);
 			elseif params.Status == 3 then
-				self:stoptweening():diffusealpha(1):sleep(0.025):diffusealpha(0):sleep(0.025):diffusealpha(1):sleep(0.025):diffusealpha(0):sleep(0.025):diffusealpha(1);
+				self:stoptweening():diffusealpha(1):sleep(1):decelerate(0.1):diffusealpha(0);
 			elseif params.Status == 0 then
 				self:stoptweening():settext(""):diffusealpha(0);
 			end;
@@ -119,6 +119,7 @@ local t = Def.ActorFrame{
 
 	LoadFont('_TitleXolonium 30px')..
 	{
+		--text inside the box
 		OnCommand=cmd(xy,SCREEN_CENTER_X - 0,SCREEN_CENTER_Y + 60;horizalign,center;vertalign,top;zoom,0.6;diffusealpha,0);
 		SaniNetLoginScreenMessageCommand=function(self, params)
 			if params.Status == 1 then
@@ -129,7 +130,7 @@ local t = Def.ActorFrame{
 				self:stoptweening():cropright(1):settext(textSuccess):linear(0.2):cropright(0):sleep(0.7):diffusealpha(0);
 			elseif params.Status == 3 then
 				local textFailed = getSaninetTextLang("login-failed");
-				self:stoptweening():cropright(1):settext(textFailed):linear(0.2):cropright(0);
+				self:stoptweening():cropright(1):settext(textFailed):linear(0.2):cropright(0):sleep(0.8):decelerate(0.1):diffusealpha(0);
 			elseif params.Status == 0 then
 				self:stoptweening():diffusealpha(0);
 			end;
@@ -147,6 +148,8 @@ local t = Def.ActorFrame{
 				self:diffusealpha(1);
 			elseif params.Status == 2 then
 				self:stoptweening():sleep(0.9):diffusealpha(0);
+			elseif params.Status == 3 then
+				self:stoptweening():sleep(1):diffusealpha(0);
 			elseif params.Status == 0 then
 				self:stoptweening():diffusealpha(0);
 			end;
@@ -164,13 +167,17 @@ t[#t+1]=Def.ActorFrame{
 	SaniNetLoginScreenMessageCommand=function(self, params)
 		self:visible(true);
 		if params.Status == 1 then
-			self:visible(false);
+			self:visible(true);
+			self:linear(0.2):diffusealpha(0);
 		elseif params.Status == 2 then	--success
 			self:visible(true);
+			self:sleep(1):linear(0.2):diffusealpha(1);
 		elseif params.Status == 3 then	--failed
-			self:visible(false);
+			self:visible(true);
+			self:sleep(1):linear(0.2):diffusealpha(1);
 		elseif params.Status == 0 then
 			self:visible(true);
+			self:sleep(1):linear(0.2):diffusealpha(1);
 		end;
 	end;
 
@@ -240,11 +247,22 @@ t[#t+1]=Def.ActorFrame{
 		SaniNetClientConnectedMessageCommand=function(self, params)
 			self:visible(true);
 		 end;
+		 --[[
 		SaniNetAliveMessageCommand=function(self, params)
 			self:visible(params.Alive);
 		end;
+		]]
 
+		SaniNetAliveMessageCommand=function(self,params)
+	--		self:visible(params.Alive);
+			if params.Alive then
+				self:queuecommand("recheck");
+			end;
+		end;
 
+		recheckCommand=function(self)
+				self:visible(true);
+		end;
 
 		SaniNetLoginScreenMessageCommand=function(self, params)
 			-- if params.Status == 1 then
@@ -272,9 +290,23 @@ t[#t+1]=Def.ActorFrame{
 		SaniNetClientConnectedMessageCommand=function(self, params)
 			self:visible(true);
 		 end;
+		 --[[
 		SaniNetAliveMessageCommand=function(self, params)
 			self:visible(params.Alive);
 		end;
+		]]
+
+		SaniNetAliveMessageCommand=function(self,params)
+	--		self:visible(params.Alive);
+			if params.Alive then
+				self:queuecommand("recheck");
+			end;
+		end;
+
+		recheckCommand=function(self)
+				self:visible(true);
+		end;
+
 	};
 
 	LoadActor(THEME:GetPathG("","SaniNet/login/qr_saninet"))..
@@ -283,8 +315,20 @@ t[#t+1]=Def.ActorFrame{
 		SaniNetClientConnectedMessageCommand=function(self, params)
 			self:visible(true);
 		 end;
+		 --[[
 		SaniNetAliveMessageCommand=function(self, params)
 			self:visible(params.Alive);
+		end;
+		]]
+		SaniNetAliveMessageCommand=function(self,params)
+	--		self:visible(params.Alive);
+			if params.Alive then
+				self:queuecommand("recheck");
+			end;
+		end;
+
+		recheckCommand=function(self)
+				self:visible(true);
 		end;
 	};
 
@@ -298,45 +342,65 @@ t[#t+1]=Def.ActorFrame{
 			self:zoom(0.9);
 			self:sleep(0.25);
 			self:diffusealpha(1);
-			self:settext('');
+			--self:settext('');
 		end;
 
 		SaniNetAliveMessageCommand=function(self, params)
 			if params.Alive then
+				self:queuecommand("recheck");
+			end;
+		end;
+
+		recheckCommand=function(self)
 				local textFooterNoUser = getSaninetTextLang("login-footer-no-user");
 				self:settext(textFooterNoUser);
 				self:y(12);
-				if PREFSMAN:GetPreference('Language') == "es" then
+				local langSelected = PREFSMAN:GetPreference('Language');
+				if langSelected == "es" then
 					self:zoom(0.7);
+				elseif langSelected == "ko" then
+					self:zoom(1.1);
+				elseif langSelected == "pt" then
+					self:zoom(0.65);
 				else
 					self:zoom(0.9);
 				end;
-			end;
 		end;
+
+
 		SaniNetLoginScreenMessageCommand=function(self, params)
 			-- if params.Status == 1 then
 				-- self:settext("Not Logged In");
 			if params.Status == 2 then	--success
 				local textFooterConnected = getSaninetTextLang("login-footer-connected");
-				self:settext(textFooterConnected..params.Username);
-				self:y(18);
-				self:zoom(0.9);
-			elseif params.Status == 3 then	--failed
-				local textFooterFailed = getSaninetTextLang("login-failed");
-				self:settext("Login Failed");
-				self:y(12);
-				self:zoom(0.9);
-			elseif params.Status == 0 then
+
+				local langSelected = PREFSMAN:GetPreference('Language');
+				if langSelected == "ko" then
+					self:settext(params.Username.." "..textFooterConnected);
+					self:y(18);
+					self:zoom(1);
+				else
+					self:settext(textFooterConnected..params.Username);
+					self:y(18);
+					self:zoom(0.9);					
+				end;
+			elseif params.Status == 0 or params.Status == 3 then
+				self:diffusealpha(1);
 				local textFooterNoUser = getSaninetTextLang("login-footer-no-user");
 				self:settext(textFooterNoUser);
 				self:y(12);
 				if PREFSMAN:GetPreference('Language') == "es" then
 					self:zoom(0.7);
+				elseif PREFSMAN:GetPreference('Language') == "ko" then
+					self:zoom(1.1);
+				elseif PREFSMAN:GetPreference('Language') == "pt" then
+					self:zoom(0.65);
 				else
 					self:zoom(0.9);
 				end;
 			end;
 		end;
+
 		SaniNetErrorMessageMessageCommand=function(self, params)
 			if params.Message == 2 then	--success
 				local textFooterNoUser = getSaninetTextLang("login-footer-no-user");
@@ -344,6 +408,10 @@ t[#t+1]=Def.ActorFrame{
 				self:y(12);
 				if PREFSMAN:GetPreference('Language') == "es" then
 					self:zoom(0.7);
+				elseif PREFSMAN:GetPreference('Language') == "ko" then
+					self:zoom(1.1);
+				elseif PREFSMAN:GetPreference('Language') == "pt" then
+					self:zoom(0.65);
 				else
 					self:zoom(0.9);
 				end;
@@ -353,7 +421,7 @@ t[#t+1]=Def.ActorFrame{
 };
 
 
-local lastPinEnter=0;
+local pinInconsObjects = {};
 
 for i=0, 3 do
 	
@@ -365,6 +433,8 @@ for i=0, 3 do
 				self:stoptweening():diffusealpha(0):sleep(0.1):diffusealpha(1);
 			elseif params.Status == 2 then
 				self:stoptweening():sleep(0.9):diffusealpha(0);
+			elseif params.Status == 3 then
+				self:stoptweening():sleep(1):decelerate(0.1):diffusealpha(0);
 			elseif params.Status == 0 then
 				self:stoptweening():diffusealpha(0);
 			end;
@@ -376,12 +446,14 @@ for i=0, 3 do
 		OnCommand=cmd(xy,SCREEN_CENTER_X - 162 + 90 * i,SCREEN_CENTER_Y + 15;horizalign,left;diffusealpha,0;zoom,0.92);
 		SaniNetLoginScreenMessageCommand=function(self, params)
 			if params.Status == 1 then
+				self:visible(true);
 				if i == 0 then
 					self:stoptweening():diffusealpha(0):sleep(0.08):diffusealpha(1):diffuseshift():effectcolor1(color('1,1,1,0')):effectcolor2(color('1,1,1,0.5')):effectperiod(0.5);
 				end;
 			elseif params.Status == 2 or params.Status == 3 then
 				self:stoptweening():diffusealpha(0);
 			elseif params.Status == 0 then
+				self:visible(false);
 				self:stoptweening():diffusealpha(0);
 			end;
 		end;
@@ -397,25 +469,110 @@ for i=0, 3 do
 	
 	t[#t+1]=LoadActor(THEME:GetPathG("","SaniNet/login/pinicon"))..
 	{
-		OnCommand=cmd(xy,SCREEN_CENTER_X - 136 + 90 * i,SCREEN_CENTER_Y + 15;zoom,1;diffusealpha,0);
+		Name="pinIcon"..i+1;
+		--OnCommand=cmd(xy,SCREEN_CENTER_X - 136 + 90 * i,SCREEN_CENTER_Y + 15;zoom,1;diffusealpha,0);
+		OnCommand=function(self)
+			self:x(SCREEN_CENTER_X - 136 + 90 * i);
+			self:y(SCREEN_CENTER_Y + 15);
+			self:zoom(1);
+			self:diffusealpha(0);
+			table.insert(pinInconsObjects,self);
+		end;
+
 		SaniNetLoginScreenMessageCommand=function(self, params)
 			self:visible(true);
 			if params.Status == 1 then
+				self:visible(true);
 				self:stoptweening():diffusealpha(0);
 			elseif params.Status == 2 then
 				self:stoptweening():diffusealpha(1):sleep(0.9):diffusealpha(0);
 			elseif params.Status == 3 then
-				self:stoptweening():diffusealpha(1);
+				self:stoptweening():diffusealpha(1):sleep(1):decelerate(0.1):diffusealpha(0);
 			elseif params.Status == 0 then
+				self:visible(false);
 				self:stoptweening():diffusealpha(0);
 			end;
 		end;
 		SaniNetLoginNumPadMessageCommand=function(self, params)
+			if params.Position == 0 then				
+				self:stoptweening():diffusealpha(1);
+				self:sleep(0.25);
+				self:linear(0.05);
+				self:diffusealpha(0);
+			end;
 			if params.Position == (i + 1) then
 				self:stoptweening():diffusealpha(1);
 			end;
 		end;
 	};
+
+	local blinkTime=0.05;
+	t[#t+1]=LoadActor(THEME:GetPathG("","SaniNet/login/error_bigcursorglow"))..
+	{
+		Name="GlowError"..i;
+		OnCommand=cmd(xy,SCREEN_CENTER_X - 162 + 90 * i,SCREEN_CENTER_Y + 15;horizalign,left;diffusealpha,0;zoom,0.92;diffusecolor,color("#ff0000"));
+
+		SaniNetLoginNumPadMessageCommand=function(self, params)
+			if params.Position == 0 then				
+				self:stoptweening();
+				self:diffusealpha(1);
+				self:linear(blinkTime);
+				self:diffusealpha(0);
+				self:linear(blinkTime);
+				self:diffusealpha(1);
+				self:linear(blinkTime);
+				self:diffusealpha(0);
+				self:linear(blinkTime);
+				self:diffusealpha(1);
+				self:linear(blinkTime);
+				self:diffusealpha(0);
+				self:linear(blinkTime);
+			end;
+		end;
+
+		SaniNetLoginScreenMessageCommand=function(self, params)
+			self:diffusecolor(color("#ff0000"));
+			if params.Status == 0 then				
+				self:diffusealpha(0);
+				self:visible(false);
+			elseif params.Status == 1 then	
+				self:visible(true);
+			elseif params.Status == 2 then
+				self:diffusecolor(color("#00ff00"));
+				self:stoptweening();				
+				self:diffusealpha(1);
+				self:linear(blinkTime);
+				self:diffusealpha(0);
+				self:linear(blinkTime);
+				self:diffusealpha(1);
+				self:linear(blinkTime);
+				self:diffusealpha(0);
+				self:linear(blinkTime);
+				self:diffusealpha(1);
+				self:linear(blinkTime);
+				self:diffusealpha(0);
+				self:linear(blinkTime);
+			elseif params.Status == 3 then				
+				self:diffusecolor(color("#ff0000"));
+				self:stoptweening();				
+				self:diffusealpha(1);
+				self:linear(blinkTime);
+				self:diffusealpha(0);
+				self:linear(blinkTime);
+				self:diffusealpha(1);
+				self:linear(blinkTime);
+				self:diffusealpha(0);
+				self:linear(blinkTime);
+				self:diffusealpha(1);
+				self:linear(blinkTime);
+				self:diffusealpha(0);
+				self:linear(blinkTime);
+			end;
+		end;
+
+	};
+
+
 end;			
 
 return t;

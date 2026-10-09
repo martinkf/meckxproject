@@ -110,9 +110,6 @@ function getGraphCard(width,height,MinOffset,MaxOffset,padding,smooth_radius)
 				local miss= STATSMAN:GetCurStageStats():GetPlayerStageStats(player):GetTapNoteScores("TapNoteScore_Miss")+ STATSMAN:GetCurStageStats():GetPlayerStageStats(player):GetTapNoteScores("TapNoteScore_CheckpointMiss");
 				local totalNotes = pf+gr+gd+bd+miss;
 
-				--Trace("# TOTAL NOTES->"..totalNotes);
-
-
 				local noteOffset = -1;
 				local isEarly = 0;		
 				local iTns = TNSframe[param["TapNoteScore"]];
@@ -326,40 +323,10 @@ local t = Def.ActorFrame
 		local totalNotes = pfplus+pf+gr+gd+bd+miss;
 		noteOffset = param["TapNoteOffset"] and math.floor(param["TapNoteOffset"] * 1000 + 0.5) or nil;
 
-		--[[
-		Trace("#####################");
-		Trace("# MPERFECT->"..pfplus);
-		Trace("# PERFECT ->"..pf);
-		Trace("# GREAT   ->"..gr);
-		Trace("# GOOD    ->"..gd);
-		Trace("# BAD     ->"..bd);
-		Trace("# MISS    ->"..miss);
-		Trace("####");
-		Trace("#OFFSET JUDGMENT:"..noteOffset);
-		Trace("#OFFSET JUDGMENT:"..param["TapNoteScore"]);
-		]]
-
-
-
-		--[[
-	    Trace("=== SomeMessage param ===")
-	    if not param then Trace("(nil)"); return end
-	    for k, v in pairs(param) do
-	        -- Convierte enums a texto legible cuando existan
-	        if k == "Player" or k == "pn" then
-	            v = ToEnumShortString(v)  -- PLAYER_1 -> "P1"
-	        elseif k == "TapNoteScore" or k == "tns" then
-	            v = ToEnumShortString(v)  -- TapNoteScore_W1 -> "W1"
-	        end
-	        Trace(string.format("param[%s] = %s", tostring(k), tostring(v)))
-	    end
-
-	    Trace(param["TapNoteOffset"]);
-		]]
 	end;
 
 	resetGraphCommand=function(self)
-		--Trace("# Reseteo grafico");
+		
 	end;
 
 };

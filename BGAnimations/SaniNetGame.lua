@@ -126,21 +126,23 @@ t[#t+1] = Def.ActorFrame{
 					return;
 				end;
 
+				if params["Combo"] ~= nil then
+					if params["Combo"] > 0 then
+						local comboInit = "00";
+						if params["Combo"] > 9 and params["Combo"] < 100 then
+							comboInit = "0";
+						elseif params["Combo"] >= 100 then
+							comboInit = "";
+						end;	
+						local comboText = comboInit..params["Combo"];
 
-				if params["Combo"] > 0 then
-					local comboInit = "00";
-					if params["Combo"] > 9 and params["Combo"] < 100 then
-						comboInit = "0";
-					elseif params["Combo"] >= 100 then
-						comboInit = "";
-					end;	
-					local comboText = comboInit..params["Combo"];
-					Trace("#### Combo Text:"..comboText);
-
-					self:GetChild("mcombo"):settext(comboText):stoptweening():zoom(1.15):linear(0.2):zoom(1);
-				else
-					self:GetChild("mcombo"):settext("000"):zoom(1);
+						self:GetChild("mcombo"):settext(comboText):stoptweening():zoom(1.15):linear(0.2):zoom(1);
+					else
+						self:GetChild("mcombo"):settext("000"):zoom(1);
+					end;
 				end;
+
+
 
 
 
@@ -234,7 +236,6 @@ if isCenteredPlay == false and isDoublePlay == false and is2PlayersPlay == false
 
 			SaniNetStatsMessageCommand=function(self,params)
 				if (i - 1) == params.Position then
-
 					if checkRoomSize() == 0 then
 						self:visible(false);
 						return;
@@ -253,30 +254,43 @@ if isCenteredPlay == false and isDoublePlay == false and is2PlayersPlay == false
 					self:GetChild("miss"):settext(params["Miss"]);
 
 
-					local comboInit = "00";
-					if params["Combo"] > 9 and params["Combo"] < 100 then
-						comboInit = "0";
-					elseif params["Combo"] >= 100 then
-						comboInit = "";
-					end;	
-
-					if params["Combo"] > 0 then
-						self:GetChild("combo"):stoptweening():settext(comboInit..params["Combo"]):linear(0.025):zoom(1):linear(0.015):zoom(0.85);
+					if params["Combo"] ~= nil then
+						local comboInit = "00";
+						if params["Combo"] > 9 and params["Combo"] < 100 then
+							comboInit = "0";
+						elseif params["Combo"] >= 100 then
+							comboInit = "";
+						end;	
+						if params["Combo"] > 0 then					
+							self:GetChild("combo"):stoptweening():settext(comboInit..params["Combo"]):linear(0.025):zoom(1):linear(0.015):zoom(0.85);
+						else
+							self:GetChild("combo"):stoptweening():zoom(0.85):settext(comboInit..params["Combo"]);
+						end;
 					else
-						self:GetChild("combo"):stoptweening():zoom(0.85):settext(comboInit..params["Combo"]);
+						self:GetChild("combo"):stoptweening():zoom(0.85):settext("000");
 					end;
 
+
+					
 					--things
 					if params["Perfect"] > 0 and params["Great"] == 0 and params["Good"] == 0 and params["Bad"] == 0 and params["Miss"] == 0 then
 						self:GetChild("pfg"):visible(true);
 						self:GetChild("fc"):visible(false);
-					elseif params["Perfect"] > 0 and params["Great"] >=0 and params["Good"] >= 0 and params["Bad"] == 0 and params["Miss"] == 0 then
+						self:GetChild("nm"):visible(false);
+					elseif params["Perfect"] > 0 and params["Great"] >=0 and params["Good"] == 0 and params["Bad"] == 0 and params["Miss"] == 0 then
 						self:GetChild("fc"):visible(true);
 						self:GetChild("pfg"):visible(false);
+						self:GetChild("nm"):visible(false);
+					elseif params["Perfect"] > 0 and params["Great"] >=0 and params["Good"] >= 0 and params["Bad"] == 0 and params["Miss"] == 0 then
+						self:GetChild("nm"):visible(true);
+						self:GetChild("fc"):visible(false);
+						self:GetChild("pfg"):visible(false);
 					else
+						self:GetChild("nm"):visible(false);
 						self:GetChild("fc"):visible(false);
 						self:GetChild("pfg"):visible(false);
 					end;
+					
 
 				end;
 			end;
@@ -368,6 +382,17 @@ if isCenteredPlay == false and isDoublePlay == false and is2PlayersPlay == false
 				Name="fc";
 				OnCommand=function(self)
 					self:zoom(0.5);
+					self:x(-260);
+					self:y(-4);
+					self:rotationz(270);
+					self:visible(false);
+				end;
+			};
+
+			LoadActor(THEME:GetPathG("","SaniNet/pbox/selector_nm"))..{
+				Name="nm";
+				OnCommand=function(self)
+					self:zoom(0.6);
 					self:x(-260);
 					self:y(-4);
 					self:rotationz(270);
@@ -592,6 +617,7 @@ if isCenteredPlay == true and isDoublePlay == false and is2PlayersPlay == false 
 				end;
 			};	
 
+
 			LoadActor(THEME:GetPathG("","SaniNet/pbox/selector_pfg"))..{
 				Name="pfg";
 				OnCommand=function(self)
@@ -607,6 +633,17 @@ if isCenteredPlay == true and isDoublePlay == false and is2PlayersPlay == false 
 				Name="fc";
 				OnCommand=function(self)
 					self:zoom(0.5);
+					self:x(-260);
+					self:y(-4);
+					self:rotationz(270);
+					self:visible(false);
+				end;
+			};
+
+			LoadActor(THEME:GetPathG("","SaniNet/pbox/selector_nm"))..{
+				Name="nm";
+				OnCommand=function(self)
+					self:zoom(0.6);
 					self:x(-260);
 					self:y(-4);
 					self:rotationz(270);
@@ -899,6 +936,16 @@ if isDoublePlay == true then
 				end;
 			};
 
+			LoadActor(THEME:GetPathG("","SaniNet/pbox/selector_nm"))..{
+				Name="nm";
+				OnCommand=function(self)
+					self:zoom(0.5);
+					self:x(60);
+					self:y(-28);
+
+					self:visible(false);
+				end;
+			};
 
 		};		
 

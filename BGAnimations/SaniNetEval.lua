@@ -30,7 +30,7 @@ function processPlayerOptions(mods)
 	--Trace("POST MODS PROC 4:"..modsPlayer[4]);
 	--Trace("POST MODS PROC 5:"..modsPlayer[5]);
 
-	local modsProc = {type="",speed=0,decimal=-1,av=0,judg=-1}
+	local modsProc = {type="",speed=0,decimal=-1,av=0,judg=-1,cv=0}
 
 	if modsPlayer[1] == "speed" then
 
@@ -69,8 +69,15 @@ function processPlayerOptions(mods)
 		modsProc["av"] = modsPlayer[2];
 	end;
 
+	if modsPlayer[1] == "cv" then
+		modsProc["type"]="cv";
+		modsProc["cv"] = modsPlayer[2];
+	end;
+
 	if modsPlayer[5] == "nj" then
 		modsProc["judg"]=-1;
+	elseif modsPlayer[5] == "ej" then
+		modsProc["judg"]=17;
 	elseif modsPlayer[5] == "hj" then
 		modsProc["judg"]=0;
 	elseif modsPlayer[5] == "vj" then
@@ -195,6 +202,10 @@ local SnapDistance = 37;
 local arrayOfRollNumbers = {};
 local letterScoreVs2p;
 local dataRollNumberMp = {0,0,0,0,0,0}
+
+if PREFSMAN:GetPreference('ExtraJudgment') == false then		
+	yStatPos = 257;
+end;
 
 function createRollingNumbersVersus()
 
@@ -332,6 +343,17 @@ function createEmptyLetterScore2PlayerDuel()
 
 		LoadActor(THEME:GetPathG("","SaniNet/eval/fullcombo"))..{
 			Name="fcLabel";
+			OnCommand=cmd(zoom,0.75;cropright,1;diffusealpha,1;y,SCREEN_CENTER_Y-115;x,baseXLetter;);
+			AniCommand=function(self)
+				self:sleep(0.3);
+				self:linear(0.2);
+				self:cropright(0);
+			end;
+			FinalizedMessageCommand=cmd(finishtweening;visible,false);
+		};
+
+		LoadActor(THEME:GetPathG("","SaniNet/eval/nomiss"))..{
+			Name="nmLabel";
 			OnCommand=cmd(zoom,0.75;cropright,1;diffusealpha,1;y,SCREEN_CENTER_Y-115;x,baseXLetter;);
 			AniCommand=function(self)
 				self:sleep(0.3);
@@ -490,6 +512,15 @@ function createEmptyLetterScore2PlayerDuel()
 				self:zoom(0.5);
 			end;
 		};
+		LoadActor( THEME:GetPathG("","CommandWindow/CVicon") )..{
+			Name="cvIconMod";
+			OnCommand=function(self)
+				self:visible(false);
+				self:x(baseXMods);
+				self:y(SCREEN_CENTER_Y-165);
+				self:zoom(0.5);
+			end;
+		};
 
 
 		LoadFont("interphase/InterNumber numbers").. {
@@ -506,7 +537,7 @@ function createEmptyLetterScore2PlayerDuel()
 		};
 
 		--judg
-		LoadActor( THEME:GetPathG("","CommandWindow/Icons07 17x1") )..{
+		LoadActor( THEME:GetPathG("","CommandWindow/Icons07 18x1") )..{
 			Name="judgIconMod";
 			OnCommand=function(self)
 				self:visible(false);
@@ -561,6 +592,7 @@ function UpdateGraphicsFor2PlayerDuel(playerStats)
 
 	if modsProcData["type"] == "speed" then
 		letterScoreVs2p:GetChild("avIconMod"):visible(false);
+		letterScoreVs2p:GetChild("cvIconMod"):visible(false);
 		letterScoreVs2p:GetChild("speedIconModA"):setstate(modsProcData["speed"]);
 		letterScoreVs2p:GetChild("speedIconModA"):visible(true);
 
@@ -581,9 +613,17 @@ function UpdateGraphicsFor2PlayerDuel(playerStats)
 		end;
 	elseif modsProcData["type"] == "av" then
 		letterScoreVs2p:GetChild("avIconMod"):visible(true);
+		letterScoreVs2p:GetChild("cvIconMod"):visible(false);
 		letterScoreVs2p:GetChild("speedIconModA"):visible(false);
 		letterScoreVs2p:GetChild("speedIconModB"):visible(false);
 		letterScoreVs2p:GetChild("AVText"):settext(modsProcData["av"]);
+		letterScoreVs2p:GetChild("AVText"):visible(true);
+	elseif modsProcData["type"] == "cv" then
+		letterScoreVs2p:GetChild("avIconMod"):visible(false);
+		letterScoreVs2p:GetChild("cvIconMod"):visible(true);
+		letterScoreVs2p:GetChild("speedIconModA"):visible(false);
+		letterScoreVs2p:GetChild("speedIconModB"):visible(false);
+		letterScoreVs2p:GetChild("AVText"):settext(modsProcData["cv"]);
 		letterScoreVs2p:GetChild("AVText"):visible(true);
 	end;
 
@@ -595,33 +635,11 @@ function UpdateGraphicsFor2PlayerDuel(playerStats)
 		letterScoreVs2p:GetChild("judgIconMod"):visible(true);
 	end;
 	
-
-
-	--[[
-	Trace("place:"..playerStats["place"]);
-	Trace("playerName:"..playerStats["player"]);
-	Trace("pf:"..playerStats["perfect"]);
-	Trace("gr:"..playerStats["great"]);
-	Trace("gd:"..playerStats["good"]);
-	Trace("bad:"..playerStats["bad"]);
-	Trace("miss:"..playerStats["miss"]);
-	Trace("combo:"..playerStats["maxCombo"]);
-	Trace("score:"..playerStats["score"]);
-	]]
-	--debug data
-		--[[
-	pf = 1200;
-	gr = 350;
-	gd = 450;
-	bd = 20;
-	miss = 40;
-	combo = 750;
-	]]
-	--
 	--what status is
     local clearStatus = -1;
     local isPfc=false;
     local isFc=false;
+    local isNoMiss = false;
     
     if miss > 0 then
 	    if miss > 20 then --RG  
@@ -648,7 +666,7 @@ function UpdateGraphicsFor2PlayerDuel(playerStats)
 	    	isFc = true;
 	    elseif pf >= 0 and gr >= 0 and gd > 0 and bd == 0 and miss == 0 then --EG
 	    	clearStatus = 2;
-	    	isFc = true;
+	    	isNoMiss = true;
 	    elseif pf >= 0 and gr >= 0 and gd >= 0 and bd > 0 and miss == 0 then --superb
 	    	clearStatus = 3;
 	    end;		
@@ -706,6 +724,10 @@ function UpdateGraphicsFor2PlayerDuel(playerStats)
 
 		if isFc then
 			letterScoreVs2p:GetChild("fcLabel"):queuecommand("Ani");
+		end;
+
+		if isNoMiss then
+			letterScoreVs2p:GetChild("nmLabel"):queuecommand("Ani");
 		end;
 
 	end;
@@ -776,6 +798,7 @@ function createEmptyGraphicsForMpMultiResult(place)
 
 			self:GetChild("fullcombo"):diffusealpha(0):visible(false);
 			self:GetChild("pfc"):diffusealpha(0):visible(false);
+			self:GetChild("nomiss"):diffusealpha(0):visible(false);
 			playerBoxesMp["mpBox"..place] = self;
 		end;
 
@@ -1030,6 +1053,15 @@ function createEmptyGraphicsForMpMultiResult(place)
 			end;
 		};
 
+		LoadActor( THEME:GetPathG("","CommandWindow/CVicon") )..{
+			Name="cvIconMod";
+			OnCommand=function(self)
+				self:visible(false);
+				self:x(185);
+				self:y(-20);
+				self:zoom(0.4);
+			end;
+		};
 
 		LoadFont("interphase/InterNumber numbers").. {
 				Name="AVText";
@@ -1045,7 +1077,7 @@ function createEmptyGraphicsForMpMultiResult(place)
 		};
 
 		--judg
-		LoadActor( THEME:GetPathG("","CommandWindow/Icons07 17x1") )..{
+		LoadActor( THEME:GetPathG("","CommandWindow/Icons07 18x1") )..{
 			Name="judgIconMod";
 			OnCommand=function(self)
 				self:visible(false);
@@ -1081,6 +1113,19 @@ function createEmptyGraphicsForMpMultiResult(place)
 
 			end;
 		};
+	    --nm
+		LoadActor(THEME:GetPathG("","SaniNet/eval/nomiss"))..{
+			Name="nomiss";
+			OnCommand=function(self)
+				self:x(120);
+				self:y(48);
+				self:visible(false);
+				self:diffusealpha(0);
+				self:zoom(0.45);
+
+			end;
+		};
+
 
 
 	};
@@ -1118,11 +1163,14 @@ function updateBoxMpPlayerData(playerStats,placePlayer)
 
 	local isPfc=false;
 	local isFc=false;
+	local isNomiss=false;
 
 	if pf > 0 and gr == 0 and gd == 0 and bd == 0 and miss == 0 then
 		isPfc = true;
-	elseif pf > 0 and gr > 0 and gd > 0 and bd == 0 and miss == 0 then
+	elseif pf > 0 and gr > 0 and gd == 0 and bd == 0 and miss == 0 then
 		isFc = true;
+	elseif pf > 0 and gr > 0 and gd > 0 and bd == 0 and miss == 0 then		
+		isNomiss = true;
 	end;
 
 
@@ -1130,17 +1178,9 @@ function updateBoxMpPlayerData(playerStats,placePlayer)
 	local modsProcData = processPlayerOptions(playerOptions);
 
 	--Velocity
-	--[[
-	Trace("::::::TYPE::::::::"..modsProcData["type"]);
-	Trace("::::::SPEED:::::::"..modsProcData["speed"]);
-	Trace("::::::DECIMAL:::::::"..modsProcData["decimal"]);
-	Trace("::::::AV:::::::"..modsProcData["av"]);
-	Trace("::::::JUDG:::::::"..modsProcData["judg"]);
-	]]
-
-
 	if modsProcData["type"] == "speed" then
 		boxMp:GetChild("avIconMod"):visible(false);
+		boxMp:GetChild("cvIconMod"):visible(false);
 		boxMp:GetChild("speedIconModA"):setstate(modsProcData["speed"]);
 		boxMp:GetChild("speedIconModA"):visible(true);
 
@@ -1161,9 +1201,17 @@ function updateBoxMpPlayerData(playerStats,placePlayer)
 		end;
 	elseif modsProcData["type"] == "av" then
 		boxMp:GetChild("avIconMod"):visible(true);
+		boxMp:GetChild("cvIconMod"):visible(false);
 		boxMp:GetChild("speedIconModA"):visible(false);
 		boxMp:GetChild("speedIconModB"):visible(false);
 		boxMp:GetChild("AVText"):settext(modsProcData["av"]);
+		boxMp:GetChild("AVText"):visible(true);
+	elseif modsProcData["type"] == "cv" then
+		boxMp:GetChild("avIconMod"):visible(false);
+		boxMp:GetChild("cvIconMod"):visible(true);
+		boxMp:GetChild("speedIconModA"):visible(false);
+		boxMp:GetChild("speedIconModB"):visible(false);
+		boxMp:GetChild("AVText"):settext(modsProcData["cv"]);
 		boxMp:GetChild("AVText"):visible(true);
 	end;
 
@@ -1208,12 +1256,19 @@ function updateBoxMpPlayerData(playerStats,placePlayer)
 	if isPfc then
 		boxMp:GetChild("pfc"):diffusealpha(1):visible(true);
 		boxMp:GetChild("fullcombo"):diffusealpha(0):visible(false);
+		boxMp:GetChild("nomiss"):diffusealpha(0):visible(false);
 	elseif isFc then
 		boxMp:GetChild("fullcombo"):diffusealpha(1):visible(true);
+		boxMp:GetChild("pfc"):diffusealpha(0):visible(false);
+		boxMp:GetChild("nomiss"):diffusealpha(0):visible(false);
+	elseif isNomiss then
+		boxMp:GetChild("nomiss"):diffusealpha(1):visible(true);
+		boxMp:GetChild("fullcombo"):diffusealpha(0):visible(false);
 		boxMp:GetChild("pfc"):diffusealpha(0):visible(false);
 	else
 		boxMp:GetChild("fullcombo"):diffusealpha(0):visible(false);
 		boxMp:GetChild("pfc"):diffusealpha(0):visible(false);
+		boxMp:GetChild("nomiss"):diffusealpha(0):visible(false);
 	end;
 
 	--boxMp:stoptweening():diffusealpha(0):zoom(1.2):visible(true):decelerate(0.15):zoom(1):diffusealpha(1);
@@ -1250,16 +1305,27 @@ for i=1,#roomUserStatus do
 					itsMe = true;
 				end;
 
+				local checkpointHitsData = 0;
+				local checkpointMissData = 0;
+
+				if params["CheckpointHit"] ~= nil then
+					checkpointHitsData = params["CheckpointHit"];
+				end;
+				if params["CheckpointMiss"] ~= nil then
+					checkpointMissData = params["CheckpointMiss"];
+				end;
+
+
 				local playerData = {					
 					idUser = params["ConnectionId"],
 					player = params["Username"],
 					place = params["VsPlace"],
 					slot_room = params.Position,
-					perfect = params["Perfect"] + params["CheckpointHit"],
+					perfect = params["Perfect"] + checkpointHitsData,
 					great = params["Great"],
 					good = params["Good"],
 					bad = params["Bad"],
-					miss = params["Miss"] + params["CheckpointMiss"],
+					miss = params["Miss"] + checkpointMissData,
 					score = params["ScorePhoenix"],
 					percentScore = params["ScorePercent"],
 					maxCombo = params["MaxCombo"],
@@ -1278,18 +1344,9 @@ for i=1,#roomUserStatus do
 
 
 				if params["Perfect"] == 0 and params["Great"] == 0 and params["Good"] == 0 and params["Bad"] == 0 and params["Miss"] == 0 and params["MaxCombo"] == 0 and params["ScorePhoenix"] == 0 then
-					--Trace("Datos recibidos del jugador:"..params["ConnectionId"]);
-					--Trace(":: "..params["ConnectionId"].." ::SONG DATA EMPTY");
-				else
-					--[[
-					for k, v in pairs(params) do
-					    Trace(":"..params["ConnectionId"]..":::::::::: Param " .. tostring(k) .. " = " .. tostring(v))
-					end
-					]]
 
-					--Trace("::::::::: "..params["ConnectionId"].."  :::::: Status of MP score -> "..playerData["statusUserSeval"]);
+				else
 					if not playerData["statusUserSeval"] then
-						--Trace("::::::::: "..params["ConnectionId"].."  :::::: rank is not ready");
 						return;
 					end;
 
@@ -1345,7 +1402,6 @@ t[#t+1] = LoadActor(THEME:GetPathG("","SaniNet/eval/onlineranking_text"))..{
 
 	SaniNetEvaluationStatsMessageCommand=function(self,params)
 
-			--Trace("### PARAM RankingData:"..params["RankingData"]);
 			local dataServer = params["RankingData"];
 			local partyCount = params["PartyCount"];
 			if #dataServer == 0 or partyCount > 0 then
@@ -1367,8 +1423,15 @@ t[#t+1] = LoadActor(THEME:GetPathG("","SaniNet/eval/onlineranking_text"))..{
 				local itsMe = dataServer[i]["me"];
 				local itsFc = dataServer[i]["fc"];
 				local itsPfc = dataServer[i]["pfc"];
+				local itsNoMiss = false;
 
+				if dataServer[i]["nomiss"] ~= nil then
+					itsNoMiss = dataServer[i]["nomiss"];
+				end;
 
+				onlineRecordsObjects[i]:GetChild("fcomboTag"):stoptweening():visible(false);
+				onlineRecordsObjects[i]:GetChild("pfcTag"):stoptweening():visible(false);
+				onlineRecordsObjects[i]:GetChild("nmcomboTag"):stoptweening():visible(false);
 
 				--Place
 				onlineRecordsObjects[i]:GetChild("placeRanking"):stoptweening():settext(place);
@@ -1379,20 +1442,44 @@ t[#t+1] = LoadActor(THEME:GetPathG("","SaniNet/eval/onlineranking_text"))..{
 					stateLamp = 2;
 					onlineRecordsObjects[i]:GetChild("lampRankingGlow"):stoptweening():glowshift():effectcolor1(color("0.549,0.894,1,0")):effectcolor2(color("0.549,0.894,1,0.5")):effectperiod(0.1):visible(true):diffusealpha(0.25);
 					onlineRecordsObjects[i]:GetChild("pfcTag"):stoptweening():visible(true);
+					--onlineRecordsObjects[i]:GetChild("backRecordOnline"):stoptweening():setstate(2);
 
-					onlineRecordsObjects[i]:GetChild("backRecordOnline"):stoptweening():setstate(2);
+					if judgRecord == "ej" then
+						onlineRecordsObjects[i]:GetChild("backRecordOnline"):stoptweening():setstate(3);
+					else
+						onlineRecordsObjects[i]:GetChild("backRecordOnline"):stoptweening():setstate(2);
+					end;
+
 				elseif itsFc then
 					stateLamp = 1;
 					onlineRecordsObjects[i]:GetChild("lampRankingGlow"):stoptweening():glowshift():effectcolor1(color("#FFA23900")):effectcolor2(color("#FFA239FF")):effectperiod(0.1):visible(true):diffusealpha(0.25);
 					onlineRecordsObjects[i]:GetChild("fcomboTag"):stoptweening():visible(true);
+					--onlineRecordsObjects[i]:GetChild("backRecordOnline"):stoptweening():setstate(1);
 
-					onlineRecordsObjects[i]:GetChild("backRecordOnline"):stoptweening():setstate(1);
+					if judgRecord == "ej" then
+						onlineRecordsObjects[i]:GetChild("backRecordOnline"):stoptweening():setstate(3);
+					else
+						onlineRecordsObjects[i]:GetChild("backRecordOnline"):stoptweening():setstate(1);
+					end;
+
+				elseif itsNoMiss then
+					stateLamp = 4;
+					onlineRecordsObjects[i]:GetChild("lampRankingGlow"):stoptweening():glowshift():effectcolor1(color("#ffa23900")):effectcolor2(color("#0afa36FF")):effectperiod(0.1):visible(true):diffusealpha(0.25);
+					onlineRecordsObjects[i]:GetChild("nmcomboTag"):stoptweening():visible(true);
+					--onlineRecordsObjects[i]:GetChild("backRecordOnline"):stoptweening():setstate(0);
+
+					if judgRecord == "ej" then
+						onlineRecordsObjects[i]:GetChild("backRecordOnline"):stoptweening():setstate(3);
+					else
+						onlineRecordsObjects[i]:GetChild("backRecordOnline"):stoptweening():setstate(0);
+					end;
+
 				else
 					stateLamp = 4;
 					onlineRecordsObjects[i]:GetChild("lampRankingGlow"):stoptweening():visible(false);
 					onlineRecordsObjects[i]:GetChild("fcomboTag"):stoptweening():visible(false);
 					onlineRecordsObjects[i]:GetChild("pfcTag"):stoptweening():visible(false);
-
+					onlineRecordsObjects[i]:GetChild("nmcomboTag"):stoptweening():visible(false);
 					onlineRecordsObjects[i]:GetChild("backRecordOnline"):stoptweening():setstate(0);
 				end;
 
@@ -1454,6 +1541,8 @@ t[#t+1] = LoadActor(THEME:GetPathG("","SaniNet/eval/onlineranking_text"))..{
 					onlineRecordsObjects[i]:GetChild("judgPlayerRank"):setstate(3);
 				elseif judgRecord == "uj" then
 					onlineRecordsObjects[i]:GetChild("judgPlayerRank"):setstate(4);
+				elseif judgRecord == "ej" then
+					onlineRecordsObjects[i]:GetChild("judgPlayerRank"):setstate(5);
 				else
 					onlineRecordsObjects[i]:GetChild("judgPlayerRank"):setstate(0);
 				end;
@@ -1630,6 +1719,11 @@ for i=1,9 do
 		};
 
 
+		LoadActor(THEME:GetPathG("","SaniNet/eval/nomiss"))..{
+			Name="nmcomboTag";
+			OnCommand=cmd(zoom,0.65;x,242;y,15;visible,false;diffusealpha,1);			
+			FinalizedMessageCommand=cmd(finishtweening;visible,false);			
+		};
 
 
 

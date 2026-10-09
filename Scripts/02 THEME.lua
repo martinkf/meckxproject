@@ -1,6 +1,370 @@
 function themeVersionData()
-	local vActual = "0.99";
-	return "THEME v"..vActual.."\nREV-20032026-Nightly Build";
+	local vActual = "0.99.2";
+	return "BASE THEME REV-"..vActual..".08062026";
+end;
+
+function generarEstrellaBoom(sleepStart,sleepWait,xInit,yInit,type)
+
+	--default
+	local setSelected = {
+		star2="LOGO/nlogo3/effect_star2.png",
+		star0="LOGO/nlogo3/effect_star0.png",
+		star3a="LOGO/nlogo3/effect_star3a.png",
+	};
+
+	if type == "blue" then
+		local setSelected = {
+			star2="stars/lblue_star2.png",
+			star0="stars/lblue_star0.png",
+			star3a="stars/lblue_star3a.png",
+		};
+	end;
+
+	return Def.ActorFrame{
+		LoadActor( THEME:GetPathG("",setSelected["star2"]) )..{
+			InitCommand=cmd(zoom,0.1;diffusealpha,0;y,yInit;x,xInit);	
+			OnCommand=function(self)
+				self:sleep(sleepStart);
+				self:queuecommand("AniSec");				
+			end;
+			AniSecCommand=function(self)
+				self:zoom(0.1);
+				self:diffusealpha(0);				
+
+				self:sleep(1.3); --1.3
+				self:zoom(0.1);
+				self:diffusealpha(1);
+				self:linear(0.21); --1.51
+				self:zoom(0.35);
+				self:linear(0.7); -- 2.21
+				self:zoom(0.4);
+				self:linear(0);
+				self:diffusealpha(0);
+				self:sleep(0.05); -- 2.26
+				self:diffusealpha(1);
+				self:sleep(0.05); -- 2.31
+				self:diffusealpha(0); 
+				self:sleep(0.05); -- 2.36
+				self:diffusealpha(1);
+				self:sleep(0.05); -- 2.41
+				self:diffusealpha(0);
+				self:sleep(0.59); -- 3 segundos animación
+
+				self:sleep(sleepWait);
+				self:queuecommand("AniSec");
+			end;
+
+			OffCommand=function(self)
+				self:stoptweening();
+				self:linear(0.15);
+				self:diffusealpha(0);
+			end;
+		};
+
+		LoadActor( THEME:GetPathG("",setSelected["star2"]) )..{
+			InitCommand=cmd(zoom,0.12;diffusealpha,0;y,yInit+1;x,xInit+5;rotationz,20);	
+			OnCommand=function(self)
+				self:sleep(sleepStart);
+				self:queuecommand("AniSec");				
+			end;
+
+			AniSecCommand=function(self)
+				self:zoom(0.12);
+				self:diffusealpha(0);	
+				self:x(xInit+5);
+				self:y(yInit+1);
+				self:rotationz(20);
+
+				self:sleep(1.3);   --1.3
+				self:diffusealpha(1);
+				self:rotationz(20);
+				self:zoom(0.13);
+				self:sleep(0.05);  -- 1.35
+				self:linear(0.3);  -- 1.65
+				self:zoom(0.35);
+				self:linear(0.5);  -- 2.15
+				self:zoom(0.45);
+				self:linear(0);
+				self:diffusealpha(0);
+				self:sleep(0.05); -- 2.2
+				self:diffusealpha(1);
+				self:sleep(0.05); -- 2.25
+				self:diffusealpha(0);
+				self:sleep(0.05); -- 2.3
+				self:diffusealpha(1);
+				self:sleep(0.05); -- 2.35
+				self:diffusealpha(0);
+				self:sleep(0.65); -- 3 segundos animación
+
+				self:sleep(sleepWait);
+				self:queuecommand("AniSec");							
+			end;
+
+			OffCommand=function(self)
+				self:stoptweening();
+				self:linear(0.15);
+				self:diffusealpha(0);
+			end;
+		};		
+
+
+		--estrella principal
+		LoadActor( THEME:GetPathG("",setSelected["star0"]) )..{
+			InitCommand=cmd(zoom,0.35;diffusealpha,0;y,yInit;x,xInit;rotationz,325);	
+			OnCommand=function(self)
+				self:sleep(sleepStart);
+				self:queuecommand("AniSec");
+			end;
+
+			AniSecCommand=function(self)
+				self:rotationz(325);
+				self:zoom(0.35);
+				self:diffusealpha(1);
+				self:accelerate(0.1); -- 0.1
+				self:rotationz(335);
+				self:zoom(0.4);
+				self:decelerate(0.3); -- 0.4
+				self:zoom(0.35);
+				self:rotationz(380);
+				self:linear(0.95); -- 1.15 
+				self:zoom(0.4);
+				self:rotationz(400);
+				self:sleep(0);
+				self:diffusealpha(0);
+				self:sleep(1.65); -- 3 segundos de animación.
+
+				self:sleep(sleepWait); -- 
+				self:queuecommand("AniSec");
+			end;
+
+			OffCommand=function(self)
+				self:stoptweening();
+				self:linear(0.15);
+				self:diffusealpha(0);
+			end;
+		};
+
+		LoadActor( THEME:GetPathG("",setSelected["star3a"]) )..{
+			InitCommand=cmd(zoom,0.3;diffusealpha,0;y,yInit-25;x,xInit-25;diffusealpha,0;rotationz,345);
+
+			OnCommand=function(self)
+				self:sleep(sleepStart);
+				self:queuecommand("AniSec");
+			end;
+
+
+			AniSecCommand=function(self)
+				self:zoom(0.3);
+				self:y(yInit-25);
+				self:x(xInit-25);
+				self:rotationz(345);
+
+				self:sleep(0.1);     -- 0.1
+				self:diffusealpha(1);
+				self:linear(0.2);   -- 0.3
+				self:rotationz(355);
+				self:addx(-25);
+				self:addy(-15);
+				self:zoom(0.55);
+
+				self:linear(0.5);   -- 0.8
+				self:rotationz(365);
+				self:addx(-5);
+				self:addy(-5);
+
+				self:sleep(0);
+				self:diffusealpha(0);
+				self:sleep(0.02); -- 0.82
+				self:diffusealpha(1);
+
+				self:linear(0.1); -- 0.92
+				self:rotationz(368); 
+				self:addx(-2);
+				self:addy(-2);	
+
+				self:sleep(0);
+				self:diffusealpha(0);
+				self:sleep(0.02); -- 0.94
+				self:diffusealpha(1);
+
+				self:linear(0.2); -- 1.14
+				self:rotationz(372);
+				self:addx(-2);
+				self:addy(-2);	
+
+				self:sleep(0);
+				self:diffusealpha(0);
+				self:sleep(0.02); -- 1.16
+				self:diffusealpha(1);
+
+				self:linear(0.2); -- 1.36
+				self:rotationz(376);
+				self:addx(-2);
+				self:addy(-2);	
+
+				self:sleep(0);
+				self:diffusealpha(0);
+				self:sleep(1.64); -- 3 segundos de animación.
+
+				self:sleep(sleepWait);
+				self:queuecommand("AniSec");								
+			end;
+
+			OffCommand=function(self)
+				self:stoptweening();
+				self:linear(0.15);
+				self:diffusealpha(0);
+			end;
+		};
+
+
+
+		LoadActor( THEME:GetPathG("",setSelected["star3a"]) )..{
+			InitCommand=cmd(zoom,0.3;diffusealpha,1;y,yInit+25;x,xInit;diffusealpha,0;rotationz,345);	
+
+			OnCommand=function(self)
+				self:sleep(sleepStart);
+				self:queuecommand("AniSec");
+			end;
+
+			AniSecCommand=function(self)
+				self:zoom(0.3);
+				self:y(yInit+25);
+				self:x(xInit);
+				self:rotationz(345);
+
+				self:sleep(0.1);     --0.1
+				self:diffusealpha(1);
+				self:linear(0.2);    -- 0.3
+				self:rotationz(355);
+				self:addx(-25);
+				self:addy(15);
+				self:zoom(0.55);
+
+				self:linear(0.5);   -- 0.8
+				self:rotationz(365);
+				self:addx(-5);
+				self:addy(5);
+
+				self:sleep(0);
+				self:diffusealpha(0);
+				self:sleep(0.02);   -- 0.82
+				self:diffusealpha(1);
+
+				self:linear(0.1);  -- 0.92
+				self:rotationz(368);
+				self:addx(-2);
+				self:addy(2);	
+
+				self:sleep(0);
+				self:diffusealpha(0);
+				self:sleep(0.02); -- 0.94
+				self:diffusealpha(1);
+
+				self:linear(0.2); -- 1.14
+				self:rotationz(372);
+				self:addx(-2);
+				self:addy(2);	
+
+				self:sleep(0);
+				self:diffusealpha(0);
+				self:sleep(0.02); --1.16
+				self:diffusealpha(1);
+
+				self:linear(0.2); -- 1.36
+				self:rotationz(376);
+				self:addx(-2);
+				self:addy(2);	
+
+				self:sleep(0);
+				self:diffusealpha(0);
+				self:sleep(1.64); -- 3 segundos de animación.
+
+				self:sleep(sleepWait);
+				self:queuecommand("AniSec");	
+			end;
+
+			OffCommand=function(self)
+				self:stoptweening();
+				self:linear(0.15);
+				self:diffusealpha(0);
+			end;
+		};		
+
+
+		LoadActor( THEME:GetPathG("",setSelected["star3a"]) )..{
+			InitCommand=cmd(zoom,0.3;diffusealpha,1;y,yInit;x,xInit+25;diffusealpha,0;rotationz,345);
+
+			OnCommand=function(self)
+				self:sleep(sleepStart);
+				self:queuecommand("AniSec");
+			end;
+
+			AniSecCommand=function(self)
+				self:zoom(0.3);
+				self:y(yInit);
+				self:x(xInit+25);
+				self:rotationz(345);
+
+				self:sleep(0.1);    --0.1
+				self:diffusealpha(1);
+				self:linear(0.2);  --0.3
+				self:rotationz(355);
+				self:addx(25);
+				self:addy(-15);
+				self:zoom(0.55);
+
+				self:linear(0.5); -- 0.8
+				self:rotationz(365);
+				self:addx(5);
+				self:addy(-5);
+
+				self:sleep(0);
+				self:diffusealpha(0);
+				self:sleep(0.02); -- 0.82
+				self:diffusealpha(1);
+
+				self:linear(0.1); -- 0.92
+				self:rotationz(368);
+				self:addx(2);
+				self:addy(-2);	
+
+				self:sleep(0);
+				self:diffusealpha(0);
+				self:sleep(0.02); -- 0.94
+				self:diffusealpha(1);
+
+				self:linear(0.2); -- 1.14
+				self:rotationz(372);
+				self:addx(2);
+				self:addy(-2);	
+
+				self:sleep(0);
+				self:diffusealpha(0);
+				self:sleep(0.02); -- 1.16
+				self:diffusealpha(1);
+
+				self:linear(0.2); -- 1.36
+				self:rotationz(376);
+				self:addx(2);
+				self:addy(-2);	
+
+				self:sleep(0);
+				self:diffusealpha(0);
+				self:sleep(1.64); -- 3 segundos de animación.
+
+				self:sleep(sleepWait);
+				self:queuecommand("AniSec");	
+			end;
+
+			OffCommand=function(self)
+				self:stoptweening();
+				self:linear(0.15);
+				self:diffusealpha(0);
+			end;
+		};	
+	};
+
 end;
 
 function defaultDifficultyListSkin()
@@ -19,6 +383,46 @@ function fastSave()
 		end;
 	end;
 end;
+
+function checkAndSetTimingProfile()
+	-- we set the timing selected by this player.
+	if GAMESTATE:IsHumanPlayer(PLAYER_1)  then
+
+		--only if not guest.
+		if PROFILEMAN:IsPersistentProfile(PLAYER_1) then	
+			local timingPlayerProfile = getCustomOptionValuePlayer(PLAYER_1,"timing_adjustment");
+			local offsetPlayer = tonumber(timingPlayerProfile);
+			if offsetPlayer == nil then
+				offsetPlayer = 0;
+			end;
+			GAMESTATE:GetPlayerState(PLAYER_1):GetPlayerOptions('ModsLevel_Preferred'):JudgeTiming(offsetPlayer);	
+		end;
+
+		
+	end;
+
+	if GAMESTATE:IsHumanPlayer(PLAYER_2)  then
+		if PROFILEMAN:IsPersistentProfile(PLAYER_2) then	
+			local timingPlayerProfile = getCustomOptionValuePlayer(PLAYER_2,"timing_adjustment");
+			local offsetPlayer = tonumber(timingPlayerProfile);
+			if offsetPlayer == nil then
+				offsetPlayer = 0;
+			end;
+			GAMESTATE:GetPlayerState(PLAYER_2):GetPlayerOptions('ModsLevel_Preferred'):JudgeTiming(offsetPlayer);	
+		end;
+	end;
+end;
+
+function checkAndSetTimingProfileByPlayer(player)
+	-- we set the timing selected by this player.
+	local timingPlayerProfile = getCustomOptionValuePlayer(player,"timing_adjustment");
+	local offsetPlayer = tonumber(timingPlayerProfile);
+	if offsetPlayer == nil then
+		offsetPlayer = 0;
+	end;
+	GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Preferred'):JudgeTiming(offsetPlayer);
+end;
+
 
 function checkPerformanceModeState()
 	local perfp1=false;
@@ -179,7 +583,6 @@ function getAllRankingFromSong(PLAYERNUM)
 	local steps = GAMESTATE:GetCurrentSteps(PLAYERNUM);	
 
 	local listProfileId =  PROFILEMAN:GetLocalProfileIDs();
-	--debugearTabla(listProfileId);
 	local arrayScores={};
 
 	for i=1,#listProfileId do
@@ -193,6 +596,7 @@ function getAllRankingFromSong(PLAYERNUM)
 			local dateScore = hsList[1]:GetDate();
 			local judgStateRecord = -1;
 			local fullCombo = false;
+			local nomiss = false;
 			if hsList[1]:GetFailedAux() then
 				failed = 1;
 			end;
@@ -205,21 +609,28 @@ function getAllRankingFromSong(PLAYERNUM)
 			   judgStateRecord = 3;	
 			elseif string.find(modListRecord, "UltraHardJudgement") then
 			   judgStateRecord = 4;	
+			elseif string.find(modListRecord, "EasyJudgement") then
+			   judgStateRecord = 5;	
 			elseif string.find(modListRecord, "HardJudgement") then
 			   judgStateRecord = 0;
 			end;
 
 
 			--When fixed, this will show a full combo sticker  :) but right now, this thing can't so this function is very sad.
+			local tnsgood = hsList[1]:GetTapNoteScore('TapNoteScore_W4');
 			local tnsbadmiss 	= hsList[1]:GetTapNoteScore('TapNoteScore_W5') +
 							  hsList[1]:GetTapNoteScore("TapNoteScore_Miss") +
 							  hsList[1]:GetTapNoteScore("TapNoteScore_CheckpointMiss");
 			
-			if tnsbadmiss == 0 then
+			if tnsbadmiss == 0 and tnsgood == 0 then
 				fullCombo = true;
 			end;
 
-			table.insert(arrayScores,{guid=guidProfile,name=name,failed=failed,score=score,judgState=judgStateRecord,dateScore=dateScore,fc=fullCombo});
+			if tnsbadmiss == 0 and tnsgood > 0 then
+				nomiss = true;
+			end;
+
+			table.insert(arrayScores,{guid=guidProfile,name=name,failed=failed,score=score,judgState=judgStateRecord,dateScore=dateScore,fc=fullCombo,nomiss=nomiss});
 		end;
 		
 	end;
@@ -254,14 +665,19 @@ function GetHighScoreAndStateFromPlayer(PLAYERNUM)
 		dataHs["failed"] = isFailed;
 
 		dataHs["fullcombo"] = 0;
+		dataHs["nomiss"] = 0;
 		
-		--When fixed, this will show a full combo sticker  :) but right now, this thing can't so this function is very sad.
+		local tnsgood = scores[1]:GetTapNoteScore('TapNoteScore_W4');
 		local tnsbadmiss 	= scores[1]:GetTapNoteScore('TapNoteScore_W5') +
 						  scores[1]:GetTapNoteScore("TapNoteScore_Miss") +
 						  scores[1]:GetTapNoteScore("TapNoteScore_CheckpointMiss");
 		
-		if tnsbadmiss == 0 then
+		if tnsbadmiss == 0 and tnsgood == 0 then
 			dataHs["fullcombo"] = 1;
+		end;
+
+		if tnsbadmiss == 0 and tnsgood > 0 then
+			dataHs["nomiss"] = 1;
 		end;
 		
 		printHighscoreDataPlayer(PLAYERNUM,scores[1]);
@@ -310,17 +726,6 @@ function printHighscoreDataPlayer(player,scoreData)
 				perf = plStats["Perfect"];
 			end;
 
-			--[[
-			Trace("# 02 THEME.LUA###"..player.." :HIGHSCORE [1] TRACE:");
-			Trace("# MPERFECT ->"..mperf);
-			Trace("# PERFECT  ->"..perf);
-			Trace("# GREAT    ->"..gr);
-			Trace("# GOOD     ->"..gd);
-			Trace("# BAD      ->"..bd);
-			Trace("# MISS     ->"..miss);
-			Trace("# COMBO    ->"..combo);
-			Trace("# SCORE    ->"..score);
-			]]
 end;
 
 
@@ -348,15 +753,22 @@ function GetHighScoreAndStateFromStepsPlayer(steps,player)
 		dataHs["failed"] = isFailed;
 
 
+		dataHs["nomiss"] = 0;
 		dataHs["fullcombo"] = 0;
-		--[[
+		
+		local tnsgood = scores[1]:GetTapNoteScore('TapNoteScore_W4');
 		local tnsbadmiss 	= scores[1]:GetTapNoteScore('TapNoteScore_W5') +
 						  scores[1]:GetTapNoteScore("TapNoteScore_Miss") +
 						  scores[1]:GetTapNoteScore("TapNoteScore_CheckpointMiss");
-		if tnsbadmiss == 0 then
+
+
+		if tnsbadmiss == 0 and tnsgood == 0 then
 			dataHs["fullcombo"] = 1;
 		end;
-		]]
+
+		if tnsbadmiss == 0 and tnsgood > 0 then
+			dataHs["nomiss"] = 1;
+		end;
 
 		return dataHs;
 	end;
@@ -392,4 +804,23 @@ function setStageCounterInGameplay(status)
 end;
 function hideStageCounterInGameplay()
 	GAMESTATE:Env()["counterInGameplay"] = false;
+end;
+
+function getPeriodTimeForBpm(periodTime)
+		local bpm = GAMESTATE:GetCurrentSong():GetCustomBPM();
+
+		if bpm == nil or bpm == "???" then
+		    bpm = "150";
+		end
+
+		if bpm ~= nil then
+			local part1, part2 = bpm:match("([^%-]+)%-([^%-]+)");
+			if part1 and part2 then
+				bpm = part2;
+			end;
+
+			periodTime = (60/bpm)*periodTime;
+		end;
+
+		return periodTime;
 end;
