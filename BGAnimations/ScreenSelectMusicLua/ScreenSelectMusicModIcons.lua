@@ -426,51 +426,7 @@ function CreateModForPlayer(player)
 					end;
 				end;
 			end;
-		end;
-		SpeedHalfUpMessageCommand=function(self,params)
-			if player == params.Player then
-				local x = GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Preferred' ):XMod();
-				local STATE = GAMESTATE:GetPlayerState(player);
-				if STATE:GetPlayerOptions('ModsLevel_Preferred'):IsAvEnabled() > 0 then
-					STATE:GetPlayerOptions('ModsLevel_Preferred' ):XMod(1);
-					STATE:GetPlayerOptions('ModsLevel_Preferred'):MMod(nil);
-					PAVenabled[player] = false;
-					MESSAGEMAN:Broadcast("CommandWindowAV", {Player = player} );
-					MESSAGEMAN:Broadcast("CodeMod", {Player = params.Player, Command = "speed"} )		
-				else
-					x = x + 0.5;				
-					if x ~= GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Preferred' ):XMod() then
-						if tonumber(x) >= 7 then
-							x=1;
-						end;
-						STATE:GetPlayerOptions('ModsLevel_Preferred' ):XMod(x)
-						MESSAGEMAN:Broadcast("CodeMod", {Player = params.Player, Command = "speed"} )					
-					end;
-				end;
-			end;
-		end;
-		SpeedHalfDownMessageCommand=function(self,params)
-			if player == params.Player then
-				local x = GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Preferred' ):XMod();
-				local STATE = GAMESTATE:GetPlayerState(player);
-				if STATE:GetPlayerOptions('ModsLevel_Preferred'):IsAvEnabled() > 0 then
-					STATE:GetPlayerOptions('ModsLevel_Preferred' ):XMod(6);
-					STATE:GetPlayerOptions('ModsLevel_Preferred'):MMod(nil);
-					PAVenabled[player] = false;
-					MESSAGEMAN:Broadcast("CommandWindowAV", {Player = player} );
-					MESSAGEMAN:Broadcast("CodeMod", {Player = params.Player, Command = "speed"} )		
-				else
-					x = x - 0.5;				
-					if x ~= GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Preferred' ):XMod() then
-						if tonumber(x) < 1 then
-							x=6;
-						end;
-						STATE:GetPlayerOptions('ModsLevel_Preferred' ):XMod(x)
-						MESSAGEMAN:Broadcast("CodeMod", {Player = params.Player, Command = "speed"} )					
-					end;
-				end;
-			end;
-		end;
+		end;		
 	};
 	
 	t.GlowIconModMessageCommand=function(self, params)
