@@ -919,27 +919,6 @@ local function WheelCounter(self)
 		indexText = ""
 	end
 	self:GetChild("Counter"):settext(indexText);
-	
-	local curChannel = GetFixedChannelName(GAMESTATE:GetChannelName() or "");
-	self:GetChild("Channel"):settext(curChannel);
-
-	--categorias
-	if GAMESTATE:GetRandomChannel() or GAMESTATE:GetRandomTrainChannel() or GAMESTATE:GetSurvivalChannel() then
-		self:GetChild("Category"):settext("-");		
-	else
-		if (curChannel ~= nil) then
-			if curChannel == "ORIGINAL" or curChannel == "XROSS" or curChannel == "J-MUSIC" or curChannel == "K-POP" or curChannel == "WORLD MUSIC" then
-				self:GetChild("Category"):settext("-");
-			else
-				local categoryText = CHGetCategory(0);
-				if categoryText ~= nil then
-					self:GetChild("Category"):settext(CHGetCategory(0));
-				else
-					self:GetChild("Category"):settext("-");
-				end;
-			end;
-		end;
-	end;	
 
 end;
 
@@ -1207,28 +1186,6 @@ t[#t+1] =  Def.ActorFrame{
 					self:y(140);
 				end;
 			end;
-		};
-
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/SM-BACKTITLE"))..{
-			Name="baseChannel";
-			InitCommand=cmd(xy,-360,130;zoomy,0.3;zoomx,0.6;diffusealpha,0.95;fadeleft,0.3;faderight,0.3);
-		};
-
-		LoadFont("xolonium")..{
-			Name="Channel";
-			Text="ALL TUNES";
-			InitCommand=cmd(zoom,.8;xy,-360,128;horizalign,center;maxwidth,180/.8;strokecolor,color("0,0,0,1") );
-		};
-
-		LoadActor(THEME:GetPathG("","ScreenSelectMusic/SM-BACKTITLE"))..{
-			Name="baseCategory";
-			InitCommand=cmd(xy,360,130;zoomy,0.3;zoomx,0.6;diffusealpha,0.95;fadeleft,0.3;faderight,0.3);
-		};
-
-		LoadFont("xolonium")..{
-			Name="Category";
-			Text="ALL TUNES";
-			InitCommand=cmd(zoom,.8;xy,360,128;horizalign,center;maxwidth,180/.8;strokecolor,color("0,0,0,1") );
 		};
 
 	};
