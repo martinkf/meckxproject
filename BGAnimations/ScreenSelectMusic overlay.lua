@@ -3482,4 +3482,32 @@ end;
 --random plugin
 t[#t+1] = LoadActor("ScreenSelectMusicLua/selectRandomSongPlugin")..{};
 
+
+--test
+t[#t+1] = Def.ActorFrame {
+	InitCommand=function(self)
+		self:xy(SCREEN_CENTER_X, SCREEN_CENTER_Y):visible(false);
+	end;
+	OnCommand=function(self)
+		self:xy(SCREEN_CENTER_X, SCREEN_CENTER_Y):visible(false);
+	end;
+	CodeMessageCommand = function(self, params)
+		if params.Name == "MeckxFiOne" then
+			self:visible(true)
+		elseif params.Name == "MeckxFiTwo" then
+			self:visible(false)
+		end
+	end,
+
+	Def.Quad{
+		Name="testingmeckx";
+		InitCommand=function(self)
+			self:zoomto(300, 300):diffuse(color("0,0,0"))
+		end,
+		OnCommand=function(self)
+			self:zoomto(300, 300):diffuse(color("0,0,0"))
+		end,		
+	},
+};
+
 return t;
