@@ -236,10 +236,9 @@ t[#t+1] = Def.Quad {
 		self:x(SCREEN_CENTER_X);
 		self:y(SCREEN_CENTER_Y);
 		self:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT);
-		self:diffuse(color("#000000"));
-		self:diffusealpha(1);	
-		--self:sleep(0.);	
-		self:decelerate(0.6);
+		self:diffuse(color("#ffffff"));
+		self:diffusealpha(1);
+		self:decelerate(1);
 		self:diffusealpha(0);
 	end;
 };
