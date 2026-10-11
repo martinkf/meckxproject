@@ -94,7 +94,7 @@ t[#t+1] =  Def.ActorFrame{ -- general grey background video
 	};
 };
 t[#t+1] =  Def.ActorFrame{
-	InitCommand=cmd(Center);
+	InitCommand=cmd(Center;visible,false;);
 	VisibleCommand=cmd(visible,true);
 	HideCommand=cmd(visible,false);
 	SelectChannelMessageCommand=cmd(queuecommand,"Hide");
@@ -126,11 +126,11 @@ t[#t+1] =  Def.ActorFrame{
 					-- END PERFORMANCE MODE--
 
 					if PreviewPath["novideo"] then
-						self:GetChild("nBanner"):stoptweening():diffusealpha(1):Load(BannerPath):scaletoclipped(SCREEN_WIDTH,SCREEN_HEIGHT);
+						self:GetChild("nBanner"):stoptweening():diffusealpha(1):Load(BannerPath):scaletoclipped(SCREEN_WIDTH/4,SCREEN_HEIGHT/4);
 						self:GetChild("Preview"):visible(false):LoadBackground(THEME:GetPathG("","blackdot"));
 					else
 						self:GetChild("Preview"):stoptweening():visible(true):LoadBackground(PreviewPath["path"]);
-						self:GetChild("Preview"):zoomto(SCREEN_WIDTH,SCREEN_HEIGHT):diffusealpha(0):linear(1):diffusealpha(1);
+						self:GetChild("Preview"):zoomto(SCREEN_WIDTH/4,SCREEN_HEIGHT/4):diffusealpha(0):linear(1):diffusealpha(1);
 						self:GetChild("nBanner"):stoptweening():diffusealpha(0);
 					end;
 
@@ -163,15 +163,31 @@ t[#t+1] =  Def.ActorFrame{
 			end;
 
 			Def.Sprite{		Name="Preview";	--video preview
-				InitCommand=cmd(setsize,SCREEN_WIDTH,SCREEN_HEIGHT;xy,0,0;);
+				InitCommand=cmd(setsize,SCREEN_WIDTH/4,SCREEN_HEIGHT/4;xy,0,0;);
 				OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
 			};
 
 			Def.Banner {	Name="nBanner";	--banner standard,
-				InitCommand=cmd(setsize,SCREEN_WIDTH,SCREEN_HEIGHT;xy,0,0;);
+				InitCommand=cmd(setsize,SCREEN_WIDTH/4,SCREEN_HEIGHT/4;xy,0,0;);
 				OffCommand=cmd(stoptweening;linear,0.3;diffusealpha,0;);
 			};
 		};
+	};
+};
+
+
+
+t[#t+1] =  Def.ActorFrame{ --this is a "screen filter" you add to the BGA_P when it's a background BGA_P in order to smoothen it to the eyes
+	InitCommand=cmd(Center;visible,false;);
+	Def.Quad {
+		InitCommand=cmd(zoomto,SCREEN_WIDTH/4,SCREEN_HEIGHT/4;y,SCREEN_CENTER_Y-(SCREEN_HEIGHT/2);fadetop,.42;diffuse,color("#33333399"););
+		ChannelChosenMessageCommand=cmd(visible,true);
+		SelectChannelMessageCommand=cmd(visible,false);
+	};
+	LoadActor(THEME:GetPathG("","ScreenSelectMusic/bg/back3"))..{
+		InitCommand=cmd(zoomto,SCREEN_WIDTH/4,SCREEN_HEIGHT/4;fadetop,1;diffusealpha,0.8;);
+		ChannelChosenMessageCommand=cmd(linear,0.3;fadetop,1);
+		SelectChannelMessageCommand=cmd(fadetop,0);
 	};
 };
 
@@ -213,20 +229,6 @@ t[#t+1] = Def.Quad {
 	InitCommand=cmd(zoomto,SCREEN_WIDTH,26;xy,SCREEN_CENTER_X,SCREEN_TOP;diffuse,color("#000011");valign,0);
 };
 
-
-t[#t+1] =  Def.ActorFrame{
-	InitCommand=cmd(Center;);
-	Def.Quad {
-		InitCommand=cmd(zoomto,SCREEN_WIDTH,SCREEN_CENTER_Y;y,SCREEN_CENTER_Y*.5;fadetop,.42;diffuse,color("#33333399"));
-		ChannelChosenMessageCommand=cmd(visible,true);
-		SelectChannelMessageCommand=cmd(visible,false);
-	};
-	LoadActor(THEME:GetPathG("","ScreenSelectMusic/bg/back3"))..{
-		InitCommand=cmd(zoomto,SCREEN_WIDTH,SCREEN_HEIGHT;fadetop,1;diffusealpha,0.8;);
-		ChannelChosenMessageCommand=cmd(linear,0.3;fadetop,1);
-		SelectChannelMessageCommand=cmd(fadetop,0);
-	};
-};
 
 
 t[#t+1] = Def.Quad {		
