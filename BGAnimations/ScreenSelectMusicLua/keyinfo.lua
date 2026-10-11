@@ -5,30 +5,135 @@ local isAspect43On=isAspectRatio43();
 t[#t+1] = Def.Quad {
 	InitCommand=cmd(zoomto,SCREEN_WIDTH,26;xy,SCREEN_CENTER_X,SCREEN_BOTTOM;diffuse,color("#000011");valign,1);
 };
+t[#t+1] = Def.Quad {
+	InitCommand=cmd(zoomto,SCREEN_WIDTH,26;xy,SCREEN_CENTER_X,SCREEN_TOP;diffuse,color("#000011");valign,0);
+};
 
 --meckx temp - these are all temp quads for future formatting purposes and will be removed eventually
 t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,SCREEN_WIDTH,84;xy,SCREEN_CENTER_X,SCREEN_BOTTOM-26;diffuse,color("#ffff0022");valign,1);
-};
-t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,SCREEN_WIDTH,26;xy,SCREEN_CENTER_X,SCREEN_TOP;diffuse,color("#00001177");valign,0);
-};
-t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,SCREEN_WIDTH,84;xy,SCREEN_CENTER_X,SCREEN_TOP+26;diffuse,color("#ffff0022");valign,0);
-};
-t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,40,668;xy,SCREEN_LEFT,SCREEN_TOP+26;diffuse,color("#ff000055");valign,0;halign,0);
+	InitCommand=cmd(zoomto,40,492;xy,SCREEN_LEFT,SCREEN_TOP+26+88;diffuse,color("#ff000055");valign,0;halign,0);
 };
 t[#t+1] = LoadFont("_TitleXolonium")..{
 	Text="TEMP ALL SONGS";
 	InitCommand=cmd(xy,SCREEN_LEFT+20,SCREEN_CENTER_Y;zoom,0.66;maxwidth,480;rotationz,270;);
 };
 t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,40,668;xy,SCREEN_LEFT+40,SCREEN_TOP+26;diffuse,color("#0000FF55");valign,0;halign,0);
+	InitCommand=cmd(zoomto,40,492;xy,SCREEN_LEFT+40,SCREEN_TOP+26+88;diffuse,color("#0000FF55");valign,0;halign,0);
 };
 t[#t+1] = LoadFont("_TitleXolonium")..{
 	Text="TEMP ALL CHARTS";
 	InitCommand=cmd(xy,SCREEN_LEFT+40+20,SCREEN_CENTER_Y;zoom,0.66;maxwidth,480;rotationz,270;);
+};
+
+
+
+
+t[#t+1] =  Def.ActorFrame{
+	Name="Rise proportions";
+	InitCommand=cmd(visible,false;);
+
+	Def.Quad {
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,64;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y-64-8-64-8-64-8;diffuse,color("#222222AA"));
+	};
+	Def.Quad {
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,60;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y-64-8-64-8-64-8;diffuse,color("#ffff00AA"));
+	};
+
+	Def.Quad {
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,64;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y-64-8-64-8;diffuse,color("#222222AA"));
+	};
+	Def.Quad {
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,60;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y-64-8-64-8;diffuse,color("#ffff00AA"));
+	};
+
+	Def.Quad {
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,64;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y-64-8;diffuse,color("#222222AA"));
+	};
+	Def.Quad {
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,60;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y-64-8;diffuse,color("#ffff00AA"));
+	};
+
+	Def.Quad {
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,64;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y;diffuse,color("#222222AA"));
+	};
+	Def.Quad {
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,60;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y;diffuse,color("#ffff00AA"));
+	};
+
+	Def.Quad {
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,64;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y+64+8;diffuse,color("#222222AA"));
+	};
+	Def.Quad {
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,60;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y+64+8;diffuse,color("#ffff00AA"));
+	};
+
+	Def.Quad {
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,64;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y+64+8+64+8;diffuse,color("#222222AA"));
+	};
+	Def.Quad {
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,60;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y+64+8+64+8;diffuse,color("#ffff00AA"));
+	};
+
+	Def.Quad {
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,64;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y+64+8+64+8+64+8;diffuse,color("#222222AA"));
+	};
+	Def.Quad {
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,60;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y+64+8+64+8+64+8;diffuse,color("#ffff00AA"));
+	};
+};
+
+t[#t+1] =  Def.ActorFrame{
+	Name="Rise inspired, less borders";
+	InitCommand=cmd(visible,false;);
+
+	Def.Quad {
+		InitCommand=cmd(zoomto,1196,68;xy,SCREEN_LEFT+82,SCREEN_CENTER_Y-68-2-68-2-68-2;diffuse,color("#222222AA");halign,0);
+	};
+	Def.Quad {
+		InitCommand=cmd(zoomto,1192,64;xy,SCREEN_LEFT+84,SCREEN_CENTER_Y-68-2-68-2-68-2;diffuse,color("#ffff00AA");halign,0);
+	};
+
+	Def.Quad {
+		InitCommand=cmd(zoomto,1196,68;xy,SCREEN_LEFT+82,SCREEN_CENTER_Y-68-2-68-2;diffuse,color("#222222AA");halign,0);
+	};
+	Def.Quad {
+		InitCommand=cmd(zoomto,1192,64;xy,SCREEN_LEFT+84,SCREEN_CENTER_Y-68-2-68-2;diffuse,color("#ffff00AA");halign,0);
+	};
+
+	Def.Quad {
+		InitCommand=cmd(zoomto,1196,68;xy,SCREEN_LEFT+82,SCREEN_CENTER_Y-68-2;diffuse,color("#222222AA");halign,0);
+	};
+	Def.Quad {
+		InitCommand=cmd(zoomto,1192,64;xy,SCREEN_LEFT+84,SCREEN_CENTER_Y-68-2;diffuse,color("#ffff00AA");halign,0);
+	};
+
+	Def.Quad {
+		InitCommand=cmd(zoomto,1196,68;xy,SCREEN_LEFT+82,SCREEN_CENTER_Y;diffuse,color("#222222AA");halign,0);
+	};
+	Def.Quad {
+		InitCommand=cmd(zoomto,1192,64;xy,SCREEN_LEFT+84,SCREEN_CENTER_Y;diffuse,color("#ffffAADD");halign,0);
+	};
+
+	Def.Quad {
+		InitCommand=cmd(zoomto,1196,68;xy,SCREEN_LEFT+82,SCREEN_CENTER_Y+68+2;diffuse,color("#222222AA");halign,0);
+	};
+	Def.Quad {
+		InitCommand=cmd(zoomto,1192,64;xy,SCREEN_LEFT+84,SCREEN_CENTER_Y+68+2;diffuse,color("#ffff00AA");halign,0);
+	};
+
+	Def.Quad {
+		InitCommand=cmd(zoomto,1196;xy,SCREEN_LEFT+82,SCREEN_CENTER_Y+68+2+68+2;diffuse,color("#222222AA");halign,0);
+	};
+	Def.Quad {
+		InitCommand=cmd(zoomto,1192,64;xy,SCREEN_LEFT+84,SCREEN_CENTER_Y+68+2+68+2;diffuse,color("#ffff00AA");halign,0);
+	};
+
+	Def.Quad {
+		InitCommand=cmd(zoomto,1196,68;xy,SCREEN_LEFT+82,SCREEN_CENTER_Y+68+2+68+2+68+2;diffuse,color("#222222AA");halign,0);
+	};
+	Def.Quad {
+		InitCommand=cmd(zoomto,1192,64;xy,SCREEN_LEFT+84,SCREEN_CENTER_Y+68+2+68+2+68+2;diffuse,color("#ffff00AA");halign,0);
+	};
 };
 
 
