@@ -3,29 +3,32 @@ local isAspectRatio1610On=isAspectRatio1610();
 local isAspect43On=isAspectRatio43();
 
 t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,SCREEN_WIDTH,26;xy,SCREEN_CENTER_X,SCREEN_BOTTOM-13;diffuse,color("#000011"));
+	InitCommand=cmd(zoomto,SCREEN_WIDTH,26;xy,SCREEN_CENTER_X,SCREEN_BOTTOM;diffuse,color("#000011");valign,1);
 };
 
 --meckx temp - these are all temp quads for future formatting purposes and will be removed eventually
 t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,SCREEN_WIDTH,26;xy,SCREEN_CENTER_X,SCREEN_TOP+13;diffuse,color("#00001177"));
+	InitCommand=cmd(zoomto,SCREEN_WIDTH,84;xy,SCREEN_CENTER_X,SCREEN_BOTTOM-26;diffuse,color("#ffff0022");valign,1);
 };
 t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,SCREEN_WIDTH,106;xy,SCREEN_CENTER_X,SCREEN_TOP+53;diffuse,color("#ffff0022"));
+	InitCommand=cmd(zoomto,SCREEN_WIDTH,26;xy,SCREEN_CENTER_X,SCREEN_TOP;diffuse,color("#00001177");valign,0);
 };
 t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,48,588;xy,SCREEN_LEFT+24,SCREEN_TOP+106;diffuse,color("#ff000055");valign,0);
+	InitCommand=cmd(zoomto,SCREEN_WIDTH,84;xy,SCREEN_CENTER_X,SCREEN_TOP+26;diffuse,color("#ffff0022");valign,0);
+};
+t[#t+1] = Def.Quad {
+	InitCommand=cmd(zoomto,40,668;xy,SCREEN_LEFT,SCREEN_TOP+26;diffuse,color("#ff000055");valign,0;halign,0);
 };
 t[#t+1] = LoadFont("_TitleXolonium")..{
 	Text="TEMP ALL SONGS";
-	InitCommand=cmd(xy,SCREEN_LEFT+24,SCREEN_CENTER_Y+30;zoom,0.8;maxwidth,480;rotationz,270;);
+	InitCommand=cmd(xy,SCREEN_LEFT+20,SCREEN_CENTER_Y;zoom,0.66;maxwidth,480;rotationz,270;);
 };
 t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,48,588;xy,SCREEN_LEFT+48+24,SCREEN_TOP+106;diffuse,color("#0000FF55");valign,0);
+	InitCommand=cmd(zoomto,40,668;xy,SCREEN_LEFT+40,SCREEN_TOP+26;diffuse,color("#0000FF55");valign,0;halign,0);
 };
 t[#t+1] = LoadFont("_TitleXolonium")..{
 	Text="TEMP ALL CHARTS";
-	InitCommand=cmd(xy,SCREEN_LEFT+48+24,SCREEN_CENTER_Y+30;zoom,0.8;maxwidth,480;rotationz,270;);
+	InitCommand=cmd(xy,SCREEN_LEFT+40+20,SCREEN_CENTER_Y;zoom,0.66;maxwidth,480;rotationz,270;);
 };
 
 
