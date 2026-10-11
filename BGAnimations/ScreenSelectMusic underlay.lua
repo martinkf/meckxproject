@@ -345,14 +345,7 @@ end;
 
 
 
---FILTER STEP TYPE MESSAGE (only for 1 player, because with 2 players you can't pick double............. lol)
---if GAMESTATE:GetNumSidesJoined() == 1 then
-	t[#t+1] = LoadActor("ScreenSelectMusicLua/filterMessages")..{};
---end;
 
-
---because why not
-t[#t+1] = LoadActor("ScreenSelectMusicLua/channelMusicHelper")..{};
 
 
 return t;
