@@ -176,6 +176,44 @@ t[#t+1] =  Def.ActorFrame{
 };
 
 
+
+--meckx temp - these are all temp quads for future formatting purposes and will be removed eventually
+t[#t+1] = Def.Quad {
+	InitCommand=cmd(zoomto,40,SCREEN_HEIGHT;xy,SCREEN_LEFT,SCREEN_TOP;diffuse,color("#550000");valign,0;halign,0);
+};
+t[#t+1] = LoadFont("_TitleXolonium")..{
+	Text="TEMP ALL SONGS";
+	InitCommand=cmd(xy,SCREEN_LEFT+20,SCREEN_CENTER_Y;zoom,0.66;maxwidth,480;rotationz,270;);
+};
+t[#t+1] = Def.Quad {
+	InitCommand=cmd(zoomto,40,SCREEN_HEIGHT;xy,SCREEN_LEFT+40,SCREEN_TOP;diffuse,color("#000055");valign,0;halign,0);
+};
+t[#t+1] = LoadFont("_TitleXolonium")..{
+	Text="TEMP ALL CHARTS";
+	InitCommand=cmd(xy,SCREEN_LEFT+40+20,SCREEN_CENTER_Y;zoom,0.66;maxwidth,480;rotationz,270;);
+};
+t[#t+1] = Def.Quad {
+	InitCommand=cmd(zoomto,SCREEN_WIDTH-80,SCREEN_HEIGHT;xy,SCREEN_LEFT+40+40,SCREEN_TOP;diffuse,color("#ffffff55");valign,0;halign,0;diffusealpha,0;);
+	SongChosenMessageCommand=function(self)
+		self:stoptweening();
+		self:decelerate(0.5);
+		self:zoomto(300,SCREEN_HEIGHT);
+		self:diffusealpha(1);
+	end;
+	SongUnchosenMessageCommand=function(self)
+		self:stoptweening();
+		self:decelerate(0.25);
+		self:zoomto(SCREEN_WIDTH-80,SCREEN_HEIGHT);
+		self:diffusealpha(0);
+	end;
+};
+
+
+t[#t+1] = Def.Quad {
+	InitCommand=cmd(zoomto,SCREEN_WIDTH,26;xy,SCREEN_CENTER_X,SCREEN_TOP;diffuse,color("#000011");valign,0);
+};
+
+
 t[#t+1] =  Def.ActorFrame{
 	InitCommand=cmd(Center;);
 	Def.Quad {
@@ -337,6 +375,7 @@ else
 	local frameSkinFunc = LoadActor(luaFrameSkinSelected["lua"]);
 	t[#t+1] = frameSkinFunc(luaFrameSkinSelected["path"]);
 end;
+
 
 
 

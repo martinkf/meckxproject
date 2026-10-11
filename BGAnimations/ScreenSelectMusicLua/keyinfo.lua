@@ -5,29 +5,10 @@ local isAspect43On=isAspectRatio43();
 t[#t+1] = Def.Quad {
 	InitCommand=cmd(zoomto,SCREEN_WIDTH,26;xy,SCREEN_CENTER_X,SCREEN_BOTTOM;diffuse,color("#000011");valign,1);
 };
-t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,SCREEN_WIDTH,26;xy,SCREEN_CENTER_X,SCREEN_TOP;diffuse,color("#000011");valign,0);
-};
+
+
 
 --meckx temp - these are all temp quads for future formatting purposes and will be removed eventually
-t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,40,492;xy,SCREEN_LEFT,SCREEN_TOP+26+88;diffuse,color("#ff000055");valign,0;halign,0);
-};
-t[#t+1] = LoadFont("_TitleXolonium")..{
-	Text="TEMP ALL SONGS";
-	InitCommand=cmd(xy,SCREEN_LEFT+20,SCREEN_CENTER_Y;zoom,0.66;maxwidth,480;rotationz,270;);
-};
-t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,40,492;xy,SCREEN_LEFT+40,SCREEN_TOP+26+88;diffuse,color("#0000FF55");valign,0;halign,0);
-};
-t[#t+1] = LoadFont("_TitleXolonium")..{
-	Text="TEMP ALL CHARTS";
-	InitCommand=cmd(xy,SCREEN_LEFT+40+20,SCREEN_CENTER_Y;zoom,0.66;maxwidth,480;rotationz,270;);
-};
-
-
-
-
 t[#t+1] =  Def.ActorFrame{
 	Name="Rise proportions";
 	InitCommand=cmd(visible,false;);
@@ -135,6 +116,8 @@ t[#t+1] =  Def.ActorFrame{
 		InitCommand=cmd(zoomto,1192,64;xy,SCREEN_LEFT+84,SCREEN_CENTER_Y+68+2+68+2+68+2;diffuse,color("#ffff00AA");halign,0);
 	};
 };
+
+
 
 
 --#######
