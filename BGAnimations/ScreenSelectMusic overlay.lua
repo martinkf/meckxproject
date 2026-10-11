@@ -327,6 +327,7 @@ local zoomArrowsChannel=1;
 
 t[#t+1] =  Def.ActorFrame
 {
+	InitCommand=cmd(visible,false);
 
 	LoadActor(THEME:GetPathG("","ScreenSelectMusic/ws_arrow_to_left"))..{
 		Name="MWARROW";
@@ -458,7 +459,7 @@ t[#t+1] =  Def.ActorFrame
 
 --backsimpleDiffList
 t[#t + 1] = LoadActor(THEME:GetPathG("","ScreenSelectMusic/SM-BACKTITLE"))..{
-	InitCommand=cmd(xy,SCREEN_CENTER_X,SCREEN_CENTER_Y*1.36;zoomx,2.8;zoomy,0.75;diffusealpha,0.8;fadetop,0.1);
+	InitCommand=cmd(xy,SCREEN_CENTER_X,SCREEN_CENTER_Y*1.36;zoomx,2.8;zoomy,0.75;diffusealpha,0.8;fadetop,0.1;visible,false);
 	CurrentSongChangedMessageCommand=function(self)			
 		self:finishtweening():diffusealpha(0.6):sleep(0.05):linear(0.2):diffusealpha(0.8);	
 	end;	
@@ -567,6 +568,7 @@ end;
 
 
 t[#t+1] =  Def.ActorFrame{
+	InitCommand=cmd(visible,false);
 
 
 		Def.ActorFrame{
@@ -928,7 +930,7 @@ local langMessageFav = PREFSMAN:GetPreference('Language').."_favorite_message";
 
 
 t[#t+1] =  Def.ActorFrame{
-	InitCommand=cmd(xy,SCREEN_CENTER_X,SCREEN_CENTER_Y*1.19);
+	InitCommand=cmd(xy,SCREEN_CENTER_X,SCREEN_CENTER_Y*1.19;visible,false);
 	SelectChannelMessageCommand=cmd(finishtweening;decelerate,0.1;diffusealpha,0);
 	ChannelChosenMessageCommand=cmd(stoptweening;diffusealpha,0;sleep,0.1;linear,0.3;diffusealpha,1);	
 
