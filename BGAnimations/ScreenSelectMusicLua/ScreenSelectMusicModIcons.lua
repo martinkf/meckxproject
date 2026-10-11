@@ -348,7 +348,7 @@ local function IsModSelected( index , modTitle , player)
 	return false;
 end;
 
-local yAuxPos = 46;
+local xAuxPos = 60;
 
 
 local function getAVNum(player)
@@ -463,9 +463,10 @@ function CreateModForPlayer(player)
 		local bool=true;	
 		if GetCommandTitles()[m].name == "note skin" then
 			
+			--meckx note - this is the background asset for the modicon of noteskin if you want to replace it for a quad later
 			t[#t+1] = LoadActor(THEME:GetPathG("","CommandWindow/BackIcon"))..{
 				Name="backnoteskin";
-				InitCommand=cmd(y, 4 * yAuxPos-1;visible,false);
+				InitCommand=cmd(x, 4 * xAuxPos-1;visible,false);
 		
 				OnCommand=function(self, params)
 					if GAMESTATE:GetGameMode() ~= 'Basic' then
@@ -480,10 +481,11 @@ function CreateModForPlayer(player)
 						end;
 						
 						self:visible( goVisible );
+						self:zoom(0.98);
 					end;
 				end;
-				HideCommand=cmd(stoptweening;zoom,1.0625;diffusealpha,1;linear,.25;zoom,1;diffusealpha,0);
-				ShowCommand=cmd(stoptweening;visible,true;zoom,1.0625;diffusealpha,0.25;linear,.25;zoom,1;diffusealpha,1);
+				HideCommand=cmd(stoptweening;zoom,1.0625;diffusealpha,1;linear,.25;zoom,0.98;diffusealpha,0);
+				ShowCommand=cmd(stoptweening;visible,true;zoom,1.0625;diffusealpha,0.25;linear,.25;zoom,0.98;diffusealpha,1);
 				RandomSkinEnabledMessageCommand=function(self, params)
 					if params.Player ~= player then return; end;
 					self:stoptweening():queuecommand("Hide");
@@ -501,7 +503,7 @@ function CreateModForPlayer(player)
 			
 			t[#t+1] = LoadActor(THEME:GetPathG("","_blank"))..{
 				Name="noteskin";
-				InitCommand=cmd(y, 4 * yAuxPos-1;visible,false);
+				InitCommand=cmd(x, 4 * xAuxPos-1;visible,false);
 				OnCommand=function(self, params)
 		
 							
@@ -522,6 +524,7 @@ function CreateModForPlayer(player)
 						end;
 						
 						self:visible( goVisible );
+						self:zoom(0.98);
 					end;
 				end;
 
@@ -560,9 +563,10 @@ function CreateModForPlayer(player)
 			
 			t[#t+1] = LoadActor(THEME:GetPathG("","CommandWindow/" .. FileSprite ))..{
 				Name=GetCommandTitles()[m].name;
-				InitCommand=cmd( zoom,0.5;animate,false;y,m * yAuxPos;visible,false);
+				InitCommand=cmd( zoom,0.5;animate,false;x,m * xAuxPos;visible,false);
 				OnCommand=function(self)
 					self:zoom(0.5);
+					if m==3 then self:y(1.3) end
 					MESSAGEMAN:Broadcast("FileSprite->".."CommandWindow/".. FileSprite);					
 					for i=0, #array do array[i]=nil; end;
 					int=1;
@@ -776,25 +780,25 @@ function CreateModForPlayer(player)
 		
 		t[#t+1] = LoadActor(THEME:GetPathG("","THEME-EFFECT_GLOW"))..{
 			Name=GetCommandTitles()[m].name .. "Glow1";
-			InitCommand=cmd(animate,false;setstate,0;blend,Blend.Add;diffusealpha,0;y,m*yAuxPos);
+			InitCommand=cmd(animate,false;setstate,0;blend,Blend.Add;diffusealpha,0;x,m*xAuxPos);
 			AnimateAuxCommand=cmd(finishtweening;zoom,1;diffusealpha,1;sleep,0.1;linear,0.4;diffusealpha,0;zoom,1.125);
 		};
 		
 		t[#t+1] = LoadActor(THEME:GetPathG("","THEME-EFFECT_GLOW"))..{
 			Name=GetCommandTitles()[m].name .. "Glow2";
-			InitCommand=cmd(animate,false;setstate,0;blend,Blend.Add;diffusealpha,0;y,m*yAuxPos);
+			InitCommand=cmd(animate,false;setstate,0;blend,Blend.Add;diffusealpha,0;x,m*xAuxPos);
 			AnimateAuxCommand=cmd(finishtweening;zoom,1;diffusealpha,1;sleep,0.1;linear,0.4;diffusealpha,0;zoom,1.125);
 		};
 		
 		t[#t+1] = LoadActor(THEME:GetPathG("","THEME-EFFECT_GLOW"))..{
 			Name=GetCommandTitles()[m].name .. "Glow3";
-			InitCommand=cmd(animate,false;setstate,1;blend,Blend.Add;diffusealpha,0;y,m*yAuxPos);
+			InitCommand=cmd(animate,false;setstate,1;blend,Blend.Add;diffusealpha,0;x,m*xAuxPos);
 			AnimateAuxCommand=cmd(finishtweening;zoom,1;diffusealpha,1 - (1*0.5);sleep,0.1;linear,0.4;diffusealpha,0;zoom,1.125 + (1*0.2));
 		};
 		
 		t[#t+1] = LoadActor(THEME:GetPathG("","THEME-EFFECT_GLOW"))..{
 			Name=GetCommandTitles()[m].name .. "Glow4";
-			InitCommand=cmd(animate,false;setstate,1;blend,Blend.Add;diffusealpha,0;y,m*yAuxPos);
+			InitCommand=cmd(animate,false;setstate,1;blend,Blend.Add;diffusealpha,0;x,m*xAuxPos);
 			AnimateAuxCommand=cmd(finishtweening;zoom,1;diffusealpha,1 - (1*0.5);sleep,0.1;linear,0.4;diffusealpha,0;zoom,1.125 + (1*0.2));
 		};	
 		
@@ -833,7 +837,7 @@ function CreateModForPlayer(player)
   
 	t[#t+1] = LoadActor(THEME:GetPathG("","CommandWindow/AVicon"))..{
 		Name="AVBack";
-		InitCommand=cmd(visible,false;y,2*yAuxPos;zoom,0.5);
+		InitCommand=cmd(visible,false;x,2*xAuxPos;zoom,0.5);
 		OnCommand=function(self)
 			if getAVNum(player) ~= nil then
 				self:diffusealpha(0.25);
@@ -884,10 +888,10 @@ function CreateModForPlayer(player)
 
 	t[#t+1] = LoadFont("interphase/InterNumber numbers").. {
 		Name="AVText";
-		InitCommand=cmd(visible,false;y,2*yAuxPos - 5;zoom,.42;);
+		InitCommand=cmd(visible,false;x,2*xAuxPos - 1;zoom,.42;);
 		OnCommand=function(self)
 			self:horizalign(center);
-			self:x(-1);
+			self:y(-5);
 			if getAVNum(player) ~= nil then
 				self:settext(getAVNum(player));
 			else
@@ -932,7 +936,7 @@ function CreateModForPlayer(player)
 
 	t[#t+1] = LoadActor(THEME:GetPathG("","CommandWindow/CVicon"))..{
 		Name="CVBack";
-		InitCommand=cmd(visible,false;y,2*yAuxPos;zoom,0.5);
+		InitCommand=cmd(visible,false;x,2*xAuxPos;zoom,0.5);
 		OnCommand=function(self)
 			if getCVNum(player) ~= nil then
 				self:diffusealpha(0.25);
@@ -989,10 +993,10 @@ function CreateModForPlayer(player)
 
 	t[#t+1] = LoadFont("interphase/InterNumber numbers").. {
 		Name="CVText";
-		InitCommand=cmd(visible,false;y,2*yAuxPos - 5;zoom,.42;);
+		InitCommand=cmd(visible,false;x,2*xAuxPos - 1;zoom,.42;);
 		OnCommand=function(self)
 			self:horizalign(center);
-			self:x(-1);
+			self:y(-5);
 			if getCVNum(player) ~= nil then
 				self:settext(getCVNum(player));
 			else
@@ -1052,7 +1056,7 @@ function CreateModForPlayer(player)
 
 	t[#t+1] = LoadActor(THEME:GetPathG("","THEME-EFFECT_GLOW"))..{
 		Name="AVGlow1";
-		InitCommand=cmd(animate,false;setstate,0;blend,Blend.Add;diffusealpha,0;y,2*yAuxPos);
+		InitCommand=cmd(animate,false;setstate,0;blend,Blend.Add;diffusealpha,0;x,2*xAuxPos);
 		AnimateAuxCommand=cmd(finishtweening;zoom,1;diffusealpha,1;sleep,0.1;linear,0.4;diffusealpha,0;zoom,1.125);
 		EnableAVMessageCommand=function(self, params)
 			if params.Player ~= player then return; end;
@@ -1062,7 +1066,7 @@ function CreateModForPlayer(player)
 	
 	t[#t+1] = LoadActor(THEME:GetPathG("","THEME-EFFECT_GLOW"))..{
 		Name="AVGlow2";
-		InitCommand=cmd(animate,false;setstate,1;blend,Blend.Add;diffusealpha,0;y,2*yAuxPos);
+		InitCommand=cmd(animate,false;setstate,1;blend,Blend.Add;diffusealpha,0;x,2*xAuxPos);
 		AnimateAuxCommand=cmd(finishtweening;zoom,1;diffusealpha,1 - (1*0.5);sleep,0.1;linear,0.4;diffusealpha,0;zoom,1.125 + (1*0.2));
 		EnableAVMessageCommand=function(self, params)
 			if params.Player ~= player then return; end;
@@ -1072,7 +1076,7 @@ function CreateModForPlayer(player)
 	
 	t[#t+1] = LoadActor(THEME:GetPathG("","THEME-EFFECT_GLOW"))..{
 		Name="CVGlow1";
-		InitCommand=cmd(animate,false;setstate,0;blend,Blend.Add;diffusealpha,0;y,2*yAuxPos);
+		InitCommand=cmd(animate,false;setstate,0;blend,Blend.Add;diffusealpha,0;x,2*xAuxPos);
 		AnimateAuxCommand=cmd(finishtweening;zoom,1;diffusealpha,1;sleep,0.1;linear,0.4;diffusealpha,0;zoom,1.125);
 		EnableCVMessageCommand=function(self, params)
 			if params.Player ~= player then return; end;
@@ -1082,7 +1086,7 @@ function CreateModForPlayer(player)
 	
 	t[#t+1] = LoadActor(THEME:GetPathG("","THEME-EFFECT_GLOW"))..{
 		Name="CVGlow2";
-		InitCommand=cmd(animate,false;setstate,1;blend,Blend.Add;diffusealpha,0;y,2*yAuxPos);
+		InitCommand=cmd(animate,false;setstate,1;blend,Blend.Add;diffusealpha,0;x,2*xAuxPos);
 		AnimateAuxCommand=cmd(finishtweening;zoom,1;diffusealpha,1 - (1*0.5);sleep,0.1;linear,0.4;diffusealpha,0;zoom,1.125 + (1*0.2));
 		EnableCVMessageCommand=function(self, params)
 			if params.Player ~= player then return; end;
@@ -1091,7 +1095,7 @@ function CreateModForPlayer(player)
 	};
 
 	t[#t+1] = LoadActor(THEME:GetPathG("","CommandWindow/AUTOicon"))..{
-		InitCommand=cmd(visible,false;y,yAuxPos);
+		InitCommand=cmd(visible,false;x,xAuxPos);
 		OnCommand=function(self)
 			if (GAMESTATE:IsHumanPlayer(player)) then
 				local cur_scr = SCREENMAN:GetTopScreen():GetName();
@@ -1109,7 +1113,7 @@ function CreateModForPlayer(player)
 	};
 
 	t[#t+1] = LoadActor(THEME:GetPathG("","THEME-EFFECT_GLOW"))..{
-		InitCommand=cmd(y,yAuxPos;animate,false;setstate,0;blend,Blend.Add;diffusealpha,0);
+		InitCommand=cmd(x,xAuxPos;animate,false;setstate,0;blend,Blend.Add;diffusealpha,0);
 		OnCommand=function(self)
 			if (GAMESTATE:IsHumanPlayer(player)) then
 				local cur_scr = SCREENMAN:GetTopScreen():GetName();

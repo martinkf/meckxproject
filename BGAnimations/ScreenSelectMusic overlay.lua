@@ -1898,7 +1898,7 @@ t[#t+1] =  Def.ActorFrame
 
 	LoadActor("ScreenSelectMusicLua/ScreenSelectMusicModIcons") .. {
 		CreateModForPlayer(PLAYER_1);
-		InitCommand=cmd(xy,SCREEN_CENTER_X-608,SCREEN_CENTER_Y-257);
+		InitCommand=cmd(xy,SCREEN_CENTER_X-594,SCREEN_CENTER_Y-276);
 		OnCommand=cmd(visible,GAMESTATE:GetGameMode() ~= "Quest");
 		PlayerJoinedMessageCommand=function(self,params)
 			if params.Player == PLAYER_1 then 
@@ -1940,7 +1940,7 @@ t[#t+1] =  Def.ActorFrame
 	
 	LoadActor("ScreenSelectMusicLua/ScreenSelectMusicModIcons") .. {
 		CreateModForPlayer(PLAYER_2);
-		InitCommand=cmd(xy,SCREEN_CENTER_X+610,SCREEN_CENTER_Y-257);
+		InitCommand=cmd(xy,SCREEN_CENTER_X+120,SCREEN_CENTER_Y-276);
 		OnCommand=cmd(visible,GAMESTATE:GetGameMode() ~= "Quest");
 		CurrentSongChangedMessageCommand=cmd(queuecommand,"CheckNew");
 		CheckNewCommand=function(self)
