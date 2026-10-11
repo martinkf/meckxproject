@@ -195,26 +195,26 @@ t[#t+1] =  Def.ActorFrame{ --this is a "screen filter" you add to the BGA_P when
 
 --meckx temp - these are all temp quads for future formatting purposes and will be removed eventually
 t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,40,SCREEN_HEIGHT;xy,SCREEN_LEFT,SCREEN_TOP;diffuse,color("#550000");valign,0;halign,0);
+	InitCommand=cmd(zoomto,40,SCREEN_HEIGHT;xy,SCREEN_LEFT,SCREEN_TOP;diffuse,color("#550000");valign,0;halign,0;diffusealpha,0.95;);
 };
 t[#t+1] = LoadFont("_TitleXolonium")..{
 	Text="TEMP ALL SONGS";
 	InitCommand=cmd(xy,SCREEN_LEFT+20,SCREEN_CENTER_Y;zoom,0.66;maxwidth,480;rotationz,270;);
 };
 t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,40,SCREEN_HEIGHT;xy,SCREEN_LEFT+40,SCREEN_TOP;diffuse,color("#000055");valign,0;halign,0);
+	InitCommand=cmd(zoomto,40,SCREEN_HEIGHT;xy,SCREEN_LEFT+40,SCREEN_TOP;diffuse,color("#000055");valign,0;halign,0;diffusealpha,0.95;);
 };
 t[#t+1] = LoadFont("_TitleXolonium")..{
 	Text="TEMP ALL CHARTS";
 	InitCommand=cmd(xy,SCREEN_LEFT+40+20,SCREEN_CENTER_Y;zoom,0.66;maxwidth,480;rotationz,270;);
 };
 t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,SCREEN_WIDTH-80,SCREEN_HEIGHT;xy,SCREEN_LEFT+40+40,SCREEN_TOP;diffuse,color("#ffffff55");valign,0;halign,0;diffusealpha,0;);
+	InitCommand=cmd(zoomto,SCREEN_WIDTH-80,SCREEN_HEIGHT;xy,SCREEN_LEFT+40+40,SCREEN_TOP;diffuse,color("#550000");valign,0;halign,0;diffusealpha,0;);
 	SongChosenMessageCommand=function(self)
 		self:stoptweening();
 		self:decelerate(0.5);
-		self:zoomto(300,SCREEN_HEIGHT);
-		self:diffusealpha(1);
+		self:zoomto(330,SCREEN_HEIGHT);
+		self:diffusealpha(0.95);
 	end;
 	SongUnchosenMessageCommand=function(self)
 		self:stoptweening();
