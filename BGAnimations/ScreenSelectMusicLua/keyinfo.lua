@@ -6,6 +6,28 @@ t[#t+1] = Def.Quad {
 	InitCommand=cmd(zoomto,SCREEN_WIDTH,26;xy,SCREEN_CENTER_X,SCREEN_BOTTOM-13;diffuse,color("#000011"));
 };
 
+--meckx temp - these are all temp quads for future formatting purposes and will be removed eventually
+t[#t+1] = Def.Quad {
+	InitCommand=cmd(zoomto,SCREEN_WIDTH,26;xy,SCREEN_CENTER_X,SCREEN_TOP+13;diffuse,color("#00001177"));
+};
+t[#t+1] = Def.Quad {
+	InitCommand=cmd(zoomto,SCREEN_WIDTH,106;xy,SCREEN_CENTER_X,SCREEN_TOP+53;diffuse,color("#ffff0022"));
+};
+t[#t+1] = Def.Quad {
+	InitCommand=cmd(zoomto,48,588;xy,SCREEN_LEFT+24,SCREEN_TOP+106;diffuse,color("#ff000055");valign,0);
+};
+t[#t+1] = LoadFont("_TitleXolonium")..{
+	Text="TEMP ALL SONGS";
+	InitCommand=cmd(xy,SCREEN_LEFT+24,SCREEN_CENTER_Y+30;zoom,0.8;maxwidth,480;rotationz,270;);
+};
+t[#t+1] = Def.Quad {
+	InitCommand=cmd(zoomto,48,588;xy,SCREEN_LEFT+48+24,SCREEN_TOP+106;diffuse,color("#0000FF55");valign,0);
+};
+t[#t+1] = LoadFont("_TitleXolonium")..{
+	Text="TEMP ALL CHARTS";
+	InitCommand=cmd(xy,SCREEN_LEFT+48+24,SCREEN_CENTER_Y+30;zoom,0.8;maxwidth,480;rotationz,270;);
+};
+
 
 --#######
 --PROFILE
