@@ -1207,7 +1207,7 @@ t[#t+1] =  Def.ActorFrame
 		self:visible(true);
 	end;
 	
-	InitCommand=cmd(y,THEME:GetMetric("ScreenSelectMusic", "MusicWheelY"));
+	InitCommand=cmd(y,THEME:GetMetric("ScreenSelectMusic", "MusicWheelY");visible,false;);
 	
 	Def.Quad{
 		InitCommand=cmd(xy,SCREEN_CENTER_X,-82;rainbow;effectperiod,4;setsize,220,1;faderight,.1;fadeleft,.1;queuecommand,"Ani");	--blend,"BlendMode_Add"
