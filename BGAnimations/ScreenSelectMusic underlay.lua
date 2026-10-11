@@ -188,9 +188,6 @@ t[#t+1] =  Def.ActorFrame{
 		ChannelChosenMessageCommand=cmd(linear,0.3;fadetop,1);
 		SelectChannelMessageCommand=cmd(fadetop,0);
 	};
-	Def.Quad {
-		InitCommand=cmd(zoomto,SCREEN_WIDTH,32;y,-SCREEN_CENTER_Y+16;fadebottom,.75;diffuse,color("#101010"));
-	};
 };
 
 

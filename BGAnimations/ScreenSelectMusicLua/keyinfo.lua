@@ -2,22 +2,9 @@ local t = Def.ActorFrame {}
 local isAspectRatio1610On=isAspectRatio1610();
 local isAspect43On=isAspectRatio43();
 
-t[#t+1] = LoadActor( THEME:GetPathG("","ScreenSelectMusic/bottom_keys") )..{
-		InitCommand=function(self)
-			self:zoom(0.6);
-			self:xy(SCREEN_CENTER_X,SCREEN_CENTER_Y+347);
-			self:fadetop(0.8);
-
-			if isAspectRatio1610On then
-				self:xy(SCREEN_CENTER_X,SCREEN_CENTER_Y-420);
-			end;
-
-			if isAspect43On then
-				self:xy(SCREEN_CENTER_X,SCREEN_CENTER_Y+472);
-			end;
-
-		end;
-}
+t[#t+1] = Def.Quad {
+	InitCommand=cmd(zoomto,SCREEN_WIDTH,26;xy,SCREEN_CENTER_X,SCREEN_BOTTOM-13;diffuse,color("#000011"));
+};
 
 
 --#######
